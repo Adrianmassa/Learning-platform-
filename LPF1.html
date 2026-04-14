@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>學學星球 ✨ 二年級學習平台</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+ 
+:root {
+  --sky: #6ECFF0;
+  --sun: #FFD93D;
+  --grass: #6BCB77;
+  --coral: #FF6B6B;
+  --lavender: #C3A6FF;
+  --peach: #FFB347;
+  --bg: #FFF9F0;
+  --card: #FFFFFF;
+  --text: #2D2D2D;
+  --muted: #8A8A8A;
+  --radius: 24px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.10);
+  --shadow-sm: 0 4px 16px rgba(0,0,0,0.07);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito','Noto Sans TC',sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); overflow-x: hidden; }
+ 
+/* SCREEN */
+.screen { display: none; min-height: 100vh; flex-direction: column; }
+.screen.active { display: flex; }
+ 
+/* TOPBAR */
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:white; box-shadow:0 2px 12px rgba(0,0,0,0.06); position:sticky; top:0; z-index:100; }
+.topbar-back { width:44px; height:44px; border-radius:50%; border:none; background:#F0F0F0; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .15s; }
+.topbar-back:active { transform:scale(.9); }
+.topbar-title { font-size:17px; font-weight:800; }
+.topbar-stars { display:flex; align-items:center; gap:4px; background:var(--sun); padding:6px 14px; border-radius:20px; font-weight:800; font-size:15px; }
+ 
+/* CONTENT */
+.content { flex:1; overflow-y:auto; padding:18px; }
+ 
+/* BUTTONS */
+.btn { display:flex; align-items:center; justify-content:center; gap:10px; border:none; cursor:pointer; font-family:inherit; font-weight:800; border-radius:20px; transition:transform .12s, box-shadow .12s; user-select:none; }
+.btn:active { transform:translateY(4px) scale(.97); }
+.btn-lg { width:100%; padding:20px; font-size:20px; border-radius:24px; }
+.btn-md { padding:14px 28px; font-size:17px; border-radius:18px; }
+.btn-sm { padding:10px 20px; font-size:14px; border-radius:14px; }
+.btn-primary { background:var(--coral); color:white; box-shadow:0 6px 0 #c94040; }
+.btn-primary:active { box-shadow:0 2px 0 #c94040; }
+.btn-green { background:var(--grass); color:white; box-shadow:0 6px 0 #4aaa58; }
+.btn-green:active { box-shadow:0 2px 0 #4aaa58; }
+.btn-blue { background:var(--sky); color:white; box-shadow:0 6px 0 #44aece; }
+.btn-blue:active { box-shadow:0 2px 0 #44aece; }
+.btn-yellow { background:var(--sun); color:#333; box-shadow:0 6px 0 #e0b800; }
+.btn-yellow:active { box-shadow:0 2px 0 #e0b800; }
+.btn-purple { background:var(--lavender); color:white; box-shadow:0 6px 0 #9c78e0; }
+.btn-purple:active { box-shadow:0 2px 0 #9c78e0; }
+.btn-ghost { background:#F0F0F0; color:var(--text); box-shadow:0 4px 0 #D0D0D0; }
+.btn-ghost:active { box-shadow:0 2px 0 #D0D0D0; }
+.btn-disabled { background:#E0E0E0 !important; color:#AAA !important; box-shadow:none !important; cursor:not-allowed; pointer-events:none; }
+ 
+/* PROGRESS */
+.progress-wrap { background:#F0F0F0; border-radius:12px; height:14px; overflow:hidden; margin:8px 0; }
+.progress-bar { height:100%; border-radius:12px; background:linear-gradient(90deg,var(--grass),var(--sky)); transition:width .5s ease; }
+ 
+/* Q DOTS */
+.q-dots { display:flex; gap:6px; }
+.q-dot { width:10px; height:10px; border-radius:50%; background:#E0E0E0; transition:background .3s; }
+.q-dot.done { background:var(--grass); }
+.q-dot.current { background:var(--coral); transform:scale(1.3); }
+ 
+/* ── HOME ── */
+#screen-home { background:linear-gradient(170deg,#E8F7FF 0%,#FFF9F0 60%); }
+.home-hero { padding:30px 20px 10px; text-align:center; }
+.home-planet { font-size:80px; animation:float 3s ease-in-out infinite; display:block; margin:0 auto 10px; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+.home-title { font-size:32px; font-weight:900; }
+.home-sub { font-size:16px; color:var(--muted); margin-top:6px; font-weight:600; }
+.home-stars-badge { display:inline-flex; align-items:center; gap:6px; background:var(--sun); padding:8px 20px; border-radius:20px; font-weight:900; font-size:18px; margin:16px auto 0; }
+.home-menu { padding:20px; display:flex; flex-direction:column; gap:14px; }
+.home-btn-card { border-radius:24px; padding:22px 20px; display:flex; align-items:center; gap:16px; cursor:pointer; border:none; font-family:inherit; font-weight:800; font-size:19px; color:white; text-align:left; transition:transform .12s, box-shadow .12s; box-shadow:var(--shadow); width:100%; }
+.home-btn-card .icon { font-size:38px; flex-shrink:0; }
+.hbc-1 { background:linear-gradient(135deg,#FF6B6B,#FF8E53); box-shadow:0 8px 0 #c94040; }
+.hbc-1:active { box-shadow:0 3px 0 #c94040; transform:translateY(5px) scale(.98); }
+.hbc-2 { background:linear-gradient(135deg,#6ECFF0,#43A8D0); box-shadow:0 8px 0 #3088b0; }
+.hbc-2:active { box-shadow:0 3px 0 #3088b0; transform:translateY(5px) scale(.98); }
+.hbc-3 { background:linear-gradient(135deg,#C3A6FF,#9B6FEF); box-shadow:0 8px 0 #7a4fd0; }
+.hbc-3:active { box-shadow:0 3px 0 #7a4fd0; transform:translateY(5px) scale(.98); }
+.home-btn-text { display:flex; flex-direction:column; }
+.home-btn-text span:last-child { font-size:14px; font-weight:600; opacity:.85; margin-top:2px; }
+ 
+/* ── SUBJECT ── */
+.subject-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.subject-card { border-radius:24px; padding:24px 16px; text-align:center; cursor:pointer; border:none; font-family:inherit; transition:transform .15s; box-shadow:var(--shadow); }
+.subject-card:active { transform:scale(.95); }
+.subject-card .s-icon { font-size:52px; display:block; margin-bottom:10px; }
+.subject-card .s-name { font-size:20px; font-weight:900; color:white; }
+.subject-card .s-pub { font-size:13px; font-weight:600; color:rgba(255,255,255,0.8); margin-top:4px; }
+.sc-chinese { background:linear-gradient(135deg,#FF6B6B,#FF9A9A); box-shadow:0 8px 0 #c94040; }
+.sc-locked { background:linear-gradient(135deg,#CCC,#AAA); box-shadow:0 8px 0 #888; cursor:not-allowed; }
+.lock-chip { display:inline-block; background:rgba(0,0,0,0.15); color:white; font-size:12px; font-weight:700; padding:4px 10px; border-radius:10px; margin-top:6px; }
+ 
+/* ── UNIT LIST ── */
+.unit-card { border-radius:20px; padding:18px 20px; margin-bottom:14px; cursor:pointer; border:none; font-family:inherit; text-align:left; width:100%; display:flex; align-items:center; gap:16px; box-shadow:var(--shadow-sm); transition:transform .15s; background:white; border-left:6px solid transparent; }
+.unit-card:active { transform:scale(.98); }
+.unit-card.uc-active { border-left-color:var(--coral); }
+.unit-card.uc-done { border-left-color:var(--grass); }
+.unit-card.uc-locked { opacity:.5; cursor:not-allowed; }
+.unit-num { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; color:white; flex-shrink:0; }
+.un-active { background:var(--coral); }
+.un-done { background:var(--grass); }
+.un-locked { background:#CCC; }
+.unit-info { flex:1; }
+.unit-title { font-size:17px; font-weight:800; }
+.unit-sub { font-size:13px; color:var(--muted); margin-top:3px; }
+.unit-badges { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.badge { padding:4px 10px; border-radius:10px; font-size:12px; font-weight:700; }
+.badge-done { background:#D4F5DB; color:#2e7d32; }
+.badge-todo { background:#FFE8D6; color:#e65100; }
+.badge-locked { background:#EEE; color:#888; }
+ 
+/* ── QUESTION ENGINE ── */
+.qe-header { padding:14px 18px 0; }
+.qe-mode-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:12px; font-size:13px; font-weight:700; color:white; margin-bottom:10px; }
+.qe-mode-challenge { background:var(--coral); }
+.qe-mode-reinforce { background:var(--peach); color:#333; }
+.qe-mode-explore { background:var(--lavender); }
+.q-counter { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+ 
+.question-body { background:white; border-radius:24px; padding:26px 22px; margin-bottom:14px; box-shadow:var(--shadow-sm); min-height:180px; }
+.q-stem { font-size:21px; font-weight:800; line-height:1.7; color:var(--text); margin-bottom:18px; }
+ 
+/* Options */
+.options-grid { display:flex; flex-direction:column; gap:11px; }
+.option-btn { border:3px solid #E8E8E8; background:white; border-radius:18px; padding:15px 18px; font-family:inherit; font-size:18px; font-weight:700; color:var(--text); cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px; transition:border-color .15s, background .15s; }
+.option-btn:active { transform:scale(.98); }
+.option-btn.selected { border-color:var(--sky); background:#EDF7FF; }
+.option-btn.correct { border-color:var(--grass); background:#EDFBF0; }
+.option-btn.wrong { border-color:var(--coral); background:#FFF0F0; }
+.option-letter { width:34px; height:34px; border-radius:50%; background:#F0F0F0; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:900; flex-shrink:0; transition:background .15s; }
+.selected .option-letter { background:var(--sky); color:white; }
+.correct .option-letter { background:var(--grass); color:white; }
+.wrong .option-letter { background:var(--coral); color:white; }
+ 
+/* Fill blank */
+.fill-input { width:100%; border:3px solid #E8E8E8; border-radius:16px; padding:15px 18px; font-family:inherit; font-size:21px; font-weight:700; color:var(--text); outline:none; margin-top:8px; transition:border-color .15s; }
+.fill-input:focus { border-color:var(--sky); }
+.fill-input.correct { border-color:var(--grass); background:#EDFBF0; }
+.fill-input.wrong { border-color:var(--coral); background:#FFF0F0; }
+/* For fill_blank with options, show as choices */
+.fill-choices { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+ 
+/* Sentence building chips */
+.sentence-chips { display:flex; flex-wrap:wrap; gap:10px; margin:12px 0; }
+.chip { padding:10px 18px; border-radius:14px; font-size:17px; font-weight:700; cursor:pointer; transition:transform .1s, opacity .1s; border:none; font-family:inherit; }
+.chip:active { transform:scale(.93); }
+.chip-source { background:#EEE; color:var(--text); }
+.chip-source.used { opacity:.3; pointer-events:none; }
+.chip-answer-sel { background:var(--sky); color:white; }
+.sentence-answer-area { min-height:54px; border:3px dashed #D0D0D0; border-radius:16px; padding:10px 14px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:#FAFAFA; margin:10px 0; }
+ 
+/* Handwrite */
+.handwrite-panel { background:linear-gradient(135deg,#FFF9E0,#FFFDF5); border:3px dashed var(--sun); border-radius:20px; padding:22px; text-align:center; }
+.hw-icon { font-size:52px; margin-bottom:10px; }
+.hw-title { font-size:19px; font-weight:900; margin-bottom:6px; }
+.hw-desc { font-size:14px; color:var(--muted); font-weight:600; line-height:1.7; }
+.hw-chars { display:flex; justify-content:center; gap:14px; margin:18px 0; flex-wrap:wrap; }
+.hw-char-box { width:68px; height:68px; border:3px solid var(--sun); border-radius:14px; background:white; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:900; box-shadow:0 4px 12px rgba(255,217,61,0.2); }
+.hw-note { font-size:12px; color:#BBB; margin-top:6px; font-weight:600; }
+ 
+/* Feedback */
+.feedback-panel { border-radius:18px; padding:18px; margin-top:10px; }
+.feedback-panel.correct { background:#EDFBF0; border:2px solid var(--grass); }
+.feedback-panel.wrong { background:#FFF0F0; border:2px solid var(--coral); }
+.feedback-panel.neutral { background:#F0F0FF; border:2px solid var(--lavender); }
+.feedback-icon { font-size:32px; margin-bottom:4px; }
+.feedback-title { font-size:17px; font-weight:900; }
+.feedback-text { font-size:14px; color:#555; margin-top:5px; font-weight:600; line-height:1.7; }
+ 
+/* Q footer */
+.q-footer { padding:0 18px 24px; display:flex; flex-direction:column; gap:11px; }
+ 
+/* ── RESULT ── */
+#screen-result { background:linear-gradient(160deg,#FFF0E0,#FFF9F0); }
+.result-hero { text-align:center; padding:32px 20px 16px; }
+.result-emoji { font-size:88px; animation:pop .5s ease-out; }
+@keyframes pop { 0%{transform:scale(0);opacity:0} 70%{transform:scale(1.2)} 100%{transform:scale(1);opacity:1} }
+.result-title { font-size:28px; font-weight:900; margin-top:10px; }
+.result-sub { font-size:15px; color:var(--muted); font-weight:600; margin-top:5px; }
+.result-score-card { background:white; border-radius:26px; padding:24px; margin:0 18px; box-shadow:var(--shadow); display:flex; justify-content:space-around; align-items:center; }
+.score-item { text-align:center; }
+.score-num { font-size:40px; font-weight:900; }
+.score-label { font-size:13px; color:var(--muted); font-weight:600; margin-top:4px; }
+.score-divider { width:2px; height:56px; background:#EEE; }
+.stars-earned { display:flex; justify-content:center; gap:8px; margin:18px 0; }
+.star-earned { font-size:40px; animation:starPop .4s ease-out both; }
+@keyframes starPop { 0%{transform:scale(0) rotate(-30deg)} 70%{transform:scale(1.2) rotate(10deg)} 100%{transform:scale(1) rotate(0)} }
+.star-earned:nth-child(2){animation-delay:.15s}
+.star-earned:nth-child(3){animation-delay:.3s}
+.star-earned:nth-child(4){animation-delay:.45s}
+.star-earned:nth-child(5){animation-delay:.6s}
+.result-msg { text-align:center; font-size:17px; font-weight:700; margin:0 18px 18px; padding:14px; background:white; border-radius:16px; box-shadow:var(--shadow-sm); }
+ 
+/* ── CLEAR ── */
+#screen-clear { background:linear-gradient(160deg,#E8F7FF,#FFF9F0); text-align:center; }
+.clear-confetti { font-size:96px; margin:36px 0 8px; animation:spin .8s ease-out; }
+@keyframes spin { 0%{transform:rotate(-20deg) scale(0);opacity:0} 60%{transform:rotate(10deg) scale(1.15)} 100%{transform:rotate(0) scale(1);opacity:1} }
+.clear-title { font-size:32px; font-weight:900; }
+.clear-sub { font-size:15px; color:var(--muted); font-weight:600; margin:8px 20px 0; line-height:1.7; }
+.celebration-emojis { display:flex; justify-content:center; gap:8px; font-size:24px; margin:12px 0; }
+.unlock-card { margin:20px; background:linear-gradient(135deg,#C3A6FF,#9B6FEF); border-radius:24px; padding:22px; color:white; box-shadow:0 8px 0 #7a4fd0; }
+.unlock-icon { font-size:48px; margin-bottom:8px; }
+.unlock-title { font-size:21px; font-weight:900; }
+.unlock-sub { font-size:14px; opacity:.85; font-weight:600; margin-top:5px; }
+ 
+/* ── PROGRESS ── */
+.progress-hero { background:linear-gradient(135deg,var(--lavender),#9B6FEF); border-radius:24px; padding:22px; color:white; margin-bottom:18px; text-align:center; }
+.progress-hero-stars { font-size:44px; font-weight:900; }
+.progress-hero-label { font-size:15px; opacity:.85; font-weight:600; margin-top:4px; }
+.progress-section-title { font-size:15px; font-weight:800; color:var(--muted); margin-bottom:12px; }
+.achievement-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px; }
+.achievement-card { background:white; border-radius:18px; padding:16px; text-align:center; box-shadow:var(--shadow-sm); }
+.achievement-icon { font-size:34px; margin-bottom:6px; }
+.achievement-label { font-size:12px; font-weight:700; color:var(--muted); }
+.achievement-val { font-size:22px; font-weight:900; }
+.unit-progress-card { background:white; border-radius:20px; padding:18px; margin-bottom:12px; box-shadow:var(--shadow-sm); }
+.upc-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.upc-num { width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; color:white; flex-shrink:0; }
+.upc-title { font-size:16px; font-weight:800; }
+.upc-theme { font-size:12px; color:var(--muted); font-weight:600; margin-top:2px; }
+.mode-progress-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.mode-label { width:48px; font-size:11px; font-weight:700; padding:4px 6px; border-radius:8px; text-align:center; flex-shrink:0; }
+.ml-challenge { background:#FFE8E8; color:#c94040; }
+.ml-reinforce { background:#FFF0D6; color:#e65100; }
+.ml-explore { background:#EEE8FF; color:#7a4fd0; }
+.mode-pct { font-size:12px; font-weight:700; color:var(--muted); width:36px; text-align:right; }
+.spacer { height:16px; }
+</style>
+</head>
+<body>
+ 
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="home-hero">
+    <span class="home-planet">🌏</span>
+    <div class="home-title">學學星球</div>
+    <div class="home-sub">國小二年級 ✨ 下學期</div>
+    <div class="home-stars-badge">⭐ <span id="home-total-stars">0</span> 顆星</div>
+  </div>
+  <div class="home-menu">
+    <button class="home-btn-card hbc-1" onclick="goTo('screen-subject')">
+      <span class="icon">🚀</span>
+      <span class="home-btn-text">
+        <span>開始單元挑戰</span>
+        <span>選科目，開始學習！</span>
+      </span>
+    </button>
+    <button class="home-btn-card hbc-2" onclick="goTo('screen-subject')">
+      <span class="icon">🔄</span>
+      <span class="home-btn-text">
+        <span>再練一次</span>
+        <span>複習做過的題目</span>
+      </span>
+    </button>
+    <button class="home-btn-card hbc-3" onclick="goTo('screen-progress')">
+      <span class="icon">📊</span>
+      <span class="home-btn-text">
+        <span>我的進度</span>
+        <span>看看星星和成就</span>
+      </span>
+    </button>
+  </div>
+</div>
+ 
+<!-- SUBJECT -->
+<div id="screen-subject" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <span class="topbar-title">選科目</span>
+    <div class="topbar-stars">⭐ <span class="star-display">0</span></div>
+  </div>
+  <div class="content">
+    <div class="spacer"></div>
+    <div class="subject-grid">
+      <button class="subject-card sc-chinese" onclick="goToUnits('chinese')">
+        <span class="s-icon">📖</span>
+        <div class="s-name">國語</div>
+        <div class="s-pub">康軒版</div>
+      </button>
+      <button class="subject-card sc-locked" disabled>
+        <span class="s-icon">🔢</span>
+        <div class="s-name">數學</div>
+        <div class="s-pub">翰林版</div>
+        <div class="lock-chip">🔒 即將開放</div>
+      </button>
+      <button class="subject-card sc-locked" disabled>
+        <span class="s-icon">🌍</span>
+        <div class="s-name">生活</div>
+        <div class="lock-chip">🔒 即將開放</div>
+      </button>
+      <button class="subject-card sc-locked" disabled>
+        <span class="s-icon">🎨</span>
+        <div class="s-name">藝術</div>
+        <div class="lock-chip">🔒 即將開放</div>
+      </button>
+    </div>
+  </div>
+</div>
+ 
+<!-- UNIT LIST -->
+<div id="screen-units" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <span class="topbar-title" id="units-title">國語單元</span>
+    <div class="topbar-stars">⭐ <span class="star-display">0</span></div>
+  </div>
+  <div class="content">
+    <div id="units-list"></div>
+  </div>
+</div>
+ 
+<!-- QUESTION ENGINE -->
+<div id="screen-question" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="confirmQuit()">✕</button>
+    <span class="topbar-title" id="q-topbar-title">挑戰關</span>
+    <div class="topbar-stars">⭐ <span class="star-display">0</span></div>
+  </div>
+  <div class="qe-header">
+    <div id="q-mode-chip" class="qe-mode-chip qe-mode-challenge">🎯 挑戰關</div>
+    <div class="q-counter">
+      <span id="q-counter-text" style="font-weight:800;font-size:14px;color:var(--muted)">第 1 / 5 題</span>
+      <div class="q-dots" id="q-dots"></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="q-progress-bar" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="content" style="padding-top:14px;">
+    <div id="question-render"></div>
+  </div>
+  <div class="q-footer" id="q-footer"></div>
+</div>
+ 
+<!-- RESULT -->
+<div id="screen-result" class="screen">
+  <div class="topbar" style="background:transparent;box-shadow:none;">
+    <div></div>
+    <span class="topbar-title">挑戰結果</span>
+    <div></div>
+  </div>
+  <div class="result-hero">
+    <div class="result-emoji" id="result-emoji">🎉</div>
+    <div class="result-title" id="result-title">超棒的！</div>
+    <div class="result-sub" id="result-sub">你完成了挑戰關！</div>
+  </div>
+  <div class="result-score-card">
+    <div class="score-item">
+      <div class="score-num" id="result-correct" style="color:var(--grass)">0</div>
+      <div class="score-label">答對題數</div>
+    </div>
+    <div class="score-divider"></div>
+    <div class="score-item">
+      <div class="score-num" id="result-total">0</div>
+      <div class="score-label">總題數</div>
+    </div>
+    <div class="score-divider"></div>
+    <div class="score-item">
+      <div class="score-num" id="result-stars-earned" style="color:var(--sun)">+0⭐</div>
+      <div class="score-label">獲得星星</div>
+    </div>
+  </div>
+  <div class="stars-earned" id="result-stars-display"></div>
+  <div class="result-msg" id="result-msg">繼續加油！</div>
+  <div style="padding:0 18px 30px;display:flex;flex-direction:column;gap:12px;">
+    <button class="btn btn-lg btn-green" onclick="startReinforce()">💪 進入補強關</button>
+    <button class="btn btn-lg btn-ghost" onclick="goTo('screen-units')">回單元列表</button>
+  </div>
+</div>
+ 
+<!-- CLEAR 通關 -->
+<div id="screen-clear" class="screen">
+  <div class="clear-confetti">🏆</div>
+  <div class="clear-title">恭喜通關！</div>
+  <div class="clear-sub">挑戰關 ＋ 補強關都完成了！<br>你真的很棒！</div>
+  <div class="celebration-emojis">🎊 🎉 🌟 ✨ 🎈</div>
+  <div class="unlock-card">
+    <div class="unlock-icon">🔭</div>
+    <div class="unlock-title">🔓 探索關已解鎖！</div>
+    <div class="unlock-sub">去發現更多有趣的知識吧！</div>
+  </div>
+  <div style="padding:0 18px 30px;display:flex;flex-direction:column;gap:12px;">
+    <button class="btn btn-lg btn-purple" onclick="startExplore()">🔭 進入探索關</button>
+    <button class="btn btn-lg btn-ghost" onclick="goTo('screen-units')">回單元列表</button>
+  </div>
+</div>
+ 
+<!-- PROGRESS -->
+<div id="screen-progress" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <span class="topbar-title">我的進度</span>
+    <div class="topbar-stars">⭐ <span class="star-display">0</span></div>
+  </div>
+  <div class="content">
+    <div class="progress-hero">
+      <div class="progress-hero-stars">⭐ <span id="progress-total-stars">0</span></div>
+      <div class="progress-hero-label">累積星星數</div>
+    </div>
+    <div class="progress-section-title">🏅 學習成就</div>
+    <div class="achievement-grid">
+      <div class="achievement-card"><div class="achievement-icon">🎯</div><div class="achievement-val" id="ach-challenge">0</div><div class="achievement-label">挑戰關完成</div></div>
+      <div class="achievement-card"><div class="achievement-icon">💪</div><div class="achievement-val" id="ach-reinforce">0</div><div class="achievement-label">補強關完成</div></div>
+      <div class="achievement-card"><div class="achievement-icon">🔭</div><div class="achievement-val" id="ach-explore">0</div><div class="achievement-label">探索關完成</div></div>
+      <div class="achievement-card"><div class="achievement-icon">✍️</div><div class="achievement-val" id="ach-handwrite">0</div><div class="achievement-label">手寫任務完成</div></div>
+    </div>
+    <div class="progress-section-title">📚 國語單元進度</div>
+    <div id="progress-unit-list"></div>
+  </div>
+</div>
+ 
+<script>
+// ══════════════════════════════════════════════════════
+//  STATIC DATA  ── 三張資料表（直接使用您提供的 JSON）
+// ══════════════════════════════════════════════════════
+const DB = {
+  units: [
+    {
+      unit_id: "g2_ch_kanox_s2_l01",
+      subject: "chinese",
+      grade: "國小二年級",
+      semester: "下學期",
+      version: "康軒",
+      lesson_order: 1,
+      unit_title: "春天的顏色",
+      theme: "觀察春天景物與顏色，學習用句子表達看見的景象。"
+    }
+  ],
+ 
+  knowledge_points: [
+    { kp_id:"kp_l01_001", unit_id:"g2_ch_kanox_s2_l01", kp_type:"lesson_theme", kp_title:"課文主題", kp_content:"春天有不同顏色，不同小動物看到不同景物。", common_errors:["只記得顏色或只記得角色"], challenge_allowed:true, exploration_allowed:true },
+    { kp_id:"kp_l01_002", unit_id:"g2_ch_kanox_s2_l01", kp_type:"character_scene_mapping", kp_title:"角色與景物配對", kp_content:["小蜜蜂→粉紅的桃花","小燕子→五顏六色的景色","小青蛙→淡藍的天空","小田鼠→青綠的草地"], common_errors:["角色和景物配錯"], challenge_allowed:true, exploration_allowed:true },
+    { kp_id:"kp_l01_003", unit_id:"g2_ch_kanox_s2_l01", kp_type:"core_vocabulary", kp_title:"核心詞語", kp_content:["燕子","小蜜蜂","桃花","粉紅","高興","蜂窩","景色","到處","五顏六色","彩虹","池塘","天空","小田鼠","地洞","草地","青綠","淡藍","藍色","綠色"], common_errors:["詞語與圖像連結不足"], challenge_allowed:true, exploration_allowed:true },
+    { kp_id:"kp_l01_004", unit_id:"g2_ch_kanox_s2_l01", kp_type:"radical", kp_title:"土部識字", kp_content:["土","地","塘","城","堡"], common_errors:["部首辨識混淆"], challenge_allowed:true, exploration_allowed:true },
+    { kp_id:"kp_l01_005", unit_id:"g2_ch_kanox_s2_l01", kp_type:"radical_words", kp_title:"土部相關詞語", kp_content:["土地","地面","池塘","水塘","城鎮","城市","古堡","堡壘"], common_errors:["相關詞語不熟"], challenge_allowed:true, exploration_allowed:true },
+    { kp_id:"kp_l01_006", unit_id:"g2_ch_kanox_s2_l01", kp_type:"polyphonic_word", kp_title:"多音字：興", kp_content:{"ㄒㄧㄥ":["高興","興趣"],"ㄒㄧㄥˋ":["興奮","興建"]}, common_errors:["讀音混淆"], challenge_allowed:true, exploration_allowed:false },
+    { kp_id:"kp_l01_007", unit_id:"g2_ch_kanox_s2_l01", kp_type:"emotion_words", kp_title:"情緒詞語", kp_content:["高興","快樂","開心","笑咪咪","興奮"], common_errors:["情緒詞和景物詞混淆"], challenge_allowed:true, exploration_allowed:true },
+    { kp_id:"kp_l01_008", unit_id:"g2_ch_kanox_s2_l01", kp_type:"sentence_pattern", kp_title:"課文句型", kp_content:"小動物 + 動作 + 地點，一眼就看見 + 顏色 + 景物。", common_errors:["句型順序錯誤"], challenge_allowed:true, exploration_allowed:true },
+    { kp_id:"kp_l01_009", unit_id:"g2_ch_kanox_s2_l01", kp_type:"writing_characters", kp_title:"第一課會寫字", kp_content:["顏","池","塘","田","洞","窩","色","草","蜂","粉","桃"], common_errors:["部首與字形混淆"], challenge_allowed:true, exploration_allowed:true },
+    { kp_id:"kp_l01_010", unit_id:"g2_ch_kanox_s2_l01", kp_type:"text_comprehension", kp_title:"課文理解", kp_content:["小蜜蜂飛出蜂窩看見粉紅的桃花","小燕子從很遠的地方飛來看見五顏六色的景色","小青蛙跳出池塘看見淡藍的天空","小田鼠跑出地洞看見青綠的草地"], common_errors:["角色動作地點混淆"], challenge_allowed:true, exploration_allowed:true }
+  ],
+ 
+  questions: [
+    // ── CHALLENGE ─────────────────────────────────────────
+    { question_id:"q_l01_001", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_002", mode_type:"challenge", question_type:"single_choice", response_mode:"onscreen", stem:"小蜜蜂看見什麼？", options:["青綠的草地","粉紅的桃花","淡藍的天空","五顏六色的景色"], answer:"粉紅的桃花", explanation:"課文中小蜜蜂飛出蜂窩後，看見粉紅的桃花。", difficulty:1 },
+    { question_id:"q_l01_002", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_002", mode_type:"challenge", question_type:"single_choice", response_mode:"onscreen", stem:"小青蛙看見什麼？", options:["淡藍的天空","粉紅的桃花","青綠的草地","彩虹"], answer:"淡藍的天空", explanation:"小青蛙跳出池塘後，看見淡藍的天空。", difficulty:1 },
+    { question_id:"q_l01_003", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_010", mode_type:"challenge", question_type:"single_choice", response_mode:"onscreen", stem:"小田鼠跑出哪裡？", options:["池塘","蜂窩","地洞","花園"], answer:"地洞", explanation:"課文中小田鼠跑出地洞。", difficulty:1 },
+    { question_id:"q_l01_004", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_002", mode_type:"challenge", question_type:"single_choice", response_mode:"onscreen", stem:"小燕子覺得春天的顏色像什麼？", options:["草地","彩虹","桃花","池塘"], answer:"彩虹", explanation:"小燕子說春天的顏色像彩虹。", difficulty:1 },
+    { question_id:"q_l01_005", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_004", mode_type:"challenge", question_type:"single_choice", response_mode:"onscreen", stem:"哪一個字是土部的字？", options:["花","塘","蜂","青"], answer:"塘", explanation:"「塘」是課本中的土部識字。", difficulty:1 },
+    { question_id:"q_l01_006", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_005", mode_type:"challenge", question_type:"single_choice", response_mode:"onscreen", stem:"哪一組詞語和土部有關？", options:["池塘、地面","桃花、粉紅","燕子、小蜜蜂","天空、彩虹"], answer:"池塘、地面", explanation:"池塘、地面都屬於土部相關詞語。", difficulty:2 },
+    { question_id:"q_l01_007", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_006", mode_type:"challenge", question_type:"single_choice", response_mode:"onscreen", stem:"「高興」的「興」讀哪一個音？", options:["ㄒㄧㄥ","ㄒㄧㄥˋ","ㄏㄧㄥ","ㄏㄨㄥ"], answer:"ㄒㄧㄥ", explanation:"高興、興趣都讀ㄒㄧㄥ。", difficulty:2 },
+    { question_id:"q_l01_008", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_006", mode_type:"challenge", question_type:"single_choice", response_mode:"onscreen", stem:"哪一個詞語的「興」讀作ㄒㄧㄥˋ？", options:["高興","興趣","興奮","很興"], answer:"興奮", explanation:"興奮、興建讀作ㄒㄧㄥˋ。", difficulty:2 },
+    { question_id:"q_l01_009", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_007", mode_type:"challenge", question_type:"single_choice", response_mode:"onscreen", stem:"哪一個是表示開心的詞語？", options:["快樂","池塘","地洞","粉紅"], answer:"快樂", explanation:"快樂是心情好的詞語。", difficulty:1 },
+    { question_id:"q_l01_010", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_008", mode_type:"challenge", question_type:"fill_blank", response_mode:"onscreen", stem:"小青蛙跳出（　），一眼就看見淡藍的天空。", options:["池塘","地洞","蜂窩","花園"], answer:"池塘", explanation:"這是課文原句。", difficulty:1 },
+    { question_id:"q_l01_011", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_008", mode_type:"challenge", question_type:"fill_blank", response_mode:"onscreen", stem:"小田鼠跑出地洞，一眼就看見（　）的草地。", options:["粉紅","青綠","淡藍","五顏六色"], answer:"青綠", explanation:"課文中是青綠的草地。", difficulty:1 },
+    { question_id:"q_l01_012", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_009", mode_type:"challenge", question_type:"single_choice", response_mode:"onscreen", stem:"「池」的部首是什麼？", options:["土","水","木","田"], answer:"水", explanation:"「池」的部首是水。", difficulty:1 },
+    { question_id:"q_l01_hw_001", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_009", mode_type:"challenge", question_type:"writing_task", response_mode:"handwrite_then_confirm", stem:"請先在紙上寫一次「桃」，寫完後按「我寫好了」。", options:[], answer:"桃", explanation:"「桃」是木字旁，右邊是兆。透過手寫熟悉字形與春天景物的連結。", difficulty:1 },
+ 
+    // ── REINFORCEMENT ─────────────────────────────────────
+    { question_id:"q_l01_hw_002", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_004", mode_type:"reinforcement", question_type:"writing_task", response_mode:"handwrite_then_confirm", stem:"請先在紙上寫出「塘」的部首，寫完後按「我寫好了」。", options:[], answer:"土", explanation:"「塘」是土部的字，部首寫在左邊。", difficulty:1 },
+    { question_id:"q_l01_013", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_009", mode_type:"reinforcement", question_type:"single_choice", response_mode:"onscreen", stem:"哪一個字的部首是「虫」？", options:["粉","蜂","桃","窩"], answer:"蜂", explanation:"「蜂」的部首是虫。", difficulty:1 },
+    { question_id:"q_l01_014", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_009", mode_type:"reinforcement", question_type:"single_choice", response_mode:"onscreen", stem:"「草地」的「草」部首是什麼？", options:["艸","木","土","米"], answer:"艸", explanation:"「草」的部首是艸（草字頭）。", difficulty:1 },
+    { question_id:"q_l01_015", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_007", mode_type:"reinforcement", question_type:"single_choice", response_mode:"onscreen", stem:"課文中哪一個不是表示開心的詞？", options:["高興","笑咪咪","開心","城堡"], answer:"城堡", explanation:"城堡不是情緒詞語。", difficulty:1 },
+    { question_id:"q_l01_016", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_004", mode_type:"reinforcement", question_type:"single_choice", response_mode:"onscreen", stem:"哪一個字不是土部相關字？", options:["塘","地","堡","蜂"], answer:"蜂", explanation:"蜂不屬於課本中的土部識字。", difficulty:1 },
+    { question_id:"q_l01_017", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_002", mode_type:"reinforcement", question_type:"single_choice", response_mode:"onscreen", stem:"小燕子看見的是哪一種景象？", options:["淡藍的天空","粉紅的桃花","五顏六色的景色","青綠的草地"], answer:"五顏六色的景色", explanation:"小燕子從很遠的地方飛來，看見五顏六色的景色。", difficulty:1 },
+    { question_id:"q_l01_018", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_008", mode_type:"reinforcement", question_type:"fill_blank", response_mode:"onscreen", stem:"小蜜蜂飛出蜂窩，一眼就看見（　）的桃花。", options:["粉紅","淡藍","青綠","黑色"], answer:"粉紅", explanation:"課文中桃花是粉紅色的。", difficulty:1 },
+ 
+    // ── EXPLORATION ───────────────────────────────────────
+    { question_id:"q_l01_hw_003", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_008", mode_type:"exploration", question_type:"writing_task", response_mode:"handwrite_then_confirm", stem:"請在紙上用「高興」寫一句短句，寫完後按「我寫好了」。", options:[], answer:"高興造句", explanation:"這題重點是練習把詞語用進句子裡，例如：春天來了，我感到好高興！", difficulty:2 },
+    { question_id:"q_l01_019", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_008", mode_type:"exploration", question_type:"sentence_choice", response_mode:"onscreen", stem:"哪一句最像課文的句型？", options:["小青蛙跳出池塘，一眼就看見淡藍的天空。","我今天吃了很多水果。","天空裡有白雲。","我和同學去公園玩。"], answer:"小青蛙跳出池塘，一眼就看見淡藍的天空。", explanation:"這句完整符合本課句型：小動物＋動作＋地點，一眼就看見＋顏色＋景物。", difficulty:2 },
+    { question_id:"q_l01_020", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_008", mode_type:"exploration", question_type:"sentence_building", response_mode:"onscreen", stem:"把詞語排成正確的句子！", options:["小田鼠","跑出","地洞","，","一眼就看見","青綠","的","草地","。"], answer:"小田鼠跑出地洞，一眼就看見青綠的草地。", explanation:"排對了！這是課文中小田鼠的句子。", difficulty:2 },
+    { question_id:"q_l01_021", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_009", mode_type:"exploration", question_type:"single_choice", response_mode:"onscreen", stem:"哪一組字最像春天景物？", options:["桃、草、池","洞、窩、田","顏、色、遠","發、現、從"], answer:"桃、草、池", explanation:"桃、草、池都和春天景物很有關係。", difficulty:2 },
+    { question_id:"q_l01_022", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_007", mode_type:"exploration", question_type:"single_choice", response_mode:"onscreen", stem:"哪一個詞語最適合形容看到春天時的心情？", options:["高興","洞口","池塘","草地"], answer:"高興", explanation:"高興是本課重要情緒詞。", difficulty:1 },
+    { question_id:"q_l01_023", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_002", mode_type:"exploration", question_type:"single_choice", response_mode:"onscreen", stem:"如果你看到淡藍的天空，最像課文中的哪個角色？", options:["小蜜蜂","小田鼠","小青蛙","小燕子"], answer:"小青蛙", explanation:"課文中小青蛙看見淡藍的天空。", difficulty:1 },
+    { question_id:"q_l01_024", unit_id:"g2_ch_kanox_s2_l01", kp_id:"kp_l01_001", mode_type:"exploration", question_type:"single_choice", response_mode:"onscreen", stem:"這一課最主要在說什麼？", options:["春天有不同顏色和景物","如何蓋城堡","如何找地洞","如何養蜜蜂"], answer:"春天有不同顏色和景物", explanation:"本課主題是春天的顏色與景物。", difficulty:1 }
+  ]
+};
+ 
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+const state = {
+  currentScreen: 'screen-home',
+  screenHistory: [],
+  totalStars: 0,
+  currentSubject: null,
+  currentUnit: null,
+  currentMode: null,
+  currentQuestions: [],
+  currentQIndex: 0,
+  correctCount: 0,
+  answered: false,
+  selectedOption: null,
+  sentenceBuilt: [],
+  unitProgress: {
+    "g2_ch_kanox_s2_l01": { challenge:false, reinforcement:false, exploration:false, starsEarned:0, hwDone:0 }
+  }
+};
+ 
+// ══════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════
+function goTo(id) {
+  state.screenHistory.push(state.currentScreen);
+  showScreen(id);
+}
+function goBack() {
+  const prev = state.screenHistory.pop();
+  showScreen(prev || 'screen-home');
+}
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  state.currentScreen = id;
+  syncStars();
+  if (id === 'screen-progress') renderProgress();
+}
+function syncStars() {
+  document.getElementById('home-total-stars').textContent = state.totalStars;
+  document.getElementById('progress-total-stars').textContent = state.totalStars;
+  document.querySelectorAll('.star-display').forEach(el => el.textContent = state.totalStars);
+}
+function confirmQuit() {
+  if (confirm('要離開這一關嗎？進度不會儲存喔！')) goTo('screen-units');
+}
+ 
+// ══════════════════════════════════════════════════════
+//  SUBJECT → UNITS
+// ══════════════════════════════════════════════════════
+function goToUnits(subject) {
+  state.currentSubject = subject;
+  document.getElementById('units-title').textContent = subject === 'chinese' ? '國語單元' : '數學單元';
+  renderUnitList(subject);
+  goTo('screen-units');
+}
+ 
+function renderUnitList(subject) {
+  const container = document.getElementById('units-list');
+  const units = DB.units.filter(u => u.subject === subject);
+  container.innerHTML = '';
+ 
+  units.forEach((unit, idx) => {
+    const prog = state.unitProgress[unit.unit_id] || {};
+    const isUnlocked = idx === 0 || (state.unitProgress[units[idx-1].unit_id]?.challenge);
+    const isDone = prog.challenge && prog.reinforcement;
+ 
+    const numClass = !isUnlocked ? 'un-locked' : isDone ? 'un-done' : 'un-active';
+    const cardClass = !isUnlocked ? 'uc-locked' : isDone ? 'uc-done' : 'uc-active';
+    const numIcon = !isUnlocked ? '🔒' : isDone ? '✓' : unit.lesson_order;
+ 
+    const modes = [
+      { key:'challenge', label:'挑戰關' },
+      { key:'reinforcement', label:'補強關' },
+      { key:'exploration', label:'探索關' }
+    ];
+    const badges = modes.map(m => {
+      if (!isUnlocked) return `<span class="badge badge-locked">${m.label} 🔒</span>`;
+      if (prog[m.key]) return `<span class="badge badge-done">${m.label} ✓</span>`;
+      return `<span class="badge badge-todo">${m.label}</span>`;
+    }).join('');
+ 
+    const onclick = isUnlocked ? `openUnit('${unit.unit_id}')` : `alert('請先完成前一課！')`;
+    container.innerHTML += `
+      <button class="unit-card ${cardClass}" onclick="${onclick}">
+        <div class="unit-num ${numClass}">${numIcon}</div>
+        <div class="unit-info">
+          <div class="unit-title">第${unit.lesson_order}課　${unit.unit_title}</div>
+          <div class="unit-sub" style="font-size:12px;color:var(--muted);margin-top:4px;">${unit.theme}</div>
+          <div class="unit-badges">${badges}</div>
+        </div>
+      </button>`;
+  });
+}
+ 
+// ══════════════════════════════════════════════════════
+//  OPEN UNIT → AUTO-ROUTE MODE
+// ══════════════════════════════════════════════════════
+function openUnit(unitId) {
+  state.currentUnit = unitId;
+  const prog = state.unitProgress[unitId];
+  if (!prog.challenge) startMode('challenge');
+  else if (!prog.reinforcement) startMode('reinforcement');
+  else if (!prog.exploration) startMode('exploration');
+  else {
+    if (confirm('你已經完成這一課了！要重新挑戰嗎？')) startMode('challenge');
+  }
+}
+ 
+// ══════════════════════════════════════════════════════
+//  START MODE
+// ══════════════════════════════════════════════════════
+function startMode(mode) {
+  state.currentMode = mode;
+  state.currentQuestions = DB.questions.filter(
+    q => q.unit_id === state.currentUnit && q.mode_type === mode
+  );
+  state.currentQIndex = 0;
+  state.correctCount = 0;
+ 
+  const labels = { challenge:'🎯 挑戰關', reinforcement:'💪 補強關', exploration:'🔭 探索關' };
+  const chipCls = { challenge:'qe-mode-challenge', reinforcement:'qe-mode-reinforce', exploration:'qe-mode-explore' };
+  const topbarLabels = { challenge:'挑戰關', reinforcement:'補強關', exploration:'探索關' };
+ 
+  document.getElementById('q-mode-chip').textContent = labels[mode];
+  document.getElementById('q-mode-chip').className = 'qe-mode-chip ' + chipCls[mode];
+  document.getElementById('q-topbar-title').textContent = topbarLabels[mode];
+ 
+  goTo('screen-question');
+  renderQuestion();
+}
+ 
+// ══════════════════════════════════════════════════════
+//  RENDER QUESTION
+// ══════════════════════════════════════════════════════
+function renderQuestion() {
+  const q = state.currentQuestions[state.currentQIndex];
+  const total = state.currentQuestions.length;
+  const idx = state.currentQIndex;
+ 
+  state.answered = false;
+  state.selectedOption = null;
+  state.sentenceBuilt = [];
+ 
+  // Counter & dots
+  document.getElementById('q-counter-text').textContent = `第 ${idx+1} / ${total} 題`;
+  document.getElementById('q-progress-bar').style.width = (idx / total * 100) + '%';
+  const dotsEl = document.getElementById('q-dots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'q-dot ' + (i < idx ? 'done' : i === idx ? 'current' : '');
+    dotsEl.appendChild(d);
+  }
+ 
+  const container = document.getElementById('question-render');
+  const footer = document.getElementById('q-footer');
+  container.innerHTML = '';
+  footer.innerHTML = '';
+ 
+  if (q.response_mode === 'handwrite_then_confirm') {
+    renderHandwrite(q, container, footer);
+  } else if (q.question_type === 'fill_blank') {
+    renderFillBlankChoice(q, container, footer);
+  } else if (q.question_type === 'sentence_building') {
+    renderSentenceBuilding(q, container, footer);
+  } else {
+    // single_choice, sentence_choice
+    renderSingleChoice(q, container, footer);
+  }
+}
+ 
+// ── Single / Sentence Choice ───────────────────────────
+function renderSingleChoice(q, container, footer) {
+  const letters = ['Ａ','Ｂ','Ｃ','Ｄ'];
+  const optsHtml = q.options.map((opt, i) => `
+    <button class="option-btn" id="opt-${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${letters[i]}</span>${opt}
+    </button>`).join('');
+ 
+  container.innerHTML = `
+    <div class="question-body">
+      <div class="q-stem">${q.stem}</div>
+      <div class="options-grid">${optsHtml}</div>
+      <div id="q-feedback" style="margin-top:12px;"></div>
+    </div>`;
+ 
+  footer.innerHTML = `<button class="btn btn-lg btn-primary btn-disabled" id="btn-next" onclick="nextQuestion()">下一題 →</button>`;
+}
+ 
+function selectOption(idx) {
+  if (state.answered) return;
+  const q = state.currentQuestions[state.currentQIndex];
+  state.answered = true;
+  const chosen = q.options[idx];
+  const isCorrect = chosen === q.answer;
+  if (isCorrect) state.correctCount++;
+ 
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    if (q.options[i] === q.answer) btn.classList.add('correct');
+    else if (i === idx && !isCorrect) btn.classList.add('wrong');
+  });
+ 
+  document.getElementById('q-feedback').innerHTML = isCorrect
+    ? `<div class="feedback-panel correct"><div class="feedback-icon">🎉</div><div class="feedback-title">答對了！</div><div class="feedback-text">${q.explanation}</div></div>`
+    : `<div class="feedback-panel wrong"><div class="feedback-icon">🤔</div><div class="feedback-title">再想想…</div><div class="feedback-text">正確答案是「${q.answer}」<br>${q.explanation}</div></div>`;
+ 
+  document.getElementById('btn-next').classList.remove('btn-disabled');
+}
+ 
+// ── Fill Blank (as choice buttons) ────────────────────
+function renderFillBlankChoice(q, container, footer) {
+  const letters = ['Ａ','Ｂ','Ｃ','Ｄ'];
+  const optsHtml = q.options.map((opt, i) => `
+    <button class="option-btn" id="opt-${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${letters[i]}</span>${opt}
+    </button>`).join('');
+ 
+  container.innerHTML = `
+    <div class="question-body">
+      <div class="q-stem">${q.stem}</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:12px;">選出正確的答案填入空格</div>
+      <div class="options-grid">${optsHtml}</div>
+      <div id="q-feedback" style="margin-top:12px;"></div>
+    </div>`;
+ 
+  footer.innerHTML = `<button class="btn btn-lg btn-primary btn-disabled" id="btn-next" onclick="nextQuestion()">下一題 →</button>`;
+}
+ 
+// ── Sentence Building ──────────────────────────────────
+function renderSentenceBuilding(q, container, footer) {
+  state.sentenceBuilt = [];
+  const chipsHtml = q.options.map((opt, i) =>
+    `<button class="chip chip-source" id="chip-${i}" onclick="addChip(${i},'${esc(opt)}')">${opt}</button>`
+  ).join('');
+ 
+  container.innerHTML = `
+    <div class="question-body">
+      <div class="q-stem">${q.stem}</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:8px;">點詞語來排列句子 👇</div>
+      <div class="sentence-answer-area" id="sb-answer"><span style="color:#CCC;font-size:14px;font-weight:600;">點詞語來組句子</span></div>
+      <div class="sentence-chips" id="sb-pool">${chipsHtml}</div>
+      <div id="q-feedback" style="margin-top:10px;"></div>
+    </div>`;
+ 
+  footer.innerHTML = `
+    <button class="btn btn-lg btn-primary" onclick="submitSentence()">確認答案 ✓</button>
+    <button class="btn btn-sm btn-ghost" onclick="clearSentence()">清除重排</button>`;
+}
+ 
+function addChip(idx, val) {
+  const el = document.getElementById('chip-'+idx);
+  if (el.classList.contains('used')) return;
+  el.classList.add('used');
+  state.sentenceBuilt.push({ idx, val });
+  refreshSentenceArea();
+}
+function refreshSentenceArea() {
+  const area = document.getElementById('sb-answer');
+  if (!area) return;
+  if (!state.sentenceBuilt.length) {
+    area.innerHTML = '<span style="color:#CCC;font-size:14px;font-weight:600;">點詞語來組句子</span>';
+    return;
+  }
+  area.innerHTML = '';
+  state.sentenceBuilt.forEach((item, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'chip chip-answer-sel';
+    btn.textContent = item.val;
+    btn.onclick = () => {
+      document.getElementById('chip-'+item.idx).classList.remove('used');
+      state.sentenceBuilt.splice(i, 1);
+      refreshSentenceArea();
+    };
+    area.appendChild(btn);
+  });
+}
+function clearSentence() {
+  state.sentenceBuilt.forEach(item => {
+    const el = document.getElementById('chip-'+item.idx);
+    if (el) el.classList.remove('used');
+  });
+  state.sentenceBuilt = [];
+  refreshSentenceArea();
+}
+function submitSentence() {
+  if (state.answered) return;
+  const q = state.currentQuestions[state.currentQIndex];
+  const built = state.sentenceBuilt.map(i => i.val).join('');
+  if (!built) { alert('請先排列詞語喔！'); return; }
+  state.answered = true;
+  const isCorrect = built === q.answer;
+  if (isCorrect) state.correctCount++;
+ 
+  document.getElementById('q-feedback').innerHTML = isCorrect
+    ? `<div class="feedback-panel correct"><div class="feedback-icon">🎉</div><div class="feedback-title">排對了！</div><div class="feedback-text">${q.explanation}</div></div>`
+    : `<div class="feedback-panel wrong"><div class="feedback-icon">🤔</div><div class="feedback-title">再排排看！</div><div class="feedback-text">正確答案是「${q.answer}」<br>${q.explanation}</div></div>`;
+ 
+  document.getElementById('q-footer').innerHTML = `<button class="btn btn-lg btn-primary" onclick="nextQuestion()">下一題 →</button>`;
+}
+ 
+// ── Handwrite Task ─────────────────────────────────────
+function renderHandwrite(q, container, footer) {
+  let charsHtml = '';
+  const isOpenEnded = !q.answer || q.answer.includes('造句');
+  if (isOpenEnded) {
+    charsHtml = `<div style="margin:16px 0;padding:16px 20px;background:white;border-radius:16px;font-size:20px;font-weight:800;color:#555;text-align:center;border:2px solid var(--sun);line-height:1.8;">${q.stem.replace('請在紙上用「高興」寫一句短句，寫完後按「我寫好了」。','').trim() || '在紙上寫出你的句子'}</div>`;
+  } else {
+    charsHtml = '<div class="hw-chars">';
+    [...q.answer].forEach(ch => {
+      charsHtml += `<div><div class="hw-char-box">${ch}</div><div class="hw-note">在紙上寫</div></div>`;
+    });
+    charsHtml += '</div>';
+  }
+ 
+  container.innerHTML = `
+    <div class="question-body">
+      <div class="q-stem" style="font-size:19px;margin-bottom:16px;">${q.stem}</div>
+      <div class="handwrite-panel">
+        <div class="hw-icon">✍️</div>
+        <div class="hw-title">先在紙上寫！</div>
+        <div class="hw-desc">拿出鉛筆和格子紙，練習寫出來：</div>
+        ${charsHtml}
+        <div class="hw-note">寫好了再按下方按鈕 👇</div>
+      </div>
+      <div id="q-feedback" style="margin-top:12px;"></div>
+    </div>`;
+ 
+  footer.innerHTML = `<button class="btn btn-lg btn-yellow" onclick="confirmHandwrite()">✅ 我寫好了！</button>`;
+}
+ 
+function confirmHandwrite() {
+  if (state.answered) return;
+  state.answered = true;
+  state.correctCount++;
+  state.unitProgress[state.currentUnit].hwDone = (state.unitProgress[state.currentUnit].hwDone || 0) + 1;
+ 
+  const q = state.currentQuestions[state.currentQIndex];
+  document.getElementById('q-feedback').innerHTML = `
+    <div class="feedback-panel neutral">
+      <div class="feedback-icon">✨</div>
+      <div class="feedback-title">寫完了！超棒！</div>
+      <div class="feedback-text">${q.explanation}</div>
+    </div>`;
+  document.getElementById('q-footer').innerHTML = `<button class="btn btn-lg btn-green" onclick="nextQuestion()">繼續 →</button>`;
+}
+ 
+// ══════════════════════════════════════════════════════
+//  NEXT / END
+// ══════════════════════════════════════════════════════
+function nextQuestion() {
+  state.currentQIndex++;
+  if (state.currentQIndex >= state.currentQuestions.length) endMode();
+  else renderQuestion();
+}
+ 
+function endMode() {
+  const mode = state.currentMode;
+  const prog = state.unitProgress[state.currentUnit];
+  prog[mode] = true;
+ 
+  if (mode === 'challenge') {
+    const earned = calcStars(state.correctCount, state.currentQuestions.length);
+    prog.starsEarned = earned;
+    state.totalStars += earned;
+    syncStars();
+    showResult();
+  } else if (mode === 'reinforcement') {
+    state.totalStars += 3;
+    syncStars();
+    showClear();
+  } else {
+    state.totalStars += 5;
+    syncStars();
+    showExploreDone();
+  }
+}
+ 
+function calcStars(correct, total) {
+  const pct = correct / total;
+  if (pct === 1) return 5;
+  if (pct >= 0.8) return 4;
+  if (pct >= 0.6) return 3;
+  if (pct >= 0.4) return 2;
+  return 1;
+}
+ 
+// ══════════════════════════════════════════════════════
+//  RESULT
+// ══════════════════════════════════════════════════════
+function showResult() {
+  const total = state.currentQuestions.length;
+  const correct = state.correctCount;
+  const pct = correct / total;
+  const stars = state.unitProgress[state.currentUnit].starsEarned;
+ 
+  const [emoji, title] = pct === 1 ? ['🤩','全對！你是小天才！'] :
+                          pct >= .6 ? ['🎉','做得很好！'] : ['😊','繼續加油！'];
+ 
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-sub').textContent = `完成挑戰關！答對 ${correct}/${total} 題`;
+  document.getElementById('result-correct').textContent = correct;
+  document.getElementById('result-total').textContent = total;
+  document.getElementById('result-stars-earned').textContent = `+${stars}⭐`;
+ 
+  let starsHtml = '';
+  for (let i = 0; i < 5; i++) {
+    starsHtml += `<span class="star-earned" style="${i >= stars ? 'opacity:.2' : ''}"
+      ${i > 0 ? `style="animation-delay:${i*.15}s;${i >= stars ? 'opacity:.2' : ''}"` : ''}>⭐</span>`;
+  }
+  document.getElementById('result-stars-display').innerHTML = starsHtml;
+ 
+  document.getElementById('result-msg').textContent =
+    pct === 1 ? '完美！繼續去補強關挑戰吧！' :
+    pct >= .6 ? '不錯喔！去補強關再練看看！' :
+                '沒關係！補強關多練習就會了！';
+ 
+  state.screenHistory = [];
+  goTo('screen-result');
+}
+ 
+function startReinforce() { startMode('reinforcement'); }
+ 
+// ══════════════════════════════════════════════════════
+//  CLEAR
+// ══════════════════════════════════════════════════════
+function showClear() {
+  state.screenHistory = [];
+  goTo('screen-clear');
+}
+function startExplore() { startMode('exploration'); }
+ 
+// ══════════════════════════════════════════════════════
+//  EXPLORE DONE
+// ══════════════════════════════════════════════════════
+function showExploreDone() {
+  const unit = DB.units.find(u => u.unit_id === state.currentUnit);
+  document.getElementById('question-render').innerHTML = `
+    <div class="question-body" style="text-align:center;padding:40px 24px;">
+      <div style="font-size:70px;margin-bottom:14px;">🌟</div>
+      <div style="font-size:24px;font-weight:900;margin-bottom:10px;">探索完成！</div>
+      <div style="font-size:15px;color:var(--muted);font-weight:600;line-height:1.8;">
+        你完成了《${unit.unit_title}》全部三關！<br>
+        獲得 ＋5⭐ 星星！<br><br>
+        <span style="font-size:24px;">🎊 🎉 ✨</span>
+      </div>
+    </div>`;
+  document.getElementById('q-footer').innerHTML = `
+    <button class="btn btn-lg btn-purple" onclick="goTo('screen-units')">🏠 回到單元列表</button>
+    <button class="btn btn-lg btn-ghost" onclick="goTo('screen-progress')">📊 看我的進度</button>`;
+}
+ 
+// ══════════════════════════════════════════════════════
+//  PROGRESS
+// ══════════════════════════════════════════════════════
+function renderProgress() {
+  const allProg = Object.values(state.unitProgress);
+  document.getElementById('ach-challenge').textContent = allProg.filter(p => p.challenge).length;
+  document.getElementById('ach-reinforce').textContent = allProg.filter(p => p.reinforcement).length;
+  document.getElementById('ach-explore').textContent = allProg.filter(p => p.exploration).length;
+  document.getElementById('ach-handwrite').textContent = allProg.reduce((s, p) => s + (p.hwDone || 0), 0);
+ 
+  const container = document.getElementById('progress-unit-list');
+  container.innerHTML = '';
+  const colors = ['#FF6B6B','#6ECFF0','#6BCB77'];
+ 
+  DB.units.filter(u => u.subject === 'chinese').forEach((unit, idx) => {
+    const prog = state.unitProgress[unit.unit_id] || {};
+    const color = colors[idx % colors.length];
+    const modes = [
+      { key:'challenge', label:'挑戰', cls:'ml-challenge', color:'var(--coral)' },
+      { key:'reinforcement', label:'補強', cls:'ml-reinforce', color:'var(--peach)' },
+      { key:'exploration', label:'探索', cls:'ml-explore', color:'var(--lavender)' }
+    ];
+    const modesHtml = modes.map(m => `
+      <div class="mode-progress-row">
+        <span class="mode-label ${m.cls}">${m.label}</span>
+        <div class="progress-wrap" style="flex:1;height:10px;margin:0;">
+          <div class="progress-bar" style="width:${prog[m.key]?100:0}%;background:${m.color}"></div>
+        </div>
+        <span class="mode-pct">${prog[m.key]?100:0}%</span>
+      </div>`).join('');
+ 
+    container.innerHTML += `
+      <div class="unit-progress-card">
+        <div class="upc-header">
+          <div class="upc-num" style="background:${color}">${unit.lesson_order}</div>
+          <div style="flex:1;">
+            <div class="upc-title">${unit.unit_title}</div>
+            <div class="upc-theme">${unit.version} ．${unit.semester}</div>
+          </div>
+          <div style="font-weight:900;color:var(--sun);font-size:18px;">
+            ${prog.starsEarned ? '⭐'.repeat(prog.starsEarned) : '—'}
+          </div>
+        </div>
+        ${modesHtml}
+      </div>`;
+  });
+}
+ 
+// ── UTIL ──────────────────────────────────────────────
+function esc(s) { return (s||'').replace(/'/g,"\\'"); }
+ 
+// INIT
+syncStars();
+</script>
+</body>
+</html>
