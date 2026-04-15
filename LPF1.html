@@ -1,0 +1,2924 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>學學星球 ✨ 二年級學習平台</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+:root{
+  --sky:#6ECFF0;--sun:#FFD93D;--grass:#6BCB77;--coral:#FF6B6B;
+  --lavender:#C3A6FF;--peach:#FFB347;--bg:#FFF9F0;--text:#2D2D2D;--muted:#8A8A8A;
+  --teal:#2EC4B6;--orange:#FF9F1C;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito','Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+.screen{display:none;height:100dvh;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+#screen-home,#screen-result,#screen-clear,#screen-progress{overflow-y:auto}
+ 
+/* TOPBAR */
+.topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.06);z-index:10}
+.topbar-back{width:44px;height:44px;border-radius:50%;border:none;background:#F0F0F0;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.topbar-back:active{transform:scale(.9)}
+.topbar-title{font-size:17px;font-weight:800}
+.topbar-stars{display:flex;align-items:center;gap:4px;background:var(--sun);padding:6px 14px;border-radius:20px;font-weight:800;font-size:15px}
+ 
+/* SCROLL */
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 18px 100px}
+ 
+/* FIXED FOOTER */
+.q-fixed-footer{position:fixed;bottom:0;left:0;right:0;padding:12px 18px;padding-bottom:calc(12px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:10px;z-index:20}
+ 
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:inherit;font-weight:800;border-radius:20px;transition:transform .12s,box-shadow .12s;user-select:none;width:100%}
+.btn-lg{padding:18px;font-size:19px;border-radius:22px}
+.btn-sm{padding:10px 20px;font-size:14px;border-radius:14px;width:auto}
+.btn-primary{background:var(--coral);color:#fff;box-shadow:0 5px 0 #c94040}
+.btn-primary:active{box-shadow:0 2px 0 #c94040;transform:translateY(3px) scale(.97)}
+.btn-green{background:var(--grass);color:#fff;box-shadow:0 5px 0 #4aaa58}
+.btn-green:active{box-shadow:0 2px 0 #4aaa58;transform:translateY(3px) scale(.97)}
+.btn-purple{background:var(--lavender);color:#fff;box-shadow:0 5px 0 #9c78e0}
+.btn-purple:active{box-shadow:0 2px 0 #9c78e0;transform:translateY(3px) scale(.97)}
+.btn-teal{background:var(--teal);color:#fff;box-shadow:0 5px 0 #1a9e96}
+.btn-teal:active{box-shadow:0 2px 0 #1a9e96;transform:translateY(3px) scale(.97)}
+.btn-ghost{background:#F0F0F0;color:var(--text);box-shadow:0 4px 0 #D0D0D0}
+.btn-ghost:active{box-shadow:0 2px 0 #D0D0D0;transform:translateY(2px) scale(.97)}
+.btn-disabled{background:#E0E0E0!important;color:#AAA!important;box-shadow:none!important;cursor:not-allowed;pointer-events:none}
+.btn-danger{background:#FF4444;color:#fff;box-shadow:0 4px 0 #cc0000}
+.btn-danger:active{box-shadow:0 2px 0 #cc0000;transform:translateY(2px) scale(.97)}
+ 
+/* PROGRESS BARS */
+.progress-wrap{background:#F0F0F0;border-radius:12px;height:12px;overflow:hidden;margin:8px 0}
+.progress-bar{height:100%;border-radius:12px;background:linear-gradient(90deg,var(--grass),var(--sky));transition:width .5s ease}
+.q-dots{display:flex;gap:5px;flex-wrap:wrap}
+.q-dot{width:9px;height:9px;border-radius:50%;background:#E0E0E0;flex-shrink:0}
+.q-dot.done{background:var(--grass)}.q-dot.current{background:var(--coral);transform:scale(1.3)}
+ 
+/* HOME */
+#screen-home{background:linear-gradient(170deg,#E8F7FF 0%,#FFF9F0 60%)}
+.home-hero{padding:28px 20px 8px;text-align:center}
+.home-planet{font-size:72px;animation:float 3s ease-in-out infinite;display:block;margin:0 auto 8px}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.home-title{font-size:30px;font-weight:900}
+.home-sub{font-size:15px;color:var(--muted);margin-top:5px;font-weight:600}
+.home-stars-badge{display:inline-flex;align-items:center;gap:6px;background:var(--sun);padding:7px 18px;border-radius:20px;font-weight:900;font-size:17px;margin:12px auto 0}
+.home-menu{padding:16px 20px 32px;display:flex;flex-direction:column;gap:12px}
+.hbc{border-radius:22px;padding:20px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;color:#fff;text-align:left;width:100%}
+.hbc .icon{font-size:36px;flex-shrink:0}
+.hbtext{display:flex;flex-direction:column}
+.hbtext span:last-child{font-size:13px;font-weight:600;opacity:.85;margin-top:2px}
+.hbc-1{background:linear-gradient(135deg,#FF6B6B,#FF8E53);box-shadow:0 7px 0 #c94040}
+.hbc-1:active{box-shadow:0 3px 0 #c94040;transform:translateY(4px) scale(.98)}
+.hbc-2{background:linear-gradient(135deg,#6ECFF0,#43A8D0);box-shadow:0 7px 0 #3088b0}
+.hbc-2:active{box-shadow:0 3px 0 #3088b0;transform:translateY(4px) scale(.98)}
+.hbc-3{background:linear-gradient(135deg,#C3A6FF,#9B6FEF);box-shadow:0 7px 0 #7a4fd0}
+.hbc-3:active{box-shadow:0 3px 0 #7a4fd0;transform:translateY(4px) scale(.98)}
+.hbc-4{background:linear-gradient(135deg,#2EC4B6,#1a9e96);box-shadow:0 7px 0 #127a74}
+.hbc-4:active{box-shadow:0 3px 0 #127a74;transform:translateY(4px) scale(.98)}
+ 
+/* SUBJECT */
+.subject-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.subject-card{border-radius:22px;padding:22px 14px;text-align:center;cursor:pointer;border:none;font-family:inherit;transition:transform .15s;box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.subject-card:active{transform:scale(.95)}
+.subject-card .s-icon{font-size:48px;display:block;margin-bottom:8px}
+.subject-card .s-name{font-size:19px;font-weight:900;color:#fff}
+.subject-card .s-pub{font-size:12px;font-weight:600;color:rgba(255,255,255,.8);margin-top:3px}
+.sc-chinese{background:linear-gradient(135deg,#FF6B6B,#FF9A9A);box-shadow:0 7px 0 #c94040}
+.sc-locked{background:linear-gradient(135deg,#CCC,#AAA);box-shadow:0 7px 0 #888;cursor:not-allowed}
+.lock-chip{display:inline-block;background:rgba(0,0,0,.15);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;margin-top:5px}
+ 
+/* UNITS */
+.unit-card{border-radius:18px;padding:16px 18px;margin-bottom:12px;cursor:pointer;border:none;font-family:inherit;text-align:left;width:100%;display:flex;align-items:center;gap:14px;box-shadow:0 4px 14px rgba(0,0,0,.07);background:#fff;border-left:6px solid transparent}
+.unit-card:active{transform:scale(.98)}
+.uc-active{border-left-color:var(--coral)}.uc-done{border-left-color:var(--grass)}.uc-locked{opacity:.5;cursor:not-allowed}
+.unit-num{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:900;color:#fff;flex-shrink:0}
+.un-active{background:var(--coral)}.un-done{background:var(--grass)}.un-locked{background:#CCC}
+.unit-info{flex:1}
+.unit-title{font-size:16px;font-weight:800}
+.unit-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.unit-badges{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.badge{padding:3px 9px;border-radius:9px;font-size:11px;font-weight:700}
+.badge-done{background:#D4F5DB;color:#2e7d32}
+.badge-todo{background:#FFE8D6;color:#e65100}
+.badge-locked{background:#EEE;color:#888}
+ 
+/* INTEGRATED LEARNING */
+.integ-header{padding:16px 18px 4px}
+.integ-title{font-size:19px;font-weight:900;margin-bottom:4px}
+.integ-sub{font-size:13px;color:var(--muted);font-weight:600}
+.module-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.module-card{border-radius:20px;padding:20px 14px;text-align:center;cursor:pointer;border:none;font-family:inherit;transition:transform .12s;box-shadow:0 6px 20px rgba(0,0,0,.1);color:#fff;position:relative}
+.module-card:active{transform:scale(.96)}
+.module-icon{font-size:36px;display:block;margin-bottom:8px}
+.module-name{font-size:15px;font-weight:900;line-height:1.3}
+.module-count{font-size:11px;opacity:.85;font-weight:600;margin-top:3px}
+.mc-1{background:linear-gradient(135deg,#FF6B6B,#FF8E53);box-shadow:0 6px 0 #c94040}
+.mc-2{background:linear-gradient(135deg,#FFB347,#FF8C00);box-shadow:0 6px 0 #cc6600}
+.mc-3{background:linear-gradient(135deg,#6BCB77,#4aaa58);box-shadow:0 6px 0 #2e7d32}
+.mc-4{background:linear-gradient(135deg,#6ECFF0,#43A8D0);box-shadow:0 6px 0 #1a78a0}
+.mc-5{background:linear-gradient(135deg,#C3A6FF,#9B6FEF);box-shadow:0 6px 0 #7a4fd0}
+.mc-6{background:linear-gradient(135deg,#FF9A9A,#FF6B9A);box-shadow:0 6px 0 #c94070}
+ 
+/* Q ENGINE */
+.qe-header{flex-shrink:0;padding:11px 18px 0;background:var(--bg)}
+.qe-mode-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:11px;font-size:12px;font-weight:700;color:#fff;margin-bottom:7px}
+.qe-mode-challenge{background:var(--coral)}.qe-mode-reinforce{background:var(--peach);color:#333}
+.qe-mode-explore{background:var(--lavender)}.qe-mode-integrated{background:var(--teal)}
+.q-counter{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+ 
+/* QUESTION BODY */
+.question-body{background:#fff;border-radius:20px;padding:22px 18px;margin-bottom:12px;box-shadow:0 4px 14px rgba(0,0,0,.07)}
+.q-stem{font-size:19px;font-weight:800;line-height:1.7;margin-bottom:14px}
+.q-hint{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px}
+ 
+/* OPTIONS */
+.options-grid{display:flex;flex-direction:column;gap:9px}
+.option-btn{border:3px solid #E8E8E8;background:#fff;border-radius:16px;padding:13px 15px;font-family:inherit;font-size:16px;font-weight:700;color:var(--text);cursor:pointer;text-align:left;display:flex;align-items:center;gap:11px;width:100%}
+.option-btn:active{transform:scale(.98)}
+.option-btn.correct{border-color:var(--grass);background:#EDFBF0}
+.option-btn.wrong{border-color:var(--coral);background:#FFF0F0}
+.opt-letter{width:30px;height:30px;border-radius:50%;background:#F0F0F0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0}
+.option-btn.correct .opt-letter{background:var(--grass);color:#fff}
+.option-btn.wrong .opt-letter{background:var(--coral);color:#fff}
+ 
+/* TEXT INPUT */
+.input-tip{display:inline-flex;align-items:center;gap:5px;background:#F0F8FF;border:1.5px solid #B8E4F9;border-radius:9px;padding:4px 10px;font-size:11px;font-weight:700;color:#2a7da0;margin-bottom:9px}
+.ti-single{width:100%;border:3px solid #E0E0E0;border-radius:16px;padding:15px 16px;font-family:inherit;font-size:24px;font-weight:800;color:var(--text);outline:none;text-align:center;letter-spacing:3px;transition:border-color .2s;background:#FAFAFA}
+.ti-single:focus{border-color:var(--sky);background:#fff}
+.ti-single.correct{border-color:var(--grass);background:#EDFBF0}
+.ti-single.wrong{border-color:var(--coral);background:#FFF0F0}
+.ti-sentence{width:100%;border:3px solid #E0E0E0;border-radius:16px;padding:15px 16px;font-family:inherit;font-size:18px;font-weight:700;color:var(--text);outline:none;transition:border-color .2s;background:#FAFAFA;resize:none;line-height:1.7}
+.ti-sentence:focus{border-color:var(--sky);background:#fff}
+.ti-sentence.correct{border-color:var(--grass);background:#EDFBF0}
+.ti-sentence.wrong{border-color:var(--coral);background:#FFF0F0}
+ 
+/* CHIPS */
+.chip-pool{display:flex;flex-wrap:wrap;gap:8px;margin:9px 0}
+.chip{padding:8px 13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
+.chip:active{transform:scale(.93)}
+.chip-src{background:#EEE;color:var(--text)}
+.chip-src.used{opacity:.25;pointer-events:none}
+.chip-sel{background:var(--sky);color:#fff}
+.answer-area{min-height:48px;border:3px dashed #D0D0D0;border-radius:14px;padding:9px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#FAFAFA;margin:9px 0}
+ 
+/* MATCHING */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:7px}
+.match-col-title{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:6px;text-align:center}
+.match-item{border:3px solid #E8E8E8;background:#fff;border-radius:12px;padding:10px 7px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:center;width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;line-height:1.4}
+.match-item.selected{border-color:var(--sky);background:#EDF7FF}
+.match-item.matched-ok{border-color:var(--grass);background:#EDFBF0;cursor:default}
+.match-item.matched-no{border-color:var(--coral);background:#FFF0F0;cursor:default}
+.match-pair-line{font-size:11px;font-weight:700;color:var(--muted);padding:3px 0;text-align:center}
+ 
+/* CLASSIFICATION */
+.classif-bins{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.classif-bin{border:3px solid #E8E8E8;border-radius:14px;padding:10px;background:#FAFAFA}
+.classif-bin-title{font-size:13px;font-weight:800;color:var(--muted);margin-bottom:7px;text-align:center}
+.classif-bin.bin-ok{border-color:var(--grass)}
+.classif-bin.bin-no{border-color:var(--coral)}
+.classif-items{min-height:40px;display:flex;flex-wrap:wrap;gap:5px}
+.classif-source{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+.cls-chip{padding:7px 12px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:#EEE;color:var(--text)}
+.cls-chip.placed{opacity:.25;pointer-events:none}
+.cls-placed{padding:5px 10px;border-radius:8px;font-size:13px;font-weight:700;background:var(--sky);color:#fff;cursor:pointer}
+ 
+/* REINFORCE BANNER */
+.reinforce-banner{background:#FFF4E0;border:2px solid var(--peach);border-radius:13px;padding:11px 14px;margin-bottom:11px;display:flex;align-items:flex-start;gap:9px}
+.rb-icon{font-size:20px;flex-shrink:0}
+.rb-text{font-size:12px;font-weight:700;color:#7a4500;line-height:1.5}
+.rb-kp{display:inline-block;background:var(--peach);color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:7px;margin-top:4px}
+ 
+/* FEEDBACK */
+.feedback{border-radius:14px;padding:14px;margin-top:9px}
+.feedback.ok{background:#EDFBF0;border:2px solid var(--grass)}
+.feedback.no{background:#FFF0F0;border:2px solid var(--coral)}
+.feedback.nt{background:#F0F0FF;border:2px solid var(--lavender)}
+.fb-icon{font-size:26px;margin-bottom:3px}
+.fb-title{font-size:15px;font-weight:900}
+.fb-text{font-size:12px;color:#555;margin-top:3px;font-weight:600;line-height:1.7}
+ 
+/* RESULT */
+.result-hero{text-align:center;padding:28px 18px 12px}
+.result-emoji{font-size:76px;animation:pop .5s ease-out}
+@keyframes pop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+.result-title{font-size:24px;font-weight:900;margin-top:8px}
+.result-sub{font-size:13px;color:var(--muted);font-weight:600;margin-top:4px}
+.score-card{background:#fff;border-radius:22px;padding:18px;margin:0 16px;box-shadow:0 8px 22px rgba(0,0,0,.1);display:flex;justify-content:space-around;align-items:center}
+.score-item{text-align:center}
+.score-num{font-size:36px;font-weight:900}
+.score-label{font-size:11px;color:var(--muted);font-weight:600;margin-top:3px}
+.score-div{width:2px;height:48px;background:#EEE}
+.stars-row{display:flex;justify-content:center;gap:6px;margin:12px 0}
+.star-e{font-size:34px;animation:starPop .4s ease-out both}
+@keyframes starPop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2) rotate(10deg)}100%{transform:scale(1) rotate(0)}}
+.star-e:nth-child(2){animation-delay:.15s}.star-e:nth-child(3){animation-delay:.3s}
+.star-e:nth-child(4){animation-delay:.45s}.star-e:nth-child(5){animation-delay:.6s}
+.result-msg{text-align:center;font-size:15px;font-weight:700;margin:0 16px 12px;padding:12px;background:#fff;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,.07)}
+.reinforce-preview{margin:0 16px 12px;background:#FFF4E0;border:2px solid var(--peach);border-radius:13px;padding:12px 14px}
+.rp-title{font-size:12px;font-weight:800;color:#7a4500;margin-bottom:6px}
+.rp-kp-list{display:flex;flex-wrap:wrap;gap:6px}
+.rp-kp{background:var(--peach);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:8px}
+.result-btns{padding:0 16px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+ 
+/* CLEAR */
+#screen-clear{text-align:center;background:linear-gradient(160deg,#E8F7FF,#FFF9F0)}
+.clear-confetti{font-size:88px;margin:32px 0 6px;animation:spin .8s ease-out}
+@keyframes spin{0%{transform:rotate(-20deg) scale(0);opacity:0}60%{transform:rotate(10deg) scale(1.15)}100%{transform:rotate(0) scale(1);opacity:1}}
+.clear-title{font-size:28px;font-weight:900}
+.clear-sub{font-size:13px;color:var(--muted);font-weight:600;margin:6px 18px 0;line-height:1.7}
+.celebrate{display:flex;justify-content:center;gap:7px;font-size:20px;margin:10px 0}
+.unlock-card{margin:14px;background:linear-gradient(135deg,#C3A6FF,#9B6FEF);border-radius:20px;padding:18px;color:#fff;box-shadow:0 7px 0 #7a4fd0}
+.unlock-icon{font-size:40px;margin-bottom:6px}
+.unlock-title{font-size:18px;font-weight:900}
+.unlock-sub{font-size:12px;opacity:.85;font-weight:600;margin-top:4px}
+.clear-btns{padding:0 16px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+ 
+/* PROGRESS */
+.progress-hero{background:linear-gradient(135deg,var(--lavender),#9B6FEF);border-radius:20px;padding:18px;color:#fff;margin-bottom:14px;text-align:center}
+.ph-stars{font-size:40px;font-weight:900}
+.ph-label{font-size:13px;opacity:.85;font-weight:600;margin-top:2px}
+.sec-title{font-size:13px;font-weight:800;color:var(--muted);margin-bottom:10px}
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.ach-card{background:#fff;border-radius:15px;padding:13px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.07)}
+.ach-icon{font-size:28px;margin-bottom:4px}
+.ach-label{font-size:10px;font-weight:700;color:var(--muted)}
+.ach-val{font-size:19px;font-weight:900}
+.upc{background:#fff;border-radius:17px;padding:15px;margin-bottom:10px;box-shadow:0 4px 12px rgba(0,0,0,.07)}
+.upc-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.upc-num{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0}
+.upc-title{font-size:14px;font-weight:800}
+.upc-sub{font-size:10px;color:var(--muted);font-weight:600;margin-top:1px}
+.mp-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.mp-label{width:42px;font-size:10px;font-weight:700;padding:3px 4px;border-radius:6px;text-align:center;flex-shrink:0}
+.ml-ch{background:#FFE8E8;color:#c94040}.ml-re{background:#FFF0D6;color:#e65100}.ml-ex{background:#EEE8FF;color:#7a4fd0}
+.mp-pct{font-size:10px;font-weight:700;color:var(--muted);width:32px;text-align:right}
+.reset-btn-wrap{padding:16px 0 8px;text-align:center}
+.spacer{height:14px}
+</style>
+</head>
+<body>
+ 
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="home-hero">
+    <span class="home-planet">🌏</span>
+    <div class="home-title">學學星球</div>
+    <div class="home-sub">國小二年級 ✨ 下學期</div>
+    <div class="home-stars-badge">⭐ <span id="home-stars">0</span> 顆星</div>
+  </div>
+  <div class="home-menu">
+    <button class="hbc hbc-1" onclick="goTo('screen-subject')">
+      <span class="icon">🚀</span>
+      <span class="hbtext"><span>開始單元挑戰</span><span>依課次學習</span></span>
+    </button>
+    <button class="hbc hbc-2" onclick="goTo('screen-subject')">
+      <span class="icon">🔄</span>
+      <span class="hbtext"><span>再練一次</span><span>複習做過的題目</span></span>
+    </button>
+    <button class="hbc hbc-4" onclick="goTo('screen-integrated')">
+      <span class="icon">🧩</span>
+      <span class="hbtext"><span>國語綜合練習</span><span>跨課能力模組練習</span></span>
+    </button>
+    <button class="hbc hbc-3" onclick="goTo('screen-progress')">
+      <span class="icon">📊</span>
+      <span class="hbtext"><span>我的進度</span><span>看看星星和成就</span></span>
+    </button>
+  </div>
+</div>
+ 
+<!-- SUBJECT -->
+<div id="screen-subject" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <span class="topbar-title">選科目</span>
+    <div class="topbar-stars">⭐ <span class="sd">0</span></div>
+  </div>
+  <div class="scroll-area">
+    <div class="spacer"></div>
+    <div class="subject-grid">
+      <button class="subject-card sc-chinese" onclick="goToUnits('chinese')">
+        <span class="s-icon">📖</span><div class="s-name">國語</div><div class="s-pub">康軒版</div>
+      </button>
+      <button class="subject-card sc-locked" disabled>
+        <span class="s-icon">🔢</span><div class="s-name">數學</div><div class="s-pub">翰林版</div>
+        <div class="lock-chip">🔒 即將開放</div>
+      </button>
+      <button class="subject-card sc-locked" disabled>
+        <span class="s-icon">🌍</span><div class="s-name">生活</div><div class="lock-chip">🔒 即將開放</div>
+      </button>
+      <button class="subject-card sc-locked" disabled>
+        <span class="s-icon">🎨</span><div class="s-name">藝術</div><div class="lock-chip">🔒 即將開放</div>
+      </button>
+    </div>
+  </div>
+</div>
+ 
+<!-- UNITS -->
+<div id="screen-units" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <span class="topbar-title" id="units-title">國語單元</span>
+    <div class="topbar-stars">⭐ <span class="sd">0</span></div>
+  </div>
+  <div class="scroll-area"><div id="units-list"></div></div>
+</div>
+ 
+<!-- INTEGRATED LEARNING -->
+<div id="screen-integrated" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <span class="topbar-title">國語綜合練習</span>
+    <div class="topbar-stars">⭐ <span class="sd">0</span></div>
+  </div>
+  <div class="scroll-area">
+    <div class="integ-header">
+      <div class="integ-title">🧩 跨課能力模組</div>
+      <div class="integ-sub">選一個模組，開始綜合練習！</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="module-grid">
+      <button class="module-card mc-1" onclick="startModule('radical')">
+        <span class="module-icon">🔤</span>
+        <div class="module-name">生字與部首</div>
+        <div class="module-count">辨認・手寫・部首</div>
+      </button>
+      <button class="module-card mc-2" onclick="startModule('vocab')">
+        <span class="module-icon">📝</span>
+        <div class="module-name">詞語與造詞</div>
+        <div class="module-count">組詞・配對・分類</div>
+      </button>
+      <button class="module-card mc-3" onclick="startModule('sentence')">
+        <span class="module-icon">💬</span>
+        <div class="module-name">句型與造句</div>
+        <div class="module-count">排列・補句・造句</div>
+      </button>
+      <button class="module-card mc-4" onclick="startModule('sequence')">
+        <span class="module-icon">🔢</span>
+        <div class="module-name">順序與因果</div>
+        <div class="module-count">時序・因果・排列</div>
+      </button>
+      <button class="module-card mc-5" onclick="startModule('comprehension')">
+        <span class="module-icon">🖼️</span>
+        <div class="module-name">看圖與理解</div>
+        <div class="module-count">看圖・角色・情境</div>
+      </button>
+      <button class="module-card mc-6" onclick="startModule('emotion')">
+        <span class="module-icon">😊</span>
+        <div class="module-name">情緒與生活表達</div>
+        <div class="module-count">情緒詞・生活句</div>
+      </button>
+    </div>
+  </div>
+</div>
+ 
+<!-- QUESTION ENGINE (shared by unit mode + integrated mode) -->
+<div id="screen-question" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="confirmQuit()">✕</button>
+    <span class="topbar-title" id="q-title">挑戰關</span>
+    <div class="topbar-stars">⭐ <span class="sd">0</span></div>
+  </div>
+  <div class="qe-header">
+    <div id="q-chip" class="qe-mode-chip qe-mode-challenge">🎯 挑戰關</div>
+    <div class="q-counter">
+      <span id="q-ctr" style="font-weight:800;font-size:13px;color:var(--muted)">第 1/1 題</span>
+      <div class="q-dots" id="q-dots"></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="q-pbar" style="width:0%"></div></div>
+  </div>
+  <div class="scroll-area" id="q-scroll" style="padding-top:12px"><div id="q-render"></div></div>
+  <div class="q-fixed-footer" id="q-footer"></div>
+</div>
+ 
+<!-- RESULT -->
+<div id="screen-result" class="screen">
+  <div class="topbar" style="background:transparent;box-shadow:none"><div></div><span class="topbar-title">挑戰結果</span><div></div></div>
+  <div class="result-hero">
+    <div class="result-emoji" id="r-emoji">🎉</div>
+    <div class="result-title" id="r-title">超棒！</div>
+    <div class="result-sub" id="r-sub">完成挑戰關！</div>
+  </div>
+  <div class="score-card">
+    <div class="score-item"><div class="score-num" id="r-correct" style="color:var(--grass)">0</div><div class="score-label">答對題數</div></div>
+    <div class="score-div"></div>
+    <div class="score-item"><div class="score-num" id="r-total">0</div><div class="score-label">總題數</div></div>
+    <div class="score-div"></div>
+    <div class="score-item"><div class="score-num" id="r-stars" style="color:var(--sun)">+0⭐</div><div class="score-label">獲得星星</div></div>
+  </div>
+  <div class="stars-row" id="r-stars-row"></div>
+  <div id="reinforce-preview"></div>
+  <div class="result-msg" id="r-msg">繼續加油！</div>
+  <div class="result-btns">
+    <button class="btn btn-lg btn-green" id="btn-go-reinforce" onclick="startReinforce()">💪 進入補強關</button>
+    <button class="btn btn-lg btn-ghost" onclick="goTo('screen-units')">回單元列表</button>
+  </div>
+</div>
+ 
+<!-- CLEAR -->
+<div id="screen-clear" class="screen">
+  <div class="clear-confetti">🏆</div>
+  <div class="clear-title">恭喜通關！</div>
+  <div class="clear-sub">挑戰關 ＋ 補強關都完成了！<br>你真的很棒！</div>
+  <div class="celebrate">🎊 🎉 🌟 ✨ 🎈</div>
+  <div class="unlock-card">
+    <div class="unlock-icon">🔭</div>
+    <div class="unlock-title">🔓 探索關已解鎖！</div>
+    <div class="unlock-sub">去發現更多有趣的知識吧！</div>
+  </div>
+  <div class="clear-btns">
+    <button class="btn btn-lg btn-purple" onclick="startExplore()">🔭 進入探索關</button>
+    <button class="btn btn-lg btn-ghost" onclick="goTo('screen-units')">回單元列表</button>
+  </div>
+</div>
+ 
+<!-- PROGRESS -->
+<div id="screen-progress" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <span class="topbar-title">我的進度</span>
+    <div class="topbar-stars">⭐ <span class="sd">0</span></div>
+  </div>
+  <div class="scroll-area">
+    <div class="progress-hero">
+      <div class="ph-stars">⭐ <span id="p-stars">0</span></div>
+      <div class="ph-label">累積星星數</div>
+    </div>
+    <div class="sec-title">🏅 學習成就</div>
+    <div class="ach-grid">
+      <div class="ach-card"><div class="ach-icon">🎯</div><div class="ach-val" id="a-ch">0</div><div class="ach-label">挑戰關完成</div></div>
+      <div class="ach-card"><div class="ach-icon">💪</div><div class="ach-val" id="a-re">0</div><div class="ach-label">補強關完成</div></div>
+      <div class="ach-card"><div class="ach-icon">🔭</div><div class="ach-val" id="a-ex">0</div><div class="ach-label">探索關完成</div></div>
+      <div class="ach-card"><div class="ach-icon">✍️</div><div class="ach-val" id="a-hw">0</div><div class="ach-label">手寫輸入完成</div></div>
+    </div>
+    <div class="sec-title">📚 國語單元進度</div>
+    <div id="p-units"></div>
+    <div class="reset-btn-wrap">
+      <button class="btn btn-sm btn-danger" onclick="confirmReset()">🗑️ 重設所有進度</button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+// ═══════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function esc(s){return(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}
+ 
+// ═══════════════════════════════════════════════════
+// LOCALSTORAGE PERSISTENCE
+// ═══════════════════════════════════════════════════
+const LS_KEY='lpt1_progress_v1';
+ 
+function defaultProgress(){
+  return {
+    totalStars:0,
+    completedChallengeCount:0,
+    completedReinforcementCount:0,
+    completedExplorationCount:0,
+    completedHandwriteCount:0,
+    unitsProgress:{
+      "g2_ch_kanox_s2_l01":{challengeProgress:false,reinforcementProgress:false,explorationProgress:false,earnedStars:0,hwDone:0,wrongKps:[]},
+      "g2_ch_kanox_s2_l02":{challengeProgress:false,reinforcementProgress:false,explorationProgress:false,earnedStars:0,hwDone:0,wrongKps:[]},
+      "g2_ch_kanox_s2_l03":{challengeProgress:false,reinforcementProgress:false,explorationProgress:false,earnedStars:0,hwDone:0,wrongKps:[]},
+      "g2_ch_kanox_s2_l04":{challengeProgress:false,reinforcementProgress:false,explorationProgress:false,earnedStars:0,hwDone:0,wrongKps:[]},
+      "g2_ch_kanox_s2_l05":{challengeProgress:false,reinforcementProgress:false,explorationProgress:false,earnedStars:0,hwDone:0,wrongKps:[]},
+      "g2_ch_kanox_s2_l06":{challengeProgress:false,reinforcementProgress:false,explorationProgress:false,earnedStars:0,hwDone:0,wrongKps:[]}
+    }
+  };
+}
+ 
+function loadProgress(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return defaultProgress();
+    const p=JSON.parse(raw);
+    // ensure all units exist
+    const def=defaultProgress();
+    Object.keys(def.unitsProgress).forEach(uid=>{
+      if(!p.unitsProgress[uid])p.unitsProgress[uid]={...def.unitsProgress[uid]};
+    });
+    return p;
+  }catch(e){return defaultProgress();}
+}
+ 
+function saveProgress(){
+  try{
+    const data={
+      totalStars:S.stars,
+      completedChallengeCount:Object.values(UP).filter(p=>p.challenge).length,
+      completedReinforcementCount:Object.values(UP).filter(p=>p.reinforcement).length,
+      completedExplorationCount:Object.values(UP).filter(p=>p.exploration).length,
+      completedHandwriteCount:Object.values(UP).reduce((s,p)=>s+(p.hwDone||0),0),
+      unitsProgress:{}
+    };
+    Object.keys(UP).forEach(uid=>{
+      const p=UP[uid];
+      data.unitsProgress[uid]={
+        challengeProgress:p.challenge,
+        reinforcementProgress:p.reinforcement,
+        explorationProgress:p.exploration,
+        earnedStars:p.starsEarned,
+        hwDone:p.hwDone||0,
+        wrongKps:p.wrongKps||[]
+      };
+    });
+    localStorage.setItem(LS_KEY,JSON.stringify(data));
+  }catch(e){}
+}
+ 
+function confirmReset(){
+  if(confirm('確定要清除所有學習進度嗎？\n這個動作無法復原！')){
+    if(confirm('再次確認：清除後星星和進度都會歸零，確定嗎？')){
+      localStorage.removeItem(LS_KEY);
+      const def=defaultProgress();
+      S.stars=0;
+      Object.keys(UP).forEach(uid=>{
+        UP[uid]={challenge:false,reinforcement:false,exploration:false,starsEarned:0,hwDone:0,wrongKps:[]};
+      });
+      syncStars();
+      renderProgress();
+      alert('進度已重設！');
+    }
+  }
+}
+ 
+// ═══════════════════════════════════════════════════
+// DB
+// ═══════════════════════════════════════════════════
+const DB={
+  units:[
+    {unit_id:"g2_ch_kanox_s2_l01",subject:"chinese",grade:"國小二年級",semester:"下學期",version:"康軒",lesson_order:1,unit_title:"春天的顏色",theme:"觀察春天景物與顏色，學習用句子表達看見的景象。"},
+    {unit_id:"g2_ch_kanox_s2_l02",subject:"chinese",grade:"國小二年級",semester:"下學期",version:"康軒",lesson_order:2,unit_title:"花衣裳",theme:"家人分工合作製作驚喜，學習因為所以句型。"},
+    {unit_id:"g2_ch_kanox_s2_l03",subject:"chinese",grade:"國小二年級",semester:"下學期",version:"康軒",lesson_order:3,unit_title:"彩色王國",theme:"欣賞不同顏色的美麗，學習接受不同、和氣融融。"},
+    {unit_id:"g2_ch_kanox_s2_l04",subject:"chinese",grade:"國小二年級",semester:"下學期",version:"康軒",lesson_order:4,unit_title:"爸爸",theme:"爸爸的陪伴與溫暖，學習像……一樣與當……的時候句型。"},
+    {unit_id:"g2_ch_kanox_s2_l05",subject:"chinese",grade:"國小二年級",semester:"下學期",version:"康軒",lesson_order:5,unit_title:"我的家人",theme:"認識家人的工作與特徵，學習不管……都……句型。"},
+    {unit_id:"g2_ch_kanox_s2_l06",subject:"chinese",grade:"國小二年級",semester:"下學期",version:"康軒",lesson_order:6,unit_title:"愛笑的大樹",theme:"觀察大樹的變化，學習終於、並且，感受分享快樂。"}
+  ],
+ 
+  // 按課次索引的三關題庫
+  lessons:{
+ 
+    // ── 第1課 春天的顏色 ─────────────────────────────────
+    "g2_ch_kanox_s2_l01":{
+      challenge:[
+        {qid:"ch_01",kp:"kp_l01_002",type:"single_choice",stem:"小蜜蜂飛出蜂窩，一眼就看見什麼？",options:["青綠的草地","粉紅的桃花","淡藍的天空","五顏六色的景色"],answer:"粉紅的桃花",explanation:"課文：小蜜蜂飛出蜂窩，一眼就看見粉紅的桃花。"},
+        {qid:"ch_02",kp:"kp_l01_002",type:"single_choice",stem:"小青蛙跳出池塘，一眼就看見什麼？",options:["粉紅的桃花","五顏六色的景色","淡藍的天空","青綠的草地"],answer:"淡藍的天空",explanation:"課文：小青蛙跳出池塘，一眼就看見淡藍的天空。"},
+        {qid:"ch_03",kp:"kp_l01_010",type:"single_choice",stem:"下面四句話，哪一句和課文完全一致？",options:["小燕子看見五顏六色的景色。","小田鼠看見淡藍的天空。","小青蛙看見粉紅的桃花。","小蜜蜂看見青綠的草地。"],answer:"小燕子看見五顏六色的景色。",explanation:"其他三句的角色和景物都配錯了，只有小燕子這句是正確的。"},
+        {qid:"ch_04",kp:"kp_l01_002",type:"single_choice",stem:"小燕子說春天「五顏六色」，是因為春天…",options:["只有一種顏色","有很多種顏色","全部都是綠色","全部都是粉紅色"],answer:"有很多種顏色",explanation:"「五顏六色」就是形容顏色很多、很豐富的意思。"},
+        {qid:"ch_05",kp:"kp_l01_004",type:"single_choice",stem:"「地」「塘」「堡」「蜂」四個字，哪一個不是土部？",options:["地","塘","堡","蜂"],answer:"蜂",explanation:"「蜂」是虫字旁。地、塘、堡都是土部的字。"},
+        {qid:"ch_06",kp:"kp_l01_006",type:"single_choice",stem:"「高興」的「興」讀哪一個音？",options:["ㄒㄧㄥ","ㄒㄧㄥˋ","ㄏㄧㄥ","ㄏㄨㄥ"],answer:"ㄒㄧㄥˋ",explanation:"高興、興趣的「興」讀 ㄒㄧㄥˋ；興奮、興建則讀 ㄒㄧㄥ。"},
+        {qid:"ch_07",kp:"kp_l01_007",type:"single_choice",stem:"「笑咪咪」「高興」「城堡」「開心」，哪一個不是情緒詞？",options:["笑咪咪","高興","城堡","開心"],answer:"城堡",explanation:"城堡是建築物，不是表示心情的詞語。"},
+        {qid:"ch_08",kp:"kp_l01_008",type:"fill_blank",stem:"小田鼠跑出地洞，一眼就看見（ ）的草地。",options:["粉紅","青綠","淡藍","五顏六色"],answer:"青綠",explanation:"課文中是青綠的草地，青綠形容草地翠綠的顏色。"},
+        {qid:"ch_09",kp:"kp_l01_008",type:"fill_blank",stem:"小蜜蜂飛出（ ），一眼就看見粉紅的桃花。",options:["地洞","池塘","蜂窩","花園"],answer:"蜂窩",explanation:"小蜜蜂是從蜂窩飛出來的，不是從池塘或地洞。"},
+        {qid:"ch_10",kp:"kp_l01_008",type:"sentence_reorder",stem:"把詞語排成正確的課文句子：",options:["小田鼠","跑出","地洞","，","一眼就看見","青綠","的","草地","。"],answer:"小田鼠跑出地洞，一眼就看見青綠的草地。",explanation:"句型：主詞＋動作＋地點，一眼就看見＋顏色＋景物。"},
+        // ── 生字直接寫（4題覆蓋11字中的4字）──
+        {qid:"ch_11",kp:"kp_l01_009",type:"handwrite_character",stem:"請寫出這個字：",prompt_char:"桃",answer:"桃",explanation:"「桃」是木字旁，右邊是兆，代表春天的桃花。"},
+        {qid:"ch_12",kp:"kp_l01_009",type:"handwrite_character",stem:"請寫出這個字：",prompt_char:"草",answer:"草",explanation:"「草」是艸字頭，下面是早字，代表植物。"},
+        {qid:"ch_13",kp:"kp_l01_009",type:"handwrite_character",stem:"請寫出這個字：",prompt_char:"蜂",answer:"蜂",explanation:"「蜂」是虫字旁，因為蜜蜂是昆蟲。"},
+        {qid:"ch_14",kp:"kp_l01_009",type:"handwrite_character",stem:"請寫出這個字：",prompt_char:"池",answer:"池",explanation:"「池」是水字旁，右邊是也，代表水池。"},
+        // ── 部首題（2題）──
+        {qid:"ch_15",kp:"kp_l01_004",type:"character_to_radical_write",stem:"「塘」的部首是什麼？請寫出來：",target_char:"塘",answer:"土",explanation:"「塘」是土部的字，土字旁代表和土地有關的字。"},
+        {qid:"ch_16",kp:"kp_l01_004",type:"radical_choice",stem:"下面哪一個字的部首是「虫」？",options:["桃","草","蜂","粉"],answer:"蜂",explanation:"「蜂」是虫字旁，因為蜜蜂是昆蟲。"},
+        // ── 字詞／缺字填空（2題）──
+        {qid:"ch_17",kp:"kp_l01_009",type:"word_missing_character",stem:"請選出正確的字，完成詞語：「（　）紅的桃花」",options:["粉","芬","份","分"],answer:"粉",explanation:"「粉紅」是米字旁加上分，形容淺淺的紅色。"},
+        {qid:"ch_18",kp:"kp_l01_009",type:"character_from_context",stem:"小青蛙跳出池（　），一眼就看見淡藍的天空。",options:["塘","堂","糖","唐"],answer:"塘",explanation:"「池塘」的塘是土部，和土地、水塘有關。"}
+      ],
+      reinforcement_bank:{
+        "kp_l01_002":{kp_title:"角色與景物配對",qid:"re_002",type:"matching",stem:"把左邊的小動物和右邊看見的景物配對：",left:["小蜜蜂","小田鼠","小青蛙","小燕子"],right:["淡藍的天空","青綠的草地","粉紅的桃花","五顏六色的景色"],answer:{"小蜜蜂":"粉紅的桃花","小田鼠":"青綠的草地","小青蛙":"淡藍的天空","小燕子":"五顏六色的景色"},explanation:"記憶口訣：蜜蜂→桃花、青蛙→天空、田鼠→草地、燕子→景色。"},
+        "kp_l01_004":{kp_title:"土部識字",qid:"re_004",type:"radical_classification",stem:"把下面的字分類，放進正確的部首格：",items:["塘","桃","草","蜂","地","粉"],categories:{"土部":[],"其他部首":[]},answer:{"土部":["塘","地"],"其他部首":["桃","草","蜂","粉"]},explanation:"塘（土）、地（土）是土部；桃（木）、草（艸）、蜂（虫）、粉（米）各有不同部首。"},
+        "kp_l01_006":{kp_title:"多音字：興",qid:"re_006",type:"single_choice",stem:"「興建一座橋」的「興」讀哪一個音？",options:["ㄒㄧㄥ","ㄒㄧㄥˋ","ㄏㄧㄥ","ㄏㄨㄥ"],answer:"ㄒㄧㄥ",explanation:"興建、興奮讀 ㄒㄧㄥ；高興、興趣讀 ㄒㄧㄥˋ。"},
+        "kp_l01_007":{kp_title:"情緒詞語",qid:"re_007",type:"single_choice",stem:"看到春天美麗的景色，下面哪一句話最合適？",options:["我好高興，春天真漂亮！","春天有很多桃花。","小蜜蜂飛出蜂窩。","草地是綠色的。"],answer:"我好高興，春天真漂亮！",explanation:"只有這句話包含情緒詞「高興」，表達看到春天後的感受。"},
+        "kp_l01_008":{kp_title:"課文句型",qid:"re_008",type:"sentence_reorder",stem:"把詞語排成正確句子（這次是小青蛙的句子）：",options:["小青蛙","跳出","池塘","，","一眼就看見","淡藍","的","天空","。"],answer:"小青蛙跳出池塘，一眼就看見淡藍的天空。",explanation:"這次是「跳出」不是「跑出」，地點是「池塘」，顏色是「淡藍」。"},
+        "kp_l01_009":{kp_title:"第一課換寫法練習",qid:"re_009",type:"write_full_word",stem:"請寫出這個詞語：「粉紅」",answer:"粉紅",explanation:"粉是米字旁，紅是糸字旁。粉紅是本課描寫桃花的重要顏色詞。"},
+        "kp_l01_009b":{kp_title:"生字字形辨認",qid:"re_009b",type:"character_to_radical_write",stem:"「窩」的部首是什麼？請寫出來：",target_char:"窩",answer:"穴",explanation:"「窩」是穴字頭，穴部代表洞穴，蜂窩就是蜜蜂住的洞穴。"},
+        "kp_l01_010":{kp_title:"課文理解",qid:"re_010",type:"single_choice",stem:"課文一共寫了幾個小動物看到春天的景色？",options:["2個","3個","4個","5個"],answer:"4個",explanation:"課文寫了四個小動物：小蜜蜂、小燕子、小青蛙、小田鼠。"}
+      },
+      exploration:[
+        {qid:"ex_01",kp:"kp_l01_008",type:"single_choice",stem:"下面哪一句話，用了和課文一樣的句型「……一眼就看見……」？",options:["小朋友走出教室，一眼就看見金黃的向日葵。","今天天氣很好，我好開心。","向日葵長得好高。","我的書包是藍色的。"],answer:"小朋友走出教室，一眼就看見金黃的向日葵。",explanation:"這句話把課文的句型搬到生活中。"},
+        {qid:"ex_02",kp:"kp_l01_007",type:"single_choice",stem:"如果你放學回家，一眼就看見媽媽煮了你最愛吃的菜，你會說：",options:["我好高興！","我很地洞！","我看見蜂窩！","天空很淡藍！"],answer:"我好高興！",explanation:"「高興」是表示開心的情緒詞。"},
+        {qid:"ex_03",kp:"kp_l01_008",type:"sentence_reorder",stem:"用課文句型，排出一句關於夏天的句子：",options:["小朋友","走出","家門","，","一眼就看見","藍藍","的","天空","。"],answer:"小朋友走出家門，一眼就看見藍藍的天空。",explanation:"主詞換成小朋友，地點換成家門，景物換成藍天——句型還是一樣！"},
+        {qid:"ex_04",kp:"kp_l01_009",type:"handwrite_word",stem:"請寫出一個你在春天會看到的景物詞語：",answer:null,explanation:"春天的景物還有很多：蝴蝶、嫩葉、小溪……你寫的詞語也很棒！"},
+        {qid:"ex_05",kp:"kp_l01_008",type:"guided_sentence_writing",stem:"仿照課文，用「一眼就看見」寫一句話：",answer:null,keyword:"一眼就看見",explanation:"記得句子裡要有「一眼就看見」，後面加上顏色和景物！"},
+        {qid:"ex_06",kp:"kp_l01_009",type:"write_full_word",stem:"請寫出「蜂窩」這個詞語：",answer:"蜂窩",explanation:"「蜂窩」是蜜蜂住的地方，蜂是虫部，窩是穴部。"},
+        {qid:"ex_07",kp:"kp_l01_009",type:"character_from_context",stem:"小田鼠跑出地（　），看見了青綠的草地。",options:["洞","同","銅","筒"],answer:"洞",explanation:"「地洞」的洞是水字旁，右邊是同，是小田鼠住的地方。"}
+      ]
+    },
+ 
+    // ── 第2課 花衣裳 ─────────────────────────────────────
+    "g2_ch_kanox_s2_l02":{
+      challenge:[
+        {qid:"l02_ch_01",kp:"kp_l02_001",type:"single_choice",stem:"這件花衣裳是誰做的？",options:["只有媽媽做的","只有爸爸做的","全家人一起做的","老師做的"],answer:"全家人一起做的",explanation:"課文說全家人分工合作，一起為小朋友做了這件花衣裳。"},
+        {qid:"l02_ch_02",kp:"kp_l02_001",type:"single_choice",stem:"花衣裳上的花朵是誰畫的？",options:["媽媽","爸爸","哥哥","奶奶"],answer:"媽媽",explanation:"課文中媽媽負責在衣服上畫花朵。"},
+        {qid:"l02_ch_03",kp:"kp_l02_002",type:"single_choice",stem:"「因為大家一起幫忙，所以衣裳做得很漂亮。」這句話用的句型是：",options:["因為……所以……","當……的時候……","不管……都……","終於……"],answer:"因為……所以……",explanation:"這句話的結構是「因為（原因），所以（結果）」，是因果句型。"},
+        {qid:"l02_ch_04",kp:"kp_l02_002",type:"fill_blank",stem:"因為大家分工合作，（ ）衣裳做得特別漂亮。",options:["所以","但是","雖然","如果"],answer:"所以",explanation:"「因為……所以……」是因果關係，前面是原因，後面是結果。"},
+        {qid:"l02_ch_05",kp:"kp_l02_003",type:"single_choice",stem:"收到花衣裳，小朋友心裡感到：",options:["高興又感動","生氣","害怕","難過"],answer:"高興又感動",explanation:"收到全家人一起做的驚喜禮物，當然感到高興又感動！"},
+        {qid:"l02_ch_06",kp:"kp_l02_001",type:"sentence_reorder",stem:"把詞語排成正確的句子：",options:["大家","一起","做","了","一件","漂亮","的","花衣裳","。"],answer:"大家一起做了一件漂亮的花衣裳。",explanation:"主詞（大家）＋動作（一起做了）＋受詞（一件漂亮的花衣裳）。"},
+        {qid:"l02_ch_07",kp:"kp_l02_004",type:"handwrite_word",stem:"請寫出這個詞語：「驚喜」",answer:"驚喜",explanation:"「驚喜」是又驚訝又高興的意思，是本課的重要詞語。"},
+        {qid:"l02_ch_08",kp:"kp_l02_002",type:"single_choice",stem:"下面哪一句話使用了「因為……所以……」的句型？",options:["因為下雨，所以我帶了傘。","我喜歡吃蘋果。","天空是藍色的。","花開了真漂亮。"],answer:"因為下雨，所以我帶了傘。",explanation:"「因為下雨（原因），所以我帶了傘（結果）」是標準的因果句型。"}
+      ],
+      reinforcement_bank:{
+        "kp_l02_001":{kp_title:"課文理解",qid:"l02_re_001",type:"matching",stem:"把家人和他們做的事配對：",left:["媽媽","爸爸","哥哥"],right:["剪裁衣服","繡上名字","畫花朵"],answer:{"媽媽":"畫花朵","爸爸":"剪裁衣服","哥哥":"繡上名字"},explanation:"每個家人都有負責的工作，分工合作才能完成美麗的花衣裳。"},
+        "kp_l02_002":{kp_title:"因為所以句型",qid:"l02_re_002",type:"sentence_reorder",stem:"排出正確的因果句子：",options:["因為","天氣","很好","，","所以","大家","去","公園","玩","。"],answer:"因為天氣很好，所以大家去公園玩。",explanation:"「因為（天氣很好）→原因，所以（去公園玩）→結果」。"},
+        "kp_l02_003":{kp_title:"情緒詞語",qid:"l02_re_003",type:"single_choice",stem:"「高興又感動」，其中「感動」是什麼意思？",options:["心裡很溫暖、想哭","很生氣","很害怕","很無聊"],answer:"心裡很溫暖、想哭",explanation:"「感動」是因為看到或聽到很美好的事情，心裡感到溫暖，眼睛有時會泛淚。"},
+        "kp_l02_004":{kp_title:"詞語",qid:"l02_re_004",type:"handwrite_word",stem:"請寫出這個詞語：「合作」",answer:"合作",explanation:"「合作」是大家一起努力完成同一件事，是本課的重要詞語。"}
+      },
+      exploration:[
+        {qid:"l02_ex_01",kp:"kp_l02_002",type:"guided_sentence_writing",stem:"用「因為……所以……」寫一句你生活中的事：",answer:null,keyword:"因為",explanation:"例如：因為今天是我的生日，所以媽媽做了蛋糕。只要有「因為」就很棒！"},
+        {qid:"l02_ex_02",kp:"kp_l02_001",type:"single_choice",stem:"如果你要送朋友一個驚喜，你會怎麼做？",options:["偷偷準備，不讓他知道","大聲告訴他","什麼都不做","叫他自己買"],answer:"偷偷準備，不讓他知道",explanation:"驚喜的意思是讓對方意想不到的禮物或行動，所以要偷偷準備！"},
+        {qid:"l02_ex_03",kp:"kp_l02_003",type:"single_choice",stem:"收到別人用心做的禮物，你最可能有什麼感覺？",options:["感動和高興","生氣","害怕","無聊"],answer:"感動和高興",explanation:"別人花了心思為你做的東西，收到時會感到感動和高興。"},
+        {qid:"l02_ex_04",kp:"kp_l02_004",type:"handwrite_word",stem:"請寫出一個表示開心的詞語：",answer:null,explanation:"例如：高興、快樂、感動、興奮……你寫的詞語都很棒！"}
+      ]
+    },
+ 
+    // ── 第3課 彩色王國 ───────────────────────────────────
+    "g2_ch_kanox_s2_l03":{
+      challenge:[
+        {qid:"l03_ch_01",kp:"kp_l03_001",type:"single_choice",stem:"彩色王國裡有哪些顏色的國王？",options:["只有紅色和藍色","紅、橙、黃、綠、藍、靛、紫七種顏色","只有紅色","只有彩虹的顏色"],answer:"紅、橙、黃、綠、藍、靛、紫七種顏色",explanation:"彩色王國裡有七位顏色國王，就像彩虹的七種顏色。"},
+        {qid:"l03_ch_02",kp:"kp_l03_001",type:"single_choice",stem:"各種顏色的國王一開始為什麼吵架？",options:["因為都覺得自己的顏色最漂亮","因為食物分配不均","因為下雨了","因為比賽輸了"],answer:"因為都覺得自己的顏色最漂亮",explanation:"每個顏色國王都覺得自己的顏色最美麗，所以互相爭吵。"},
+        {qid:"l03_ch_03",kp:"kp_l03_002",type:"single_choice",stem:"最後大家學到了什麼道理？",options:["每種顏色都有自己的美，要互相包容","只有一種顏色最漂亮","顏色越多越好","不需要和別人合作"],answer:"每種顏色都有自己的美，要互相包容",explanation:"課文的主旨是：不同顏色（不同特質的人）各有美麗，要接受不同、和氣融融。"},
+        {qid:"l03_ch_04",kp:"kp_l03_003",type:"fill_blank",stem:"彩色王國裡，七種顏色混在一起，就變成了（ ）。",options:["黑色","白色","彩虹","彩色"],answer:"彩虹",explanation:"課文說七種顏色合在一起，就形成了美麗的彩虹。"},
+        {qid:"l03_ch_05",kp:"kp_l03_001",type:"single_choice",stem:"「和氣融融」這個詞的意思是：",options:["大家相處和睦、快樂","大家一起吵架","只有一個人快樂","顏色很多"],answer:"大家相處和睦、快樂",explanation:"「和氣融融」形容大家感情很好、相處和諧愉快。"},
+        {qid:"l03_ch_06",kp:"kp_l03_003",type:"sentence_reorder",stem:"把詞語排成正確的句子：",options:["七種","顏色","合在","一起","，","變成","了","美麗","的","彩虹","。"],answer:"七種顏色合在一起，變成了美麗的彩虹。",explanation:"七種顏色（主詞）合在一起（動作），變成了美麗的彩虹（結果）。"},
+        {qid:"l03_ch_07",kp:"kp_l03_002",type:"single_choice",stem:"這個故事告訴我們，對於和自己不一樣的人，應該要：",options:["接受和欣賞","排斥和忽視","覺得他們不好","只和一樣的人做朋友"],answer:"接受和欣賞",explanation:"就像七種顏色各有美麗，我們也要欣賞每個人的不同之處。"},
+        {qid:"l03_ch_08",kp:"kp_l03_003",type:"handwrite_word",stem:"請寫出這個詞語：「彩虹」",answer:"彩虹",explanation:"「彩虹」是雨後天空出現的七彩弧形，是本課的重要詞語。"}
+      ],
+      reinforcement_bank:{
+        "kp_l03_001":{kp_title:"課文理解",qid:"l03_re_001",type:"single_choice",stem:"彩色王國的故事，最重要的訊息是什麼？",options:["接受不同，互相欣賞","只有自己最好","不要和別人說話","顏色越少越好"],answer:"接受不同，互相欣賞",explanation:"每種顏色各有美麗，就像每個人各有特色，要學習接受和欣賞不同。"},
+        "kp_l03_002":{kp_title:"道理與主旨",qid:"l03_re_002",type:"guided_sentence_writing",stem:"用「不同」寫一句話，說說你接受不同的經驗：",answer:null,keyword:"不同",explanation:"例如：班上有不同的同學，大家各有優點，我喜歡和不同的人做朋友。"},
+        "kp_l03_003":{kp_title:"詞語與句型",qid:"l03_re_003",type:"handwrite_word",stem:"請寫出這個詞語：「和氣」",answer:"和氣",explanation:"「和氣」是指態度溫和、友善，和別人相處很好。"}
+      },
+      exploration:[
+        {qid:"l03_ex_01",kp:"kp_l03_002",type:"single_choice",stem:"班上有同學和你不一樣，你應該怎麼做？",options:["試著了解並接受他","不和他說話","嘲笑他","叫別人也不要理他"],answer:"試著了解並接受他",explanation:"就像彩色王國一樣，不同的特質各有美麗，接受不同才能讓大家和氣融融！"},
+        {qid:"l03_ex_02",kp:"kp_l03_001",type:"single_choice",stem:"「七種顏色合在一起變成彩虹」，這個比喻是在說什麼？",options:["不同的人合在一起能創造美麗","顏色多了很亂","只有七種顏色好看","彩虹只在下雨後出現"],answer:"不同的人合在一起能創造美麗",explanation:"七種顏色合力形成彩虹，就像不同特色的人合作，能一起創造美好的事物。"},
+        {qid:"l03_ex_03",kp:"kp_l03_003",type:"guided_sentence_writing",stem:"用「和氣融融」或「接受不同」寫一句關於班級生活的句子：",answer:null,keyword:"和氣",explanation:"例如：我們班上有很多不同的同學，大家和氣融融，相處得很快樂。"},
+        {qid:"l03_ex_04",kp:"kp_l03_003",type:"handwrite_word",stem:"請寫出你最喜歡的一種顏色詞（例如：粉紅、天藍）：",answer:null,explanation:"顏色詞讓句子更生動！你最喜歡哪種顏色？寫出來讓大家知道！"}
+      ]
+    },
+ 
+    // ── 第4課 爸爸 ───────────────────────────────────────
+    "g2_ch_kanox_s2_l04":{
+      challenge:[
+        {qid:"l04_ch_01",kp:"kp_l04_001",type:"single_choice",stem:"課文說爸爸的眼睛「亮晶晶」，這是在形容爸爸：",options:["眼睛很閃亮、有神","眼睛很大","眼睛是黑色的","眼睛很小"],answer:"眼睛很閃亮、有神",explanation:"「亮晶晶」形容眼睛閃閃發光、充滿光芒，表示爸爸精神飽滿、充滿活力。"},
+        {qid:"l04_ch_02",kp:"kp_l04_002",type:"single_choice",stem:"「爸爸的手像大樹一樣」，這句話用的修辭方式是：",options:["比喻","誇張","擬人","反問"],answer:"比喻",explanation:"用「像大樹一樣」把爸爸的手比作大樹，是比喻的修辭法。"},
+        {qid:"l04_ch_03",kp:"kp_l04_002",type:"fill_blank",stem:"爸爸的手（ ）大樹一樣，讓我覺得很安全。",options:["像","是","比","有"],answer:"像",explanation:"「像……一樣」是比喻句型，用來形容相似之處。"},
+        {qid:"l04_ch_04",kp:"kp_l04_003",type:"single_choice",stem:"「當爸爸抱著我的時候，我感覺很溫暖。」這句話用的句型是：",options:["當……的時候……","因為……所以……","不管……都……","終於……"],answer:"當……的時候……",explanation:"「當（情境）的時候，（感受或行動）」是表示時間情境的句型。"},
+        {qid:"l04_ch_05",kp:"kp_l04_003",type:"sentence_reorder",stem:"把詞語排成「當……的時候……」的句子：",options:["當","爸爸","陪我","讀書","的時候","，","我","感到","很","開心","。"],answer:"當爸爸陪我讀書的時候，我感到很開心。",explanation:"句型：當（爸爸陪我讀書）的時候，（我感到很開心）。"},
+        {qid:"l04_ch_06",kp:"kp_l04_001",type:"single_choice",stem:"課文中爸爸帶我去做哪件事？",options:["去游泳","去爬山","去看星星","去買東西"],answer:"去看星星",explanation:"課文說爸爸帶我去看星星，讓我感受到爸爸的陪伴和溫暖。"},
+        {qid:"l04_ch_07",kp:"kp_l04_002",type:"fill_blank",stem:"爸爸的笑聲像（ ）一樣，讓整個家充滿了快樂。",options:["陽光","大樹","星星","彩虹"],answer:"陽光",explanation:"課文用「陽光」來比喻爸爸的笑聲，表示溫暖、明亮的感覺。"},
+        {qid:"l04_ch_08",kp:"kp_l04_004",type:"handwrite_word",stem:"請寫出這個詞語：「溫暖」",answer:"溫暖",explanation:"「溫暖」形容感覺暖和、舒適，也可以用來描述讓人感到安心的情感。"}
+      ],
+      reinforcement_bank:{
+        "kp_l04_001":{kp_title:"課文理解",qid:"l04_re_001",type:"matching",stem:"把描寫和爸爸的特徵配對：",left:["眼睛亮晶晶","笑聲像陽光","手像大樹"],right:["讓家充滿快樂","讓我感到安全","精神飽滿有神"],answer:{"眼睛亮晶晶":"精神飽滿有神","笑聲像陽光":"讓家充滿快樂","手像大樹":"讓我感到安全"},explanation:"亮晶晶→有神、陽光→溫暖快樂、大樹→穩固安全。"},
+        "kp_l04_002":{kp_title:"像……一樣句型",qid:"l04_re_002",type:"guided_sentence_writing",stem:"用「像……一樣」寫一句話描述你的家人：",answer:null,keyword:"像",explanation:"例如：媽媽的笑容像花朵一樣美麗。只要有「像……一樣」就很棒！"},
+        "kp_l04_003":{kp_title:"當……的時候句型",qid:"l04_re_003",type:"fill_blank",stem:"當我肚子餓（ ）時候，媽媽總是會煮好吃的飯。",options:["的","了","著","過"],answer:"的",explanation:"「當……的時候」是固定句型，中間一定要加「的」字。"},
+        "kp_l04_004":{kp_title:"詞語",qid:"l04_re_004",type:"handwrite_word",stem:"請寫出這個詞語：「陪伴」",answer:"陪伴",explanation:"「陪伴」是指一直在旁邊陪著別人，是表示關心的重要詞語。"}
+      },
+      exploration:[
+        {qid:"l04_ex_01",kp:"kp_l04_002",type:"guided_sentence_writing",stem:"用「像……一樣」寫一句話，描述你最喜歡的家人：",answer:null,keyword:"像",explanation:"例如：爸爸的手像大山一樣，讓我覺得很有力量。用比喻讓句子更生動！"},
+        {qid:"l04_ex_02",kp:"kp_l04_003",type:"guided_sentence_writing",stem:"用「當……的時候……」寫一句關於家人陪伴你的句子：",answer:null,keyword:"當",explanation:"例如：當爸爸牽著我的手的時候，我感到特別安心。"},
+        {qid:"l04_ex_03",kp:"kp_l04_001",type:"single_choice",stem:"爸爸帶你去看星星，你最可能有什麼感覺？",options:["感到溫暖和幸福","感到無聊","感到害怕","感到生氣"],answer:"感到溫暖和幸福",explanation:"爸爸特地帶你去看星星，是一種陪伴和關愛，當然會感到溫暖和幸福！"},
+        {qid:"l04_ex_04",kp:"kp_l04_004",type:"handwrite_word",stem:"請寫出一個你覺得可以描述爸爸的詞語：",answer:null,explanation:"例如：溫暖、勇敢、高大、幽默……你覺得爸爸是什麼樣的人？"}
+      ]
+    },
+ 
+    // ── 第5課 我的家人 ───────────────────────────────────
+    "g2_ch_kanox_s2_l05":{
+      challenge:[
+        {qid:"l05_ch_01",kp:"kp_l05_001",type:"single_choice",stem:"課文中，爸爸的工作是什麼？",options:["醫生","老師","消防員","廚師"],answer:"消防員",explanation:"課文說爸爸是消防員，每天保護大家的安全。"},
+        {qid:"l05_ch_02",kp:"kp_l05_001",type:"single_choice",stem:"課文中，媽媽最喜歡做什麼？",options:["畫畫","唱歌","種花","看書"],answer:"畫畫",explanation:"課文說媽媽很喜歡畫畫，家裡的牆上都掛著她的作品。"},
+        {qid:"l05_ch_03",kp:"kp_l05_002",type:"single_choice",stem:"「不管天氣怎麼樣，爸爸都要去上班。」這句話用的句型是：",options:["不管……都……","因為……所以……","當……的時候……","像……一樣"],answer:"不管……都……",explanation:"「不管（條件），都（結果）」是表示無論如何都會怎樣的句型。"},
+        {qid:"l05_ch_04",kp:"kp_l05_002",type:"fill_blank",stem:"不管颳風還是下雨，消防員（ ）要出任務。",options:["都","才","又","就"],answer:"都",explanation:"「不管……都……」是固定句型，後面一定接「都」。"},
+        {qid:"l05_ch_05",kp:"kp_l05_001",type:"single_choice",stem:"課文說爺爺每天做什麼運動？",options:["爬山","打太極拳","游泳","跑步"],answer:"打太極拳",explanation:"課文說爺爺每天早上都會打太極拳，保持健康。"},
+        {qid:"l05_ch_06",kp:"kp_l05_002",type:"sentence_reorder",stem:"把詞語排成「不管……都……」的句子：",options:["不管","多麼","忙","，","媽媽","都","會","陪我","讀書","。"],answer:"不管多麼忙，媽媽都會陪我讀書。",explanation:"句型：不管（多麼忙），都（會陪我讀書）——表示無論如何都會做到。"},
+        {qid:"l05_ch_07",kp:"kp_l05_003",type:"single_choice",stem:"課文的主要主題是什麼？",options:["家人各有不同的工作和特色，我愛我的家","如何成為消防員","如何學畫畫","家裡的東西很多"],answer:"家人各有不同的工作和特色，我愛我的家",explanation:"課文介紹了各個家人的工作和特色，表達了對家人的愛。"},
+        {qid:"l05_ch_08",kp:"kp_l05_004",type:"handwrite_word",stem:"請寫出這個詞語：「家人」",answer:"家人",explanation:"「家人」是指住在一起或有血緣關係的親人，是本課的重要詞語。"}
+      ],
+      reinforcement_bank:{
+        "kp_l05_001":{kp_title:"家人特徵",qid:"l05_re_001",type:"matching",stem:"把家人和他們的特徵配對：",left:["爸爸","媽媽","爺爺"],right:["每天打太極拳","是消防員","喜歡畫畫"],answer:{"爸爸":"是消防員","媽媽":"喜歡畫畫","爺爺":"每天打太極拳"},explanation:"記憶：爸爸→消防員保護大家、媽媽→喜歡畫畫、爺爺→打太極拳保持健康。"},
+        "kp_l05_002":{kp_title:"不管……都……句型",qid:"l05_re_002",type:"guided_sentence_writing",stem:"用「不管……都……」寫一句話，說說你對家人或朋友的感情：",answer:null,keyword:"不管",explanation:"例如：不管發生什麼事，我都愛我的家人。只要有「不管……都……」就很棒！"},
+        "kp_l05_003":{kp_title:"課文主旨",qid:"l05_re_003",type:"single_choice",stem:"讀完《我的家人》，你覺得作者最想說什麼？",options:["我愛我的家人，家人各有不同的優點","消防員的工作很危險","畫畫很難學","打太極拳很累"],answer:"我愛我的家人，家人各有不同的優點",explanation:"課文透過描寫每位家人的特色，傳達對家人的愛與欣賞。"},
+        "kp_l05_004":{kp_title:"詞語",qid:"l05_re_004",type:"handwrite_word",stem:"請寫出這個詞語：「保護」",answer:"保護",explanation:"「保護」是讓人或事物不受傷害，消防員就是在保護大家。"}
+      },
+      exploration:[
+        {qid:"l05_ex_01",kp:"kp_l05_002",type:"guided_sentence_writing",stem:"用「不管……都……」寫一句你和家人的故事：",answer:null,keyword:"不管",explanation:"例如：不管我做錯什麼事，媽媽都會原諒我。"},
+        {qid:"l05_ex_02",kp:"kp_l05_001",type:"handwrite_word",stem:"請寫出一個家人的職業名稱（例如：老師、醫生）：",answer:null,explanation:"你的家人是做什麼工作的？把職業名稱寫出來！"},
+        {qid:"l05_ex_03",kp:"kp_l05_003",type:"single_choice",stem:"你最想對你的家人說什麼？",options:["謝謝你們，我愛你們","什麼都不說","我不知道","你們太忙了"],answer:"謝謝你們，我愛你們",explanation:"家人每天辛苦照顧我們，說聲謝謝和我愛你，是最好的禮物！"},
+        {qid:"l05_ex_04",kp:"kp_l05_004",type:"guided_sentence_writing",stem:"介紹你的一位家人，說說他的特色：",answer:null,keyword:null,explanation:"例如：我的媽媽很溫柔，不管我多難過，她都會陪著我。寫出你的家人最棒的地方！"}
+      ]
+    },
+ 
+    // ── 第6課 愛笑的大樹 ─────────────────────────────────
+    "g2_ch_kanox_s2_l06":{
+      challenge:[
+        {qid:"l06_ch_01",kp:"kp_l06_001",type:"single_choice",stem:"課文中的大樹，一年四季各有什麼變化？",options:["春天開花、夏天長葉、秋天果實、冬天光禿禿","春天光禿禿、夏天開花、秋天長葉、冬天果實","一年四季都一樣","只有夏天有變化"],answer:"春天開花、夏天長葉、秋天果實、冬天光禿禿",explanation:"課文描述大樹隨著四季變化：春天開花、夏天茂盛、秋天結果、冬天落葉。"},
+        {qid:"l06_ch_02",kp:"kp_l06_002",type:"single_choice",stem:"課文說「大樹終於長出了新芽」，「終於」這個詞表示：",options:["等了很久才發生","馬上就發生了","不想讓它發生","從來沒發生"],answer:"等了很久才發生",explanation:"「終於」表示經過等待或努力，事情終於實現了，帶有一種期待之後的驚喜感。"},
+        {qid:"l06_ch_03",kp:"kp_l06_002",type:"fill_blank",stem:"小鳥在大樹上唱歌，（ ）大樹也跟著搖動樹枝，好像在跳舞。",options:["並且","因為","雖然","但是"],answer:"並且",explanation:"「並且」是用來連接兩件同時或先後發生的事，表示「同時還有另一件事」。"},
+        {qid:"l06_ch_04",kp:"kp_l06_001",type:"single_choice",stem:"為什麼說這棵大樹「愛笑」？",options:["因為大樹每個季節都讓人感到快樂和美好","因為大樹真的會說話","因為大樹長很高","因為大樹的葉子很多"],answer:"因為大樹每個季節都讓人感到快樂和美好",explanation:"大樹雖然不會真的笑，但它每個季節都給人美麗和快樂的感覺，所以說它「愛笑」。"},
+        {qid:"l06_ch_05",kp:"kp_l06_003",type:"sentence_reorder",stem:"把詞語排成「終於……」的句子：",options:["等了","好久","，","春天","終於","來了","。"],answer:"等了好久，春天終於來了。",explanation:"「終於」放在期待已久的事情之前，表示等待後終於實現。"},
+        {qid:"l06_ch_06",kp:"kp_l06_002",type:"single_choice",stem:"「並且」這個詞的用法是：",options:["連接兩件相關的事情","表示原因","表示時間","表示條件"],answer:"連接兩件相關的事情",explanation:"「並且」用來連接兩件事，表示這兩件事都發生了，例如：大樹開花，並且飄出香味。"},
+        {qid:"l06_ch_07",kp:"kp_l06_001",type:"single_choice",stem:"課文說小朋友在大樹下做了什麼事？",options:["乘涼、玩耍、分享故事","睡覺","讀書","爬樹"],answer:"乘涼、玩耍、分享故事",explanation:"課文描述小朋友在大樹下乘涼、玩耍，還分享彼此的故事，快樂地度過時光。"},
+        {qid:"l06_ch_08",kp:"kp_l06_004",type:"handwrite_word",stem:"請寫出這個詞語：「終於」",answer:"終於",explanation:"「終於」表示經過等待或努力，期盼的事情終於實現了。"}
+      ],
+      reinforcement_bank:{
+        "kp_l06_001":{kp_title:"課文理解",qid:"l06_re_001",type:"matching",stem:"把季節和大樹的狀態配對：",left:["春天","夏天","秋天","冬天"],right:["光禿禿","長出新芽開花","果實纍纍","茂盛長葉"],answer:{"春天":"長出新芽開花","夏天":"茂盛長葉","秋天":"果實纍纍","冬天":"光禿禿"},explanation:"大樹四季各有不同的樣子，每個季節都有它的美麗。"},
+        "kp_l06_002":{kp_title:"終於並且句型",qid:"l06_re_002",type:"guided_sentence_writing",stem:"用「終於」寫一句你努力後成功的事：",answer:null,keyword:"終於",explanation:"例如：我練習了很久，終於學會了游泳。只要有「終於」就很棒！"},
+        "kp_l06_003":{kp_title:"句型操作",qid:"l06_re_003",type:"sentence_reorder",stem:"把詞語排成含有「並且」的句子：",options:["大樹","開滿","了","花","，","並且","飄出","了","淡淡","的","香味","。"],answer:"大樹開滿了花，並且飄出了淡淡的香味。",explanation:"「並且」連接兩件同時發生的美好事情：開滿花，並且有香味。"},
+        "kp_l06_004":{kp_title:"詞語",qid:"l06_re_004",type:"handwrite_word",stem:"請寫出這個詞語：「分享」",answer:"分享",explanation:"「分享」是把自己的東西或感受讓別人一起擁有，是本課傳達快樂的重要詞語。"}
+      },
+      exploration:[
+        {qid:"l06_ex_01",kp:"kp_l06_002",type:"guided_sentence_writing",stem:"用「終於」寫一句你期待很久的事終於發生的句子：",answer:null,keyword:"終於",explanation:"例如：我盼了好久，暑假終於來了！"},
+        {qid:"l06_ex_02",kp:"kp_l06_001",type:"single_choice",stem:"大樹在不同季節都很美麗，這告訴我們：",options:["每個時期都有它的美好","只有春天最美","冬天最不好","大樹不需要改變"],answer:"每個時期都有它的美好",explanation:"就像大樹四季各有美麗，人生每個階段也都有值得欣賞的地方。"},
+        {qid:"l06_ex_03",kp:"kp_l06_003",type:"guided_sentence_writing",stem:"用「並且」連接兩件你喜歡的事：",answer:null,keyword:"並且",explanation:"例如：我喜歡畫畫，並且喜歡唱歌。用「並且」讓句子更豐富！"},
+        {qid:"l06_ex_04",kp:"kp_l06_004",type:"handwrite_word",stem:"請寫出一件你想和朋友分享的快樂事情（寫出事情名稱）：",answer:null,explanation:"分享快樂，快樂就會變成雙份！寫出你最想分享的事情吧！"}
+      ]
+    }
+ 
+  },
+ 
+  // ── 綜合模組題庫（骨架＋第一課範例題，可擴充至第2～6課）──────
+  integrated_modules:{
+    radical:[
+      {qid:"int_r01",type:"single_choice",source:"第1課",stem:"「桃」「梅」「松」「柏」四個字，共同的部首是什麼？",options:["木","竹","艸","禾"],answer:"木",explanation:"桃、梅、松、柏都是木字旁，代表和樹木有關的字。"},
+      {qid:"int_r02",type:"single_choice",source:"第1課",stem:"下面哪一個字不是土部的字？",options:["地","塘","城","花"],answer:"花",explanation:"花是艸字頭，不是土部。地、塘、城都是土部的字。"},
+      {qid:"int_r03",type:"handwrite_character",source:"第1課",stem:"請寫出這個字：",prompt_char:"草",answer:"草",explanation:"「草」是艸字頭，下面是早字，代表植物。"},
+      {qid:"int_r04",type:"handwrite_radical",source:"第1課",stem:"「蜂」的部首是什麼？請寫出來：",answer:"虫",explanation:"「蜂」是虫字旁，因為蜜蜂是昆蟲。"},
+      {qid:"int_r05",type:"matching",source:"第1課",stem:"把字和它的部首配對：",left:["塘","蜂","桃","草"],right:["虫","木","艸","土"],answer:{"塘":"土","蜂":"虫","桃":"木","草":"艸"},explanation:"塘→土、蜂→虫、桃→木、草→艸，記住部首就能猜出字的意思！"}
+    ],
+    vocab:[
+      {qid:"int_v01",type:"single_choice",source:"第1課",stem:"「粉紅」是形容顏色的詞語，下面哪一個也是顏色詞？",options:["青綠","草地","蜂窩","桃花"],answer:"青綠",explanation:"青綠是形容顏色的詞，其他三個是景物名稱。"},
+      {qid:"int_v02",type:"word_classification",source:"第1課",stem:"把詞語分類放進正確的格子：",items:["粉紅","高興","青綠","快樂","淡藍","笑咪咪"],categories:{"顏色詞":[],"情緒詞":[]},answer:{"顏色詞":["粉紅","青綠","淡藍"],"情緒詞":["高興","快樂","笑咪咪"]},explanation:"顏色詞描述顏色，情緒詞描述心情。"},
+      {qid:"int_v03",type:"handwrite_word",source:"第1課",stem:"請寫出這個詞語：「五顏六色」",answer:"五顏六色",explanation:"「五顏六色」形容顏色非常多、非常豐富。"},
+      {qid:"int_v04",type:"single_choice",source:"第1課",stem:"「一眼就看見」這個詞的意思是：",options:["找了很久才看見","馬上就看見了","閉著眼睛看見","用一隻眼睛看"],answer:"馬上就看見了",explanation:"「一眼就」表示立刻、馬上的意思。"}
+    ],
+    sentence:[
+      {qid:"int_s01",type:"sentence_reorder",source:"第1課",stem:"把詞語排成課文句型：",options:["小青蛙","跳出","池塘","，","一眼就看見","淡藍","的","天空","。"],answer:"小青蛙跳出池塘，一眼就看見淡藍的天空。",explanation:"句型：主詞＋動作＋地點，一眼就看見＋顏色＋景物。"},
+      {qid:"int_s02",type:"fill_blank",source:"第1課",stem:"小燕子從很遠的地方飛來，一眼就看見（ ）的景色。",options:["粉紅","五顏六色","淡藍","青綠"],answer:"五顏六色",explanation:"課文中小燕子看見五顏六色的景色。"},
+      {qid:"int_s03",type:"guided_sentence_writing",source:"第1課",stem:"仿照課文，用「一眼就看見」寫一句新的句子：",answer:null,keyword:"一眼就看見",explanation:"好棒！只要句子有「一眼就看見」，後面接上顏色和景物就很完整！"},
+      {qid:"int_s04",type:"single_choice",source:"第1課",stem:"哪一句話的句型和課文最像？",options:["小貓走出門，一眼就看見紅色的玫瑰。","今天天氣很好。","我喜歡春天。","花朵很漂亮。"],answer:"小貓走出門，一眼就看見紅色的玫瑰。",explanation:"這句用了一樣的句型：小動物＋動作＋地點，一眼就看見＋顏色＋景物。"}
+    ],
+    sequence:[
+      {qid:"int_q01",type:"sentence_reorder",source:"第1課",stem:"把下面的詞語排成完整的句子：",options:["春天","來了","，","到處","都是","五顏六色","的","花朵","。"],answer:"春天來了，到處都是五顏六色的花朵。",explanation:"春天到了，各種顏色的花都開了，所以到處都是五顏六色的花朵。"},
+      {qid:"int_q02",type:"single_choice",source:"第1課",stem:"「先飛出蜂窩，才看見桃花」，這句話說明了：",options:["先有結果，再有原因","先有動作，再有發現","先有顏色，再有景物","先有景物，再有動作"],answer:"先有動作，再有發現",explanation:"先做了「飛出蜂窩」的動作，之後才「發現桃花」，這就是動作和發現的先後順序。"},
+      {qid:"int_q03",type:"fill_blank",source:"第1課",stem:"因為春天有很多美麗的景色，所以小動物們都感到很（ ）。",options:["高興","地洞","蜂窩","淡藍"],answer:"高興",explanation:"看到美麗的景色，當然會感到高興！這是因果關係：因為有美景，所以感到高興。"}
+    ],
+    comprehension:[
+      {qid:"int_c01",type:"single_choice",source:"第1課",stem:"課文中，從「蜂窩」裡飛出來的是哪個小動物？",options:["小青蛙","小田鼠","小蜜蜂","小燕子"],answer:"小蜜蜂",explanation:"「蜂窩」是蜜蜂住的地方，所以從蜂窩飛出來的是小蜜蜂。"},
+      {qid:"int_c02",type:"matching",source:"第1課",stem:"把小動物和牠們住的地方配對：",left:["小蜜蜂","小青蛙","小田鼠"],right:["地洞","池塘","蜂窩"],answer:{"小蜜蜂":"蜂窩","小青蛙":"池塘","小田鼠":"地洞"},explanation:"蜜蜂住蜂窩、青蛙住池塘、田鼠住地洞。"},
+      {qid:"int_c03",type:"single_choice",source:"第1課",stem:"課文說小燕子看到春天的景色，覺得「像彩虹一樣」，這代表春天的顏色是：",options:["只有一種顏色","很多種顏色","全是綠色","全是粉紅色"],answer:"很多種顏色",explanation:"彩虹有七種顏色，所以說「像彩虹」是在形容春天顏色非常豐富多彩。"}
+    ],
+    emotion:[
+      {qid:"int_e01",type:"single_choice",source:"第1課",stem:"看到美麗的春天，你最可能有什麼心情？",options:["高興","生氣","害怕","難過"],answer:"高興",explanation:"看到美麗的春天景色，當然會感到高興和開心！"},
+      {qid:"int_e02",type:"word_classification",source:"第1課",stem:"把詞語分類：哪些是「開心」的詞語，哪些是「景物」的詞語？",items:["高興","桃花","快樂","草地","笑咪咪","天空"],categories:{"開心的詞語":[],"景物詞語":[]},answer:{"開心的詞語":["高興","快樂","笑咪咪"],"景物詞語":["桃花","草地","天空"]},explanation:"情緒詞描述心情，景物詞描述我們看見的東西。"},
+      {qid:"int_e03",type:"guided_sentence_writing",source:"第1課",stem:"用「高興」寫一句話，說說是什麼讓你感到高興：",answer:null,keyword:"高興",explanation:"把「高興」這個詞用到生活中，讓別人知道什麼讓你開心！"}
+    ]
+  }
+};
+ 
+// ═══════════════════════════════════════════════════
+// INTEGRATED_QB — 綜合學習 JSON 題庫規格 v1
+// 兩層結構：knowledge_points 層 + question_bank 層
+// mode: "integrated" 供國語綜合練習模組使用
+// ═══════════════════════════════════════════════════
+const INTEGRATED_QB = {
+ 
+  // ── A. Knowledge Points 層 ──────────────────────────
+  knowledge_points: [
+ 
+    // 模組1：生字與部首
+    {
+      kp_id: "ikp_rad_001",
+      module: "radical",
+      subcategory: "部首辨認",
+      title: "木部高頻字辨認",
+      source_lessons: ["l01","l02","l03"],
+      difficulty_band: 1,
+      recommended_question_types: ["radical_choice","handwrite_character","matching"],
+      core_examples: ["桃","梅","樹","根","枝"],
+      tags: ["木部","生字","辨認"]
+    },
+    {
+      kp_id: "ikp_rad_002",
+      module: "radical",
+      subcategory: "部首辨認",
+      title: "土部高頻字辨認",
+      source_lessons: ["l01"],
+      difficulty_band: 1,
+      recommended_question_types: ["radical_choice","handwrite_radical","single_choice"],
+      core_examples: ["地","塘","城","堡"],
+      tags: ["土部","生字","辨認"]
+    },
+    {
+      kp_id: "ikp_rad_003",
+      module: "radical",
+      subcategory: "部首意義",
+      title: "部首與字義關聯",
+      source_lessons: ["l01","l02","l03","l04","l05","l06"],
+      difficulty_band: 2,
+      recommended_question_types: ["matching","word_classification","single_choice"],
+      core_examples: [
+        {"部首":"木","字義":"與樹木有關","例字":["桃","樹"]},
+        {"部首":"虫","字義":"與昆蟲有關","例字":["蜂","蛙"]},
+        {"部首":"艸","字義":"與植物有關","例字":["草","花"]}
+      ],
+      tags: ["部首","字義","推理"]
+    },
+ 
+    // 模組2：詞語與造詞
+    {
+      kp_id: "ikp_vocab_001",
+      module: "vocab",
+      subcategory: "顏色詞",
+      title: "顏色描寫詞辨認與運用",
+      source_lessons: ["l01","l02","l03"],
+      difficulty_band: 1,
+      recommended_question_types: ["single_choice","word_classification","handwrite_word","context_word_choice"],
+      core_examples: ["粉紅","青綠","淡藍","五顏六色","金黃","雪白"],
+      tags: ["顏色","描寫詞","形容詞"]
+    },
+    {
+      kp_id: "ikp_vocab_002",
+      module: "vocab",
+      subcategory: "詞語分類",
+      title: "情緒詞 vs 景物詞分類",
+      source_lessons: ["l01","l02","l05","l06"],
+      difficulty_band: 2,
+      recommended_question_types: ["word_classification","single_choice","context_word_choice"],
+      core_examples: {
+        "情緒詞": ["高興","感動","興奮","幸福","驚喜"],
+        "景物詞": ["桃花","草地","天空","彩虹","大樹"]
+      },
+      tags: ["分類","詞語","情緒","景物"]
+    },
+    {
+      kp_id: "ikp_vocab_003",
+      module: "vocab",
+      subcategory: "造詞",
+      title: "高頻詞組合練習",
+      source_lessons: ["l01","l02","l03","l04","l05","l06"],
+      difficulty_band: 1,
+      recommended_question_types: ["word_building","handwrite_word","single_choice"],
+      core_examples: ["驚喜","合作","陪伴","終於","分享","保護"],
+      tags: ["造詞","組合","核心詞"]
+    },
+ 
+    // 模組3：句型與造句
+    {
+      kp_id: "ikp_sent_001",
+      module: "sentence",
+      subcategory: "句型操作",
+      title: "一眼就看見句型",
+      source_lessons: ["l01"],
+      difficulty_band: 2,
+      recommended_question_types: ["sentence_reorder","sentence_pattern_fill","guided_sentence_writing"],
+      core_examples: ["小蜜蜂飛出蜂窩，一眼就看見粉紅的桃花。","小青蛙跳出池塘，一眼就看見淡藍的天空。"],
+      tags: ["句型","觀察","描寫"]
+    },
+    {
+      kp_id: "ikp_sent_002",
+      module: "sentence",
+      subcategory: "句型操作",
+      title: "因為……所以……句型",
+      source_lessons: ["l02","l03","l05"],
+      difficulty_band: 2,
+      recommended_question_types: ["because_so_fill","sentence_reorder","sentence_pattern_fill_dual","guided_sentence_writing"],
+      core_examples: ["因為大家合作，所以作品很漂亮。","因為天氣很好，所以我們去公園玩。"],
+      tags: ["因果","關聯詞","句型"]
+    },
+    {
+      kp_id: "ikp_sent_003",
+      module: "sentence",
+      subcategory: "句型操作",
+      title: "像……一樣比喻句型",
+      source_lessons: ["l04"],
+      difficulty_band: 2,
+      recommended_question_types: ["sentence_pattern_fill","guided_sentence_writing","single_choice"],
+      core_examples: ["爸爸的手像大樹一樣。","媽媽的笑容像陽光一樣溫暖。"],
+      tags: ["比喻","修辭","句型"]
+    },
+ 
+    // 模組4：順序與因果
+    {
+      kp_id: "ikp_seq_001",
+      module: "sequence",
+      subcategory: "時序",
+      title: "先／再／最後時序詞",
+      source_lessons: ["l02","l03","l04","l06"],
+      difficulty_band: 1,
+      recommended_question_types: ["time_sequence_fill","story_sequence","sentence_reorder"],
+      core_examples: ["先","再","然後","最後","接著"],
+      tags: ["時序","順序","關聯詞"]
+    },
+    {
+      kp_id: "ikp_seq_002",
+      module: "sequence",
+      subcategory: "因果",
+      title: "因果關係辨認",
+      source_lessons: ["l02","l03","l05"],
+      difficulty_band: 2,
+      recommended_question_types: ["cause_effect_match","because_so_fill","single_choice"],
+      core_examples: [
+        {"原因":"下雨","結果":"帶傘"},
+        {"原因":"大家合作","結果":"作品完成"},
+        {"原因":"很努力","結果":"終於成功"}
+      ],
+      tags: ["因果","邏輯","關聯詞"]
+    },
+ 
+    // 模組5：看圖與理解
+    {
+      kp_id: "ikp_comp_001",
+      module: "comprehension",
+      subcategory: "角色動作",
+      title: "誰在做什麼",
+      source_lessons: ["l01","l02","l03","l04","l05","l06"],
+      difficulty_band: 1,
+      recommended_question_types: ["role_action_choice","single_choice","matching"],
+      core_examples: [
+        {"角色":"小蜜蜂","動作":"飛出蜂窩"},
+        {"角色":"小青蛙","動作":"跳出池塘"},
+        {"角色":"爸爸","動作":"帶我看星星"}
+      ],
+      tags: ["角色","動作","理解"]
+    },
+    {
+      kp_id: "ikp_comp_002",
+      module: "comprehension",
+      subcategory: "事件順序",
+      title: "故事先後順序",
+      source_lessons: ["l02","l04","l06"],
+      difficulty_band: 2,
+      recommended_question_types: ["story_sequence","time_sequence_fill","sentence_reorder"],
+      core_examples: [
+        "先準備材料，再動手製作，最後完成作品。",
+        "先等待，然後出現，終於看見了。"
+      ],
+      tags: ["順序","故事","理解"]
+    },
+ 
+    // 模組6：情緒與生活表達
+    {
+      kp_id: "ikp_emo_001",
+      module: "emotion",
+      subcategory: "正向情緒",
+      title: "正向情緒詞辨認與造句",
+      source_lessons: ["l01","l02","l05","l06"],
+      difficulty_band: 1,
+      recommended_question_types: ["emotion_word_choice","word_classification","guided_sentence_writing","picture_sentence_writing"],
+      core_examples: ["高興","感動","驚喜","幸福","興奮","溫暖"],
+      tags: ["正向情緒","感受","表達"]
+    },
+    {
+      kp_id: "ikp_emo_002",
+      module: "emotion",
+      subcategory: "情境應用",
+      title: "情境情緒選詞",
+      source_lessons: ["l02","l04","l05","l06"],
+      difficulty_band: 2,
+      recommended_question_types: ["emotion_word_choice","single_choice","guided_sentence_writing"],
+      core_examples: [
+        {"情境":"收到驚喜禮物","情緒":"感動和高興"},
+        {"情境":"爸爸陪我看星星","情緒":"溫暖和幸福"},
+        {"情境":"看到彩虹","情緒":"驚喜和開心"}
+      ],
+      tags: ["情境","情緒","應用"]
+    }
+  ],
+ 
+  // ── B. Question Bank 層 ─────────────────────────────
+  // 每個模組各 3 題樣本，共 18 題
+  // mode: "integrated" — 供國語綜合練習使用
+  question_bank: [
+ 
+    // ── 模組1：生字與部首 ──────────────────
+    {
+      question_id: "iq_rad_001",
+      mode: "integrated",
+      module: "radical",
+      subcategory: "部首辨認",
+      linked_kp_ids: ["ikp_rad_001","ikp_rad_002"],
+      question_type: "radical_choice",
+      prompt: "「桃」「草」「塘」「蜂」四個字，哪一個字的部首是「木」？",
+      options: ["桃","草","塘","蜂"],
+      answer: "桃",
+      explanation: "「桃」是木字旁，代表和樹木有關；草是艸、塘是土、蜂是虫。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 1,
+      source_lessons: ["l01"],
+      tags: ["木部","部首","辨認"]
+    },
+    {
+      question_id: "iq_rad_002",
+      mode: "integrated",
+      module: "radical",
+      subcategory: "部首意義",
+      linked_kp_ids: ["ikp_rad_003"],
+      question_type: "matching",
+      prompt: "把字和它的部首配對：",
+      options: null,
+      answer: {"塘":"土","蜂":"虫","桃":"木","草":"艸"},
+      explanation: "塘→土（土地有關）、蜂→虫（昆蟲有關）、桃→木（植物有關）、草→艸（草本植物有關）。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 2,
+      source_lessons: ["l01"],
+      tags: ["部首","配對","字義"],
+      // matching 需要的額外欄位
+      left: ["塘","蜂","桃","草"],
+      right: ["虫","木","艸","土"]
+    },
+    {
+      question_id: "iq_rad_003",
+      mode: "integrated",
+      module: "radical",
+      subcategory: "手寫生字",
+      linked_kp_ids: ["ikp_rad_001"],
+      question_type: "handwrite_character",
+      prompt: "請寫出這個字：",
+      options: null,
+      answer: "草",
+      explanation: "「草」是艸字頭，下面是早字，代表草本植物。",
+      response_mode: "handwrite_input",
+      input_method_hint: "可用 iPad 手寫鍵盤輸入",
+      difficulty: 1,
+      source_lessons: ["l01","l02"],
+      tags: ["手寫","生字","艸部"],
+      prompt_char: "草"
+    },
+ 
+    // ── 模組2：詞語與造詞 ──────────────────
+    {
+      question_id: "iq_vocab_001",
+      mode: "integrated",
+      module: "vocab",
+      subcategory: "詞語分類",
+      linked_kp_ids: ["ikp_vocab_002"],
+      question_type: "word_classification",
+      prompt: "把詞語分類，放進正確的格子：",
+      options: null,
+      answer: {"顏色詞":["粉紅","青綠","淡藍"],"情緒詞":["高興","感動","驚喜"]},
+      explanation: "顏色詞描述顏色的樣子，情緒詞描述心裡的感受。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 2,
+      source_lessons: ["l01","l02"],
+      tags: ["分類","詞語","顏色","情緒"],
+      items: ["粉紅","高興","青綠","感動","淡藍","驚喜"],
+      categories: {"顏色詞":[],"情緒詞":[]}
+    },
+    {
+      question_id: "iq_vocab_002",
+      mode: "integrated",
+      module: "vocab",
+      subcategory: "顏色詞",
+      linked_kp_ids: ["ikp_vocab_001"],
+      question_type: "context_word_choice",
+      prompt: "小田鼠看見（　　）的草地，覺得春天真美麗！",
+      options: ["青綠","粉紅","淡藍","雪白"],
+      answer: "青綠",
+      explanation: "課文說小田鼠看見青綠的草地，青綠形容翠綠的草地顏色。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 1,
+      source_lessons: ["l01"],
+      tags: ["顏色詞","填空","情境"]
+    },
+    {
+      question_id: "iq_vocab_003",
+      mode: "integrated",
+      module: "vocab",
+      subcategory: "造詞",
+      linked_kp_ids: ["ikp_vocab_003"],
+      question_type: "handwrite_word",
+      prompt: "請寫出這個詞語：「驚喜」",
+      options: null,
+      answer: "驚喜",
+      explanation: "「驚喜」是又驚訝又高興的意思，是第二課的重要詞語。",
+      response_mode: "handwrite_input",
+      input_method_hint: "可用 iPad 手寫鍵盤輸入",
+      difficulty: 1,
+      source_lessons: ["l02"],
+      tags: ["手寫","造詞","情緒詞"]
+    },
+ 
+    // ── 模組3：句型與造句 ──────────────────
+    {
+      question_id: "iq_sent_001",
+      mode: "integrated",
+      module: "sentence",
+      subcategory: "句型操作",
+      linked_kp_ids: ["ikp_sent_001"],
+      question_type: "sentence_reorder",
+      prompt: "把詞語排成正確的句子：",
+      options: ["小青蛙","跳出","池塘","，","一眼就看見","淡藍","的","天空","。"],
+      answer: "小青蛙跳出池塘，一眼就看見淡藍的天空。",
+      explanation: "句型：主詞＋動作＋地點，一眼就看見＋顏色＋景物。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 2,
+      source_lessons: ["l01"],
+      tags: ["句型","排列","一眼就看見"]
+    },
+    {
+      question_id: "iq_sent_002",
+      mode: "integrated",
+      module: "sentence",
+      subcategory: "因果句型",
+      linked_kp_ids: ["ikp_sent_002"],
+      question_type: "because_so_fill",
+      prompt: "因為大家一起努力，（　　）作品做得很漂亮。",
+      options: ["所以","但是","雖然","如果"],
+      answer: "所以",
+      explanation: "「因為……所以……」是因果句型，前面是原因，後面是結果。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 1,
+      source_lessons: ["l02"],
+      tags: ["因果","關聯詞","句型"]
+    },
+    {
+      question_id: "iq_sent_003",
+      mode: "integrated",
+      module: "sentence",
+      subcategory: "造句",
+      linked_kp_ids: ["ikp_sent_002"],
+      question_type: "guided_sentence_writing",
+      prompt: "用「因為……所以……」寫一句你生活中的事：",
+      options: null,
+      answer: null,
+      explanation: "例如：因為今天是我的生日，所以媽媽做了蛋糕。只要有「因為……所以……」就很棒！",
+      response_mode: "handwrite_input",
+      input_method_hint: "可用 iPad 手寫鍵盤輸入整句話",
+      difficulty: 2,
+      source_lessons: ["l02","l03","l05"],
+      tags: ["造句","因果","開放"],
+      keyword: "因為"
+    },
+ 
+    // ── 模組4：順序與因果 ──────────────────
+    {
+      question_id: "iq_seq_001",
+      mode: "integrated",
+      module: "sequence",
+      subcategory: "時序詞",
+      linked_kp_ids: ["ikp_seq_001"],
+      question_type: "time_sequence_fill",
+      prompt: "大家（　　）準備材料，（　　）動手製作，（　　）完成了漂亮的花衣裳。",
+      options: ["先","再","最後","然後"],
+      answer: ["先","再","最後"],
+      explanation: "時序詞「先→再→最後」表示事情發生的順序。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 1,
+      source_lessons: ["l02"],
+      tags: ["時序","順序","關聯詞"]
+    },
+    {
+      question_id: "iq_seq_002",
+      mode: "integrated",
+      module: "sequence",
+      subcategory: "因果辨認",
+      linked_kp_ids: ["ikp_seq_002"],
+      question_type: "cause_effect_match",
+      prompt: "把「原因」和「結果」配對：",
+      options: null,
+      answer: {"因為下雨":"所以帶傘","因為大家合作":"所以作品完成","因為努力練習":"所以終於學會"},
+      explanation: "因果關係：原因導致結果，用「因為……所以……」連接。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 2,
+      source_lessons: ["l02","l03"],
+      tags: ["因果","配對","邏輯"],
+      left: ["因為下雨","因為大家合作","因為努力練習"],
+      right: ["所以作品完成","所以帶傘","所以終於學會"]
+    },
+    {
+      question_id: "iq_seq_003",
+      mode: "integrated",
+      module: "sequence",
+      subcategory: "故事順序",
+      linked_kp_ids: ["ikp_comp_002"],
+      question_type: "story_sequence",
+      prompt: "把下面的事情排成正確的順序：",
+      options: ["終於完成了花衣裳","全家人一起準備材料","媽媽開始畫花朵","爸爸剪裁布料"],
+      answer: "全家人一起準備材料→爸爸剪裁布料→媽媽開始畫花朵→終於完成了花衣裳",
+      explanation: "做衣服的順序：先準備→剪裁→畫花→完成。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 2,
+      source_lessons: ["l02"],
+      tags: ["順序","故事","第2課"]
+    },
+ 
+    // ── 模組5：看圖與理解 ──────────────────
+    {
+      question_id: "iq_comp_001",
+      mode: "integrated",
+      module: "comprehension",
+      subcategory: "角色動作",
+      linked_kp_ids: ["ikp_comp_001"],
+      question_type: "role_action_choice",
+      prompt: "「看見粉紅的桃花」的是哪一個小動物？",
+      options: ["小青蛙","小田鼠","小蜜蜂","小燕子"],
+      answer: "小蜜蜂",
+      explanation: "課文：小蜜蜂飛出蜂窩，一眼就看見粉紅的桃花。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 1,
+      source_lessons: ["l01"],
+      tags: ["角色","動作","第1課"]
+    },
+    {
+      question_id: "iq_comp_002",
+      mode: "integrated",
+      module: "comprehension",
+      subcategory: "角色配對",
+      linked_kp_ids: ["ikp_comp_001"],
+      question_type: "matching",
+      prompt: "把小動物和牠們看見的景物配對：",
+      options: null,
+      answer: {"小蜜蜂":"粉紅的桃花","小青蛙":"淡藍的天空","小田鼠":"青綠的草地","小燕子":"五顏六色的景色"},
+      explanation: "蜜蜂→桃花、青蛙→天空、田鼠→草地、燕子→景色。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 2,
+      source_lessons: ["l01"],
+      tags: ["配對","角色","景物"],
+      left: ["小蜜蜂","小青蛙","小田鼠","小燕子"],
+      right: ["淡藍的天空","青綠的草地","粉紅的桃花","五顏六色的景色"]
+    },
+    {
+      question_id: "iq_comp_003",
+      mode: "integrated",
+      module: "comprehension",
+      subcategory: "課文理解",
+      linked_kp_ids: ["ikp_comp_002"],
+      question_type: "single_choice",
+      prompt: "《彩色王國》的故事最後，所有顏色合在一起變成了什麼？",
+      options: ["黑色","白色","彩虹","彩色"],
+      answer: "彩虹",
+      explanation: "七種顏色合在一起，形成了美麗的彩虹，象徵大家和氣融融。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 1,
+      source_lessons: ["l03"],
+      tags: ["理解","第3課","主旨"]
+    },
+ 
+    // ── 模組6：情緒與生活表達 ──────────────
+    {
+      question_id: "iq_emo_001",
+      mode: "integrated",
+      module: "emotion",
+      subcategory: "情緒選詞",
+      linked_kp_ids: ["ikp_emo_002"],
+      question_type: "emotion_word_choice",
+      prompt: "收到全家人一起做的驚喜花衣裳，你最可能有什麼感覺？",
+      options: ["高興又感動","生氣","害怕","無聊"],
+      answer: "高興又感動",
+      explanation: "收到用心做的禮物，當然會感到高興又感動！",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 1,
+      source_lessons: ["l02"],
+      tags: ["情緒","情境","第2課"]
+    },
+    {
+      question_id: "iq_emo_002",
+      mode: "integrated",
+      module: "emotion",
+      subcategory: "詞語分類",
+      linked_kp_ids: ["ikp_emo_001"],
+      question_type: "word_classification",
+      prompt: "把詞語分類：哪些是正向情緒詞，哪些不是？",
+      options: null,
+      answer: {"正向情緒詞":["高興","感動","驚喜","幸福"],"非情緒詞":["桃花","草地","大樹"]},
+      explanation: "正向情緒詞描述開心的感受，桃花、草地、大樹是景物詞。",
+      response_mode: "onscreen",
+      input_method_hint: null,
+      difficulty: 2,
+      source_lessons: ["l01","l02","l06"],
+      tags: ["情緒","分類","詞語"],
+      items: ["高興","桃花","感動","草地","驚喜","大樹","幸福"],
+      categories: {"正向情緒詞":[],"非情緒詞":[]}
+    },
+    {
+      question_id: "iq_emo_003",
+      mode: "integrated",
+      module: "emotion",
+      subcategory: "生活造句",
+      linked_kp_ids: ["ikp_emo_001","ikp_emo_002"],
+      question_type: "guided_sentence_writing",
+      prompt: "用一個情緒詞，寫一句話說說你什麼時候有這種感覺：",
+      options: null,
+      answer: null,
+      explanation: "例如：當爸爸帶我去看星星的時候，我感到很幸福。把情緒詞用進生活裡！",
+      response_mode: "handwrite_input",
+      input_method_hint: "可用 iPad 手寫鍵盤輸入整句話",
+      difficulty: 2,
+      source_lessons: ["l01","l02","l04","l05","l06"],
+      tags: ["造句","情緒","生活","開放"],
+      keyword: null
+    }
+  ]
+};
+ 
+// 把 INTEGRATED_QB 的 question_bank 接入各模組，
+// 以 question_type 和現有 renderQ 相容
+(function patchIntegratedModules(){
+  // 將 question_bank 按 module 分組，補充到 DB.integrated_modules
+  INTEGRATED_QB.question_bank.forEach(q=>{
+    const mod=q.module;
+    if(!DB.integrated_modules[mod])return;
+    // 轉換為現有 renderQ 相容格式（加 type / stem / options 等別名）
+    const compat={
+      qid: q.question_id,
+      type: q.question_type,
+      source: q.source_lessons.map(l=>`第${l.replace('l','')}課`).join('、'),
+      stem: q.prompt,
+      options: q.options||undefined,
+      answer: q.answer,
+      explanation: q.explanation,
+      keyword: q.keyword||undefined,
+      // matching / classification 專用欄位
+      left: q.left||undefined,
+      right: q.right||undefined,
+      items: q.items||undefined,
+      categories: q.categories||undefined,
+      prompt_char: q.prompt_char||undefined,
+      // 標記來源
+      _from_iqb: true,
+      _kp_ids: q.linked_kp_ids
+    };
+    // 避免重複加入（若 qid 已存在則跳過）
+    const already=DB.integrated_modules[mod].some(x=>x.qid===q.question_id);
+    if(!already) DB.integrated_modules[mod].push(compat);
+  });
+})();
+ 
+// ═══════════════════════════════════════════════════
+// KP_POOL — 1～6課跨課 knowledge points 整併資料池
+// 供單課出題、綜合練習、補強錯題、模組分類使用
+// ═══════════════════════════════════════════════════
+const KP_POOL=[
+ 
+  // ── A. 生字 ─────────────────────────────────────────
+  {
+    kp_id:"kp_x_char_001",
+    module:"radical",
+    subcategory:"生字",
+    title:"木部高頻字",
+    source_lessons:["l01","l02","l03"],
+    difficulty_band:1,
+    recommended_question_types:["handwrite_character","radical_choice","matching"],
+    core_examples:["桃","梅","松","柏","樹","根","枝","葉"],
+    tags:["木部","生字","植物"]
+  },
+  {
+    kp_id:"kp_x_char_002",
+    module:"radical",
+    subcategory:"生字",
+    title:"土部高頻字",
+    source_lessons:["l01"],
+    difficulty_band:1,
+    recommended_question_types:["radical_choice","handwrite_radical","single_choice"],
+    core_examples:["地","塘","城","堡","坐","坡","場"],
+    tags:["土部","生字","地理"]
+  },
+  {
+    kp_id:"kp_x_char_003",
+    module:"radical",
+    subcategory:"生字",
+    title:"虫部高頻字",
+    source_lessons:["l01","l04"],
+    difficulty_band:1,
+    recommended_question_types:["radical_choice","handwrite_character"],
+    core_examples:["蜂","蝴","蝶","蛙","蟲","螢"],
+    tags:["虫部","生字","動物"]
+  },
+  {
+    kp_id:"kp_x_char_004",
+    module:"radical",
+    subcategory:"生字",
+    title:"水部高頻字",
+    source_lessons:["l01","l03"],
+    difficulty_band:1,
+    recommended_question_types:["radical_choice","handwrite_character","matching"],
+    core_examples:["池","河","海","泳","波","流","清"],
+    tags:["水部","生字","自然"]
+  },
+  {
+    kp_id:"kp_x_char_005",
+    module:"radical",
+    subcategory:"生字",
+    title:"艸部高頻字",
+    source_lessons:["l01","l02"],
+    difficulty_band:1,
+    recommended_question_types:["radical_choice","handwrite_character"],
+    core_examples:["草","花","菜","葉","苗","茶","芽"],
+    tags:["艸部","生字","植物"]
+  },
+  {
+    kp_id:"kp_x_char_006",
+    module:"radical",
+    subcategory:"生字",
+    title:"心部高頻字",
+    source_lessons:["l02","l05"],
+    difficulty_band:2,
+    recommended_question_types:["radical_choice","handwrite_character","single_choice"],
+    core_examples:["想","感","愛","忙","忘","怕","快"],
+    tags:["心部","生字","情緒"]
+  },
+ 
+  // ── B. 部首 ─────────────────────────────────────────
+  {
+    kp_id:"kp_x_radical_001",
+    module:"radical",
+    subcategory:"部首",
+    title:"部首與字義對應",
+    source_lessons:["l01","l02","l03","l04","l05","l06"],
+    difficulty_band:2,
+    recommended_question_types:["radical_choice","matching","word_classification"],
+    core_examples:[
+      {"部首":"木","字義":"與樹木植物有關","例字":["桃","梅","樹"]},
+      {"部首":"土","字義":"與土地地方有關","例字":["地","塘","城"]},
+      {"部首":"虫","字義":"與昆蟲動物有關","例字":["蜂","蝴","蛙"]},
+      {"部首":"水","字義":"與水流有關","例字":["池","河","清"]},
+      {"部首":"艸","字義":"與植物花草有關","例字":["草","花","葉"]},
+      {"部首":"心","字義":"與心情感受有關","例字":["想","感","愛"]}
+    ],
+    tags:["部首","字義","識字"]
+  },
+ 
+  // ── C. 詞語 ─────────────────────────────────────────
+  {
+    kp_id:"kp_x_vocab_color",
+    module:"vocab",
+    subcategory:"顏色詞",
+    title:"顏色描寫詞",
+    source_lessons:["l01","l02","l03"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","word_classification","context_word_choice","handwrite_word"],
+    core_examples:["粉紅","青綠","淡藍","五顏六色","金黃","雪白","深紅","橙色"],
+    tags:["顏色","描寫詞","形容詞"]
+  },
+  {
+    kp_id:"kp_x_vocab_scene",
+    module:"vocab",
+    subcategory:"景物詞",
+    title:"自然景物詞",
+    source_lessons:["l01","l03","l04"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","matching","word_classification","handwrite_word"],
+    core_examples:["桃花","草地","天空","池塘","彩虹","蜂窩","地洞","樹林","河流","向日葵"],
+    tags:["景物","自然","名詞"]
+  },
+  {
+    kp_id:"kp_x_vocab_family",
+    module:"vocab",
+    subcategory:"家人與角色詞",
+    title:"家人與角色詞",
+    source_lessons:["l02","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","matching","role_action_choice"],
+    core_examples:["爸爸","媽媽","爺爺","奶奶","哥哥","姐姐","弟弟","妹妹","老師","同學","朋友"],
+    tags:["家人","角色","人物"]
+  },
+  {
+    kp_id:"kp_x_vocab_action",
+    module:"vocab",
+    subcategory:"動作詞",
+    title:"高頻動作詞",
+    source_lessons:["l01","l02","l03","l04","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","role_action_choice","sentence_reorder"],
+    core_examples:["飛出","跳出","跑出","看見","走到","拿起","放下","打開","分享","幫忙","製作","完成","等待"],
+    tags:["動作","動詞","句型"]
+  },
+  {
+    kp_id:"kp_x_vocab_emotion",
+    module:"emotion",
+    subcategory:"情緒詞",
+    title:"情緒與感受詞",
+    source_lessons:["l01","l02","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","emotion_word_choice","word_classification","guided_sentence_writing"],
+    core_examples:["高興","開心","快樂","興奮","微笑","感動","幸福","得意","熱情","冷靜","安靜","神奇","美麗","驚喜","期待","難過","生氣","害怕"],
+    tags:["情緒","感受","形容詞"]
+  },
+  {
+    kp_id:"kp_x_vocab_describe",
+    module:"vocab",
+    subcategory:"描寫詞",
+    title:"樣態描寫詞",
+    source_lessons:["l01","l02","l03","l04"],
+    difficulty_band:2,
+    recommended_question_types:["single_choice","context_word_choice","sentence_pattern_fill"],
+    core_examples:["五顏六色","一眼就","慢慢地","輕輕地","快快地","靜靜地","大大的","小小的","高高的","長長的"],
+    tags:["描寫","副詞","形容詞"]
+  },
+  {
+    kp_id:"kp_x_vocab_life",
+    module:"vocab",
+    subcategory:"生活詞",
+    title:"常用生活詞",
+    source_lessons:["l02","l03","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","word_building","context_word_choice"],
+    core_examples:["教室","學校","生日","作品","禮物","驚喜","故事","圖書館","操場","辦公室","便當","書包"],
+    tags:["生活","場所","物品"]
+  },
+ 
+  // ── D. 句型 ─────────────────────────────────────────
+  {
+    kp_id:"kp_x_sent_pattern_001",
+    module:"sentence",
+    subcategory:"句型",
+    title:"一眼就看見句型",
+    source_lessons:["l01"],
+    difficulty_band:2,
+    recommended_question_types:["sentence_reorder","sentence_pattern_fill","guided_sentence_writing","sentence_rewrite"],
+    core_examples:[
+      "小蜜蜂飛出蜂窩，一眼就看見粉紅的桃花。",
+      "小青蛙跳出池塘，一眼就看見淡藍的天空。",
+      "小田鼠跑出地洞，一眼就看見青綠的草地。",
+      "小朋友走出教室，一眼就看見金黃的向日葵。"
+    ],
+    tags:["句型","觀察","描寫"]
+  },
+  {
+    kp_id:"kp_x_sent_pattern_002",
+    module:"sentence",
+    subcategory:"句型",
+    title:"因為……所以……",
+    source_lessons:["l02","l03","l05"],
+    difficulty_band:2,
+    recommended_question_types:["because_so_fill","cause_effect_match","sentence_reorder"],
+    core_examples:[
+      "因為天氣很好，所以我們去公園玩。",
+      "因為媽媽生病了，所以我幫她倒水。",
+      "因為大家一起努力，所以作品很漂亮。"
+    ],
+    tags:["因果","關聯詞","句型"]
+  },
+  {
+    kp_id:"kp_x_sent_pattern_003",
+    module:"sentence",
+    subcategory:"句型",
+    title:"當……的時候……",
+    source_lessons:["l03","l04","l06"],
+    difficulty_band:2,
+    recommended_question_types:["sentence_pattern_fill","sentence_reorder","guided_sentence_writing"],
+    core_examples:[
+      "當春天來的時候，花朵都開了。",
+      "當我難過的時候，媽媽會抱著我。",
+      "當大家一起唱歌的時候，教室裡充滿笑聲。"
+    ],
+    tags:["時間","關聯詞","句型"]
+  },
+  {
+    kp_id:"kp_x_sent_pattern_004",
+    module:"sentence",
+    subcategory:"句型",
+    title:"不管……都……",
+    source_lessons:["l04","l05"],
+    difficulty_band:3,
+    recommended_question_types:["sentence_pattern_fill","sentence_pattern_fill_dual","guided_sentence_writing"],
+    core_examples:[
+      "不管天氣怎樣，我都會去上學。",
+      "不管多忙，媽媽都會陪我讀書。",
+      "不管遇到什麼困難，我都不放棄。"
+    ],
+    tags:["轉折","關聯詞","句型"]
+  },
+  {
+    kp_id:"kp_x_sent_pattern_005",
+    module:"sentence",
+    subcategory:"句型",
+    title:"終於……",
+    source_lessons:["l03","l05","l06"],
+    difficulty_band:2,
+    recommended_question_types:["sentence_pattern_fill","guided_sentence_writing","time_sequence_fill"],
+    core_examples:[
+      "經過很多天的努力，他終於學會了游泳。",
+      "我們等了很久，火車終於來了。",
+      "大家一起合作，終於把作品完成了。"
+    ],
+    tags:["結果","關聯詞","句型"]
+  },
+  {
+    kp_id:"kp_x_sent_pattern_006",
+    module:"sentence",
+    subcategory:"句型",
+    title:"像……一樣",
+    source_lessons:["l01","l02","l04"],
+    difficulty_band:2,
+    recommended_question_types:["sentence_pattern_fill","guided_sentence_writing","single_choice"],
+    core_examples:[
+      "春天的顏色像彩虹一樣。",
+      "媽媽的笑容像太陽一樣溫暖。",
+      "他跑得像風一樣快。"
+    ],
+    tags:["比喻","修辭","句型"]
+  },
+ 
+  // ── E. 關聯詞 ────────────────────────────────────────
+  {
+    kp_id:"kp_x_connector_001",
+    module:"sequence",
+    subcategory:"關聯詞",
+    title:"因果關聯詞：因為／所以",
+    source_lessons:["l02","l03","l05"],
+    difficulty_band:2,
+    recommended_question_types:["because_so_fill","cause_effect_match","single_choice"],
+    core_examples:["因為","所以"],
+    tags:["因果","關聯詞","邏輯"]
+  },
+  {
+    kp_id:"kp_x_connector_002",
+    module:"sequence",
+    subcategory:"關聯詞",
+    title:"時間順序詞：先／再／最後",
+    source_lessons:["l02","l03","l04","l06"],
+    difficulty_band:1,
+    recommended_question_types:["time_sequence_fill","story_sequence","sentence_reorder"],
+    core_examples:["先","再","然後","最後","接著","之後"],
+    tags:["時序","關聯詞","順序"]
+  },
+  {
+    kp_id:"kp_x_connector_003",
+    module:"sequence",
+    subcategory:"關聯詞",
+    title:"轉折強調詞：不管／都、終於、立刻",
+    source_lessons:["l04","l05","l06"],
+    difficulty_band:3,
+    recommended_question_types:["sentence_pattern_fill","single_choice","context_word_choice"],
+    core_examples:["不管","都","終於","立刻","馬上","竟然"],
+    tags:["轉折","強調","關聯詞"]
+  },
+  {
+    kp_id:"kp_x_connector_004",
+    module:"sequence",
+    subcategory:"關聯詞",
+    title:"並列關聯詞：並且／而且",
+    source_lessons:["l03","l05"],
+    difficulty_band:2,
+    recommended_question_types:["sentence_pattern_fill","single_choice","context_word_choice"],
+    core_examples:["並且","而且","也","還有","同時"],
+    tags:["並列","關聯詞","句型"]
+  },
+ 
+  // ── F. 情緒／感受詞（供 emotion 模組專用） ─────────────
+  {
+    kp_id:"kp_x_emotion_positive",
+    module:"emotion",
+    subcategory:"正向情緒",
+    title:"正向情緒詞",
+    source_lessons:["l01","l02","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["emotion_word_choice","word_classification","guided_sentence_writing","picture_sentence_writing"],
+    core_examples:["高興","開心","快樂","興奮","微笑","感動","幸福","得意","熱情","期待","驚喜"],
+    tags:["正向情緒","感受","表達"]
+  },
+  {
+    kp_id:"kp_x_emotion_calm",
+    module:"emotion",
+    subcategory:"平靜情緒",
+    title:"平靜狀態詞",
+    source_lessons:["l03","l04"],
+    difficulty_band:2,
+    recommended_question_types:["emotion_word_choice","single_choice","context_word_choice"],
+    core_examples:["冷靜","安靜","平靜","認真","專心","仔細"],
+    tags:["平靜","狀態","描寫"]
+  },
+  {
+    kp_id:"kp_x_emotion_negative",
+    module:"emotion",
+    subcategory:"負向情緒",
+    title:"負向情緒詞（辨認用）",
+    source_lessons:["l05","l06"],
+    difficulty_band:2,
+    recommended_question_types:["emotion_word_choice","word_classification","single_choice"],
+    core_examples:["難過","生氣","害怕","擔心","失望","傷心"],
+    tags:["負向情緒","對比","辨認"]
+  },
+ 
+  // ── G. 看圖理解／角色動作 ────────────────────────────
+  {
+    kp_id:"kp_x_comp_role_action",
+    module:"comprehension",
+    subcategory:"角色動作",
+    title:"誰在做什麼",
+    source_lessons:["l01","l02","l03","l04","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["role_action_choice","single_choice","matching","picture_comprehension"],
+    core_examples:[
+      {"角色":"小蜜蜂","動作":"飛出蜂窩","看見":"粉紅的桃花"},
+      {"角色":"小青蛙","動作":"跳出池塘","看見":"淡藍的天空"},
+      {"角色":"小田鼠","動作":"跑出地洞","看見":"青綠的草地"},
+      {"角色":"小燕子","動作":"從遠處飛來","看見":"五顏六色的景色"}
+    ],
+    tags:["角色","動作","課文理解"]
+  },
+  {
+    kp_id:"kp_x_comp_sequence",
+    module:"comprehension",
+    subcategory:"事件順序",
+    title:"先後發生了什麼",
+    source_lessons:["l02","l03","l04","l06"],
+    difficulty_band:2,
+    recommended_question_types:["story_sequence","time_sequence_fill","sentence_reorder"],
+    core_examples:[
+      "先出發，再到達，最後完成任務。",
+      "先準備材料，再動手製作，最後展示作品。",
+      "先等待，然後出現，終於看見了。"
+    ],
+    tags:["順序","時序","故事"]
+  },
+  {
+    kp_id:"kp_x_comp_together",
+    module:"comprehension",
+    subcategory:"合作與互動",
+    title:"誰和誰一起做事",
+    source_lessons:["l02","l05","l06"],
+    difficulty_band:2,
+    recommended_question_types:["role_action_choice","single_choice","picture_comprehension"],
+    core_examples:[
+      "爸爸和我一起去公園。",
+      "同學們一起完成作品。",
+      "老師和學生一起討論。"
+    ],
+    tags:["合作","互動","角色"]
+  },
+ 
+  // ── H. 生活應用主題 ──────────────────────────────────
+  {
+    kp_id:"kp_x_theme_spring",
+    module:"comprehension",
+    subcategory:"生活應用",
+    title:"春天與自然主題",
+    source_lessons:["l01"],
+    difficulty_band:1,
+    recommended_question_types:["picture_comprehension","single_choice","picture_sentence_writing","guided_sentence_writing"],
+    core_examples:["春天","桃花","草地","天空","彩虹","蜜蜂","燕子","青蛙","五顏六色"],
+    tags:["春天","自然","季節"]
+  },
+  {
+    kp_id:"kp_x_theme_family",
+    module:"emotion",
+    subcategory:"生活應用",
+    title:"家人與陪伴主題",
+    source_lessons:["l02","l05"],
+    difficulty_band:1,
+    recommended_question_types:["picture_comprehension","single_choice","picture_sentence_writing","emotion_word_choice"],
+    core_examples:["爸爸","媽媽","爺爺","奶奶","陪伴","關心","一起","幫忙","愛"],
+    tags:["家人","陪伴","情感"]
+  },
+  {
+    kp_id:"kp_x_theme_school",
+    module:"comprehension",
+    subcategory:"生活應用",
+    title:"教室與學校主題",
+    source_lessons:["l03","l06"],
+    difficulty_band:1,
+    recommended_question_types:["picture_comprehension","single_choice","role_action_choice"],
+    core_examples:["教室","老師","同學","書包","黑板","作業","上課","下課","操場"],
+    tags:["學校","教室","生活"]
+  },
+  {
+    kp_id:"kp_x_theme_birthday",
+    module:"emotion",
+    subcategory:"生活應用",
+    title:"生日／驚喜／作品主題",
+    source_lessons:["l04","l06"],
+    difficulty_band:2,
+    recommended_question_types:["picture_comprehension","emotion_word_choice","guided_sentence_writing","picture_sentence_writing"],
+    core_examples:["生日","驚喜","禮物","蛋糕","作品","慶祝","開心","興奮","期待"],
+    tags:["生日","驚喜","情緒"]
+  },
+  {
+    kp_id:"kp_x_theme_growth",
+    module:"comprehension",
+    subcategory:"生活應用",
+    title:"觀察與成長主題",
+    source_lessons:["l03","l04","l05"],
+    difficulty_band:2,
+    recommended_question_types:["story_sequence","picture_comprehension","guided_sentence_writing"],
+    core_examples:["種子","發芽","長大","觀察","記錄","努力","進步","完成","成功"],
+    tags:["成長","觀察","學習"]
+  },
+  {
+    kp_id:"kp_x_theme_sharing",
+    module:"emotion",
+    subcategory:"生活應用",
+    title:"分享與表達主題",
+    source_lessons:["l02","l05","l06"],
+    difficulty_band:2,
+    recommended_question_types:["guided_sentence_writing","picture_sentence_writing","emotion_word_choice"],
+    core_examples:["分享","表達","說出來","告訴","讓大家知道","一起","謝謝","幫忙"],
+    tags:["分享","表達","溝通"]
+  }
+];
+ 
+// KP_POOL 查詢工具函式
+function kpByModule(moduleId){return KP_POOL.filter(k=>k.module===moduleId);}
+function kpByLesson(lesson){return KP_POOL.filter(k=>k.source_lessons.includes(lesson));}
+function kpByTag(tag){return KP_POOL.filter(k=>k.tags.includes(tag));}
+function kpById(id){return KP_POOL.find(k=>k.kp_id===id)||null;}
+ 
+// ═══════════════════════════════════════════════════
+// STATE  ─  初始化時從 localStorage 讀取
+// ═══════════════════════════════════════════════════
+const saved=loadProgress();
+ 
+const S={
+  screen:'screen-home',history:[],
+  stars:saved.totalStars||0,
+  unit:null,mode:null,
+  questions:[],qi:0,correct:0,answered:false,
+  built:[],
+  matchSelected:null,matchPairs:{},matchDone:0,
+  wrongKps:[],
+  isIntegrated:false,
+  currentModule:null
+};
+ 
+// UP — 從 localStorage 恢復
+const UP={};
+DB.units.forEach(u=>{
+  const sp=saved.unitsProgress&&saved.unitsProgress[u.unit_id];
+  UP[u.unit_id]={
+    challenge:sp?sp.challengeProgress:false,
+    reinforcement:sp?sp.reinforcementProgress:false,
+    exploration:sp?sp.explorationProgress:false,
+    starsEarned:sp?sp.earnedStars:0,
+    hwDone:sp?sp.hwDone:0,
+    wrongKps:sp?sp.wrongKps:[]
+  };
+});
+ 
+const KP_LABELS={
+  // L01
+  "kp_l01_002":"角色與景物配對","kp_l01_004":"土部識字",
+  "kp_l01_006":"多音字：興","kp_l01_007":"情緒詞語",
+  "kp_l01_008":"課文句型","kp_l01_009":"第一課會寫字","kp_l01_010":"課文理解",
+  // L02
+  "kp_l02_001":"課文理解","kp_l02_002":"因為所以句型",
+  "kp_l02_003":"情緒詞語","kp_l02_004":"詞語",
+  // L03
+  "kp_l03_001":"課文理解","kp_l03_002":"道理與主旨","kp_l03_003":"詞語與句型",
+  // L04
+  "kp_l04_001":"課文理解","kp_l04_002":"像一樣句型",
+  "kp_l04_003":"當的時候句型","kp_l04_004":"詞語",
+  // L05
+  "kp_l05_001":"家人特徵","kp_l05_002":"不管都句型",
+  "kp_l05_003":"課文主旨","kp_l05_004":"詞語",
+  // L06
+  "kp_l06_001":"課文理解","kp_l06_002":"終於並且句型",
+  "kp_l06_003":"句型操作","kp_l06_004":"詞語"
+};
+ 
+const MODULE_LABELS={
+  radical:"🔤 生字與部首",vocab:"📝 詞語與造詞",
+  sentence:"💬 句型與造句",sequence:"🔢 順序與因果",
+  comprehension:"🖼️ 看圖與理解",emotion:"😊 情緒與生活表達"
+};
+ 
+// ═══════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════
+function goTo(id){S.history.push(S.screen);show(id)}
+function goBack(){show(S.history.pop()||'screen-home')}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  S.screen=id;syncStars();
+  if(id==='screen-progress')renderProgress();
+}
+function syncStars(){
+  document.getElementById('home-stars').textContent=S.stars;
+  document.getElementById('p-stars').textContent=S.stars;
+  document.querySelectorAll('.sd').forEach(e=>e.textContent=S.stars);
+}
+function confirmQuit(){
+  if(confirm('要離開這一關嗎？進度不會儲存喔！')){
+    if(S.isIntegrated)goTo('screen-integrated');
+    else goTo('screen-units');
+  }
+}
+ 
+// ═══════════════════════════════════════════════════
+// UNITS
+// ═══════════════════════════════════════════════════
+function goToUnits(subj){
+  document.getElementById('units-title').textContent=subj==='chinese'?'國語單元':'數學單元';
+  const c=document.getElementById('units-list');c.innerHTML='';
+  DB.units.filter(u=>u.subject===subj).forEach((unit,idx,arr)=>{
+    const p=UP[unit.unit_id]||{};
+    const done=p.challenge&&p.reinforcement;
+    const nc=done?'un-done':'un-active';
+    const cc=done?'uc-done':'uc-active';
+    const ni=done?'✓':unit.lesson_order;
+    const bgs=[{k:'challenge',l:'挑戰關'},{k:'reinforcement',l:'補強關'},{k:'exploration',l:'探索關'}]
+      .map(m=>{
+        // challenge always unlocked; reinforcement & exploration need challenge done
+        if(m.k!=='challenge'&&!p.challenge)return`<span class="badge badge-locked">${m.l} 🔒</span>`;
+        if(p[m.k])return`<span class="badge badge-done">${m.l} ✓</span>`;
+        return`<span class="badge badge-todo">${m.l}</span>`;
+      }).join('');
+    c.innerHTML+=`<button class="unit-card ${cc}" onclick="openUnit('${unit.unit_id}')">
+      <div class="unit-num ${nc}">${ni}</div>
+      <div class="unit-info">
+        <div class="unit-title">第${unit.lesson_order}課　${unit.unit_title}</div>
+        <div class="unit-sub">${unit.theme}</div>
+        <div class="unit-badges">${bgs}</div>
+      </div></button>`;
+  });
+  goTo('screen-units');
+}
+function openUnit(uid){
+  S.unit=uid;S.isIntegrated=false;const p=UP[uid];
+  if(!p.challenge) startMode('challenge');
+  else if(!p.reinforcement) startMode('reinforcement');
+  else if(!p.exploration) startMode('exploration');
+  else if(confirm('你已完成這一課！要重新挑戰嗎？')) startMode('challenge');
+}
+ 
+// ═══════════════════════════════════════════════════
+// INTEGRATED MODULE
+// ═══════════════════════════════════════════════════
+function startModule(moduleId){
+  S.isIntegrated=true;
+  S.currentModule=moduleId;
+  S.mode='integrated';S.qi=0;S.correct=0;S.wrongKps=[];
+  S.answered=false;S.built=[];S.matchSelected=null;S.matchPairs={};S.matchDone=0;
+  const qs=getModuleQuestions(moduleId);
+  if(!qs.length){
+    // Bug 3: no valid questions
+    goTo('screen-question');
+    document.getElementById('q-render').innerHTML=`<div class="question-body" style="text-align:center;padding:36px 18px">
+      <div style="font-size:48px;margin-bottom:12px">🚧</div>
+      <div style="font-size:18px;font-weight:900;margin-bottom:8px">此模組題目準備中</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:600;line-height:1.8">請先練習其他模組，<br>我們正在努力準備更多題目！</div>
+    </div>`;
+    setFooter(`<button class="btn btn-lg btn-ghost" onclick="goTo('screen-integrated')">← 回模組列表</button>`);
+    document.getElementById('q-chip').textContent=MODULE_LABELS[moduleId]||'🧩 綜合練習';
+    document.getElementById('q-chip').className='qe-mode-chip qe-mode-integrated';
+    document.getElementById('q-title').textContent='綜合練習';
+    document.getElementById('q-ctr').textContent='';
+    document.getElementById('q-pbar').style.width='0%';
+    document.getElementById('q-dots').innerHTML='';
+    return;
+  }
+  S.questions=qs;
+  document.getElementById('q-chip').textContent=MODULE_LABELS[moduleId]||'🧩 綜合練習';
+  document.getElementById('q-chip').className='qe-mode-chip qe-mode-integrated';
+  document.getElementById('q-title').textContent='綜合練習';
+  goTo('screen-question');renderQ();
+}
+ 
+// ═══════════════════════════════════════════════════
+// MODE (unit)
+// ═══════════════════════════════════════════════════
+function startMode(mode){
+  S.mode=mode;S.isIntegrated=false;S.qi=0;S.correct=0;S.wrongKps=[];
+  S.answered=false;S.built=[];S.matchSelected=null;S.matchPairs={};S.matchDone=0;
+ 
+  const lesson=DB.lessons[S.unit]||{};
+  if(mode==='challenge'){
+    S.questions=(lesson.challenge||[]).map(q=>({...q}));
+  } else if(mode==='reinforcement'){
+    const wk=UP[S.unit].wrongKps||[];
+    const bank=lesson.reinforcement_bank||{};
+    if(wk.length===0){
+      S.questions=[{qid:'re_perfect',kp:'',type:'all_correct',stem:'',answer:null,explanation:''}];
+    } else {
+      S.questions=wk.filter(kp=>bank[kp]).map(kp=>({...bank[kp]}));
+    }
+  } else {
+    S.questions=(lesson.exploration||[]).map(q=>({...q}));
+  }
+ 
+  const labels={challenge:'🎯 挑戰關',reinforcement:'💪 補強關',exploration:'🔭 探索關'};
+  const cls={challenge:'qe-mode-challenge',reinforcement:'qe-mode-reinforce',exploration:'qe-mode-explore'};
+  document.getElementById('q-chip').textContent=labels[mode];
+  document.getElementById('q-chip').className='qe-mode-chip '+cls[mode];
+  document.getElementById('q-title').textContent={challenge:'挑戰關',reinforcement:'補強關',exploration:'探索關'}[mode];
+  goTo('screen-question');renderQ();
+}
+ 
+// ─── BUG 4 FIX: normalize sentence before comparison ───
+function normStr(s){
+  if(!s)return'';
+  return s
+    .trim()
+    .replace(/\s+/g,' ')               // collapse whitespace
+    .replace(/\u3001/g,'，')            // 、→，
+    .replace(/\u3002/g,'。')            // 。full-width period normalise
+    .replace(/\uff0c/g,'，')            // ，full-width comma
+    .replace(/\uff01/g,'！')
+    .replace(/\uff1f/g,'？')
+    .replace(/[\u200b\u200c\u200d\ufeff]/g,''); // zero-width chars
+}
+ 
+// ─── BUG 3 FIX: validate a question has enough data to render ───
+const SUPPORTED_TYPES=new Set([
+  'single_choice','fill_blank','word_missing_character','character_from_context',
+  'matching','radical_meaning_match',
+  'sentence_reorder','word_classification','radical_classification',
+  'handwrite_character','handwrite_radical','handwrite_word','write_full_word',
+  'guided_sentence_writing','handwrite_sentence',
+  'zhuyin_to_character','character_to_radical_write',
+  'cause_effect_match','story_sequence','time_sequence_fill',
+  'because_so_fill','context_word_choice','emotion_word_choice',
+  'sentence_pattern_fill','sentence_pattern_fill_dual','sentence_rewrite',
+  'picture_comprehension','role_action_choice','picture_sentence_writing',
+  'all_correct'
+]);
+function isValidQ(q){
+  if(!q||!q.type)return false;
+  if(!SUPPORTED_TYPES.has(q.type))return false;
+  // types that need options array
+  if(['single_choice','fill_blank','word_missing_character','character_from_context',
+      'because_so_fill','context_word_choice','emotion_word_choice',
+      'sentence_pattern_fill'].includes(q.type)){
+    if(!q.options||!q.options.length)return false;
+    if(q.answer===undefined)return false;
+  }
+  // types that need left/right
+  if(['matching','radical_meaning_match','cause_effect_match'].includes(q.type)){
+    if(!q.left||!q.right||!q.left.length||!q.right.length)return false;
+    if(!q.answer||typeof q.answer!=='object')return false;
+  }
+  // types that need items/categories
+  if(['word_classification','radical_classification'].includes(q.type)){
+    if(!q.items||!q.categories||!q.answer)return false;
+  }
+  // reorder needs options + answer string
+  if(q.type==='sentence_reorder'){
+    if(!q.options||!q.options.length)return false;
+    if(typeof q.answer!=='string')return false;
+  }
+  return true;
+}
+ 
+// ─── BUG 2 FIX: dedup & smart-sort integrated module questions ───
+// Track recently seen qids per module (session memory)
+const _moduleSeenQids={};
+function getModuleQuestions(moduleId){
+  const pool=[...(DB.integrated_modules[moduleId]||[])];
+  if(!pool.length)return[];
+  // filter valid questions only
+  const valid=pool.filter(isValidQ);
+  if(!valid.length)return[];
+  if(!_moduleSeenQids[moduleId])_moduleSeenQids[moduleId]=[];
+  const seen=_moduleSeenQids[moduleId];
+  // score: unseen=30, wrong=20, old=10, normal=5
+  const scored=valid.map(q=>{
+    let s=5;
+    if(!seen.includes(q.qid))s=30;
+    return{q,s};
+  });
+  scored.sort((a,b)=>b.s-a.s);
+  // deduplicate: take top N, avoiding consecutive repeats
+  const result=[];
+  const usedQids=new Set();
+  scored.forEach(({q})=>{
+    if(!usedQids.has(q.qid)){usedQids.add(q.qid);result.push(q);}
+  });
+  // record seen
+  result.forEach(q=>{ if(!seen.includes(q.qid))seen.push(q.qid); });
+  // cap seen history at 2x pool size
+  if(seen.length>valid.length*2)_moduleSeenQids[moduleId]=seen.slice(-valid.length);
+  return result;
+}
+function renderQ(){
+  // Bug 3: skip invalid/unsupported questions, never blank page
+  while(S.qi<S.questions.length&&!isValidQ(S.questions[S.qi])){S.qi++;}
+  if(S.qi>=S.questions.length){endMode();return;}
+ 
+  const q=S.questions[S.qi],total=S.questions.length,idx=S.qi;
+  S.answered=false;S.built=[];
+  S.matchSelected=null;S.matchPairs={};S.matchDone=0;
+  S.classifPlacements={};
+ 
+  document.getElementById('q-ctr').textContent=`第 ${idx+1} / ${total} 題`;
+  document.getElementById('q-pbar').style.width=(idx/total*100)+'%';
+  const dots=document.getElementById('q-dots');dots.innerHTML='';
+  for(let i=0;i<total;i++){
+    const d=document.createElement('div');
+    d.className='q-dot '+(i<idx?'done':i===idx?'current':'');
+    dots.appendChild(d);
+  }
+  const r=document.getElementById('q-render');
+  const scroll=document.getElementById('q-scroll');
+  r.innerHTML='';setFooter('');
+  if(scroll)scroll.scrollTop=0;
+ 
+  // reinforce banner
+  let banner='';
+  if(S.mode==='reinforcement'&&q.kp&&KP_LABELS[q.kp]){
+    banner=`<div class="reinforce-banner"><div class="rb-icon">💡</div><div class="rb-text">針對你答錯的地方，換個問法再練一次！<br><span class="rb-kp">📌 ${KP_LABELS[q.kp]}</span></div></div>`;
+  }
+  // integrated source tag
+  if(S.isIntegrated&&q.source){
+    banner+=`<div style="display:inline-block;background:#E8F4FF;border-radius:8px;padding:3px 10px;font-size:11px;font-weight:700;color:#1a78a0;margin-bottom:10px">📚 ${q.source}</div>`;
+  }
+ 
+  if(q.type==='all_correct'){
+    r.innerHTML=`<div class="question-body" style="text-align:center;padding:36px 18px">
+      <div style="font-size:52px;margin-bottom:10px">🏅</div>
+      <div style="font-size:19px;font-weight:900;margin-bottom:8px">挑戰關全部答對！</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:600;line-height:1.8">你完全掌握了這一課，<br>不需要補強，直接通關！</div>
+    </div>`;
+    setFooter(`<button class="btn btn-lg btn-green" onclick="skipReinforce()">直接通關 🏆</button>`);
+    return;
+  }
+ 
+  r.innerHTML=banner;
+ 
+  if(q.type==='matching') renderMatching(q,r);
+  else if(q.type==='sentence_reorder') renderReorder(q,r);
+  else if(q.type==='word_classification'||q.type==='radical_classification') renderClassification(q,r);
+  else if(q.type==='handwrite_character'||q.type==='handwrite_radical'||q.type==='handwrite_word'||q.type==='write_full_word') renderWordInput(q,r);
+  else if(q.type==='guided_sentence_writing'||q.type==='handwrite_sentence') renderSentenceInput(q,r);
+  else if(q.type==='zhuyin_to_character') renderZhuyinToChar(q,r);
+  else if(q.type==='character_to_radical_write') renderCharToRadical(q,r);
+  else if(q.type==='radical_meaning_match') renderMatching(q,r);
+  else renderChoice(q,r); // single_choice, fill_blank, word_missing_character, character_from_context, etc.
+}
+ 
+function setFooter(html){document.getElementById('q-footer').innerHTML=html;}
+ 
+// ═══════════════════════════════════════════════════
+// CHOICE
+// ═══════════════════════════════════════════════════
+function renderChoice(q,r){
+  const letters=['Ａ','Ｂ','Ｃ','Ｄ'];
+  const hint=q.type==='fill_blank'?'<div class="q-hint">選出正確的詞語填入空格</div>':'';
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>${hint}
+    <div class="options-grid">
+      ${q.options.map((o,i)=>`<button class="option-btn" id="opt-${i}" onclick="selOpt(${i})"><span class="opt-letter">${letters[i]}</span>${o}</button>`).join('')}
+    </div><div id="fb"></div></div>`;
+  setFooter(`<button class="btn btn-lg btn-primary btn-disabled" id="btn-next" onclick="nextQ()">下一題 →</button>`);
+}
+function selOpt(idx){
+  if(S.answered)return;S.answered=true;
+  const q=S.questions[S.qi],ok=q.options[idx]===q.answer;
+  if(ok)S.correct++;else if(S.mode==='challenge')recordWrong(q.kp);
+  document.querySelectorAll('.option-btn').forEach((btn,i)=>{
+    if(q.options[i]===q.answer)btn.classList.add('correct');
+    else if(i===idx&&!ok)btn.classList.add('wrong');
+  });
+  fbShow(ok,q.answer,q.explanation,'fb');
+  document.getElementById('btn-next').classList.remove('btn-disabled');
+}
+ 
+// ═══════════════════════════════════════════════════
+// SENTENCE REORDER
+// ═══════════════════════════════════════════════════
+function renderReorder(q,r){
+  const shuffled=shuffle(q.options);
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-hint">點詞語來排列句子 👇</div>
+    <div class="answer-area" id="aa"><span style="color:#CCC;font-size:12px;font-weight:600">點詞語來組句子</span></div>
+    <div class="chip-pool" id="cp">
+      ${shuffled.map((o,i)=>`<button class="chip chip-src" id="chip-${i}" data-val="${esc(o)}" onclick="addChip(${i})">${o}</button>`).join('')}
+    </div><div id="fb"></div></div>`;
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="submitReorder()">確認答案 ✓</button>
+    <button class="btn btn-sm btn-ghost" style="align-self:center" onclick="clearReorder()">清除重排</button>`);
+}
+function addChip(idx){
+  const el=document.getElementById('chip-'+idx);
+  if(!el||el.classList.contains('used'))return;
+  el.classList.add('used');S.built.push({idx,val:el.dataset.val});refreshAA();
+}
+function refreshAA(){
+  const aa=document.getElementById('aa');if(!aa)return;
+  if(!S.built.length){aa.innerHTML='<span style="color:#CCC;font-size:12px;font-weight:600">點詞語來組句子</span>';return;}
+  aa.innerHTML='';
+  S.built.forEach((item,i)=>{
+    const btn=document.createElement('button');btn.className='chip chip-sel';btn.textContent=item.val;
+    btn.onclick=()=>{const s=document.getElementById('chip-'+item.idx);if(s)s.classList.remove('used');S.built.splice(i,1);refreshAA();};
+    aa.appendChild(btn);
+  });
+}
+function clearReorder(){S.built.forEach(item=>{const e=document.getElementById('chip-'+item.idx);if(e)e.classList.remove('used')});S.built=[];refreshAA();}
+function submitReorder(){
+  if(S.answered)return;
+  const q=S.questions[S.qi],built=S.built.map(i=>i.val).join('');
+  if(!built){alert('請先排列詞語喔！');return;}
+  S.answered=true;
+  // Bug 4: normalize both sides before comparison
+  const ok=normStr(built)===normStr(q.answer);
+  if(ok)S.correct++;else if(S.mode==='challenge')recordWrong(q.kp);
+  fbShow(ok,q.answer,q.explanation,'fb');
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="nextQ()">下一題 →</button>`);
+}
+ 
+// ═══════════════════════════════════════════════════
+// MATCHING
+// ═══════════════════════════════════════════════════
+function renderMatching(q,r){
+  const rightShuffled=shuffle(q.right);
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-hint">先點左邊，再點右邊配對（點已配對的左側可取消）</div>
+    <div class="match-grid">
+      <div><div class="match-col-title">左邊</div>${q.left.map((item,i)=>`<button class="match-item" id="ml-${i}" onclick="selML(${i},'${esc(item)}')">${item}</button>`).join('')}</div>
+      <div><div class="match-col-title">右邊</div>${rightShuffled.map((item,i)=>`<button class="match-item" id="mr-${i}" onclick="selMR(${i},'${esc(item)}')">${item}</button>`).join('')}</div>
+    </div>
+    <div id="match-lines" style="margin-top:7px;"></div>
+    <div id="fb"></div>
+  </div>`;
+  setFooter(`<button class="btn btn-lg btn-primary btn-disabled" id="btn-next" onclick="nextQ()">下一題 →</button>`);
+  // store rightShuffled on S so selMR can look up by index
+  S._matchRightOrder=rightShuffled;
+}
+function selML(idx,val){
+  if(S.answered)return;
+  const lEl=document.getElementById('ml-'+idx);
+  // Bug 1: if already matched, undo it
+  if(lEl.classList.contains('matched-ok')||lEl.classList.contains('matched-no')){
+    // find corresponding right item and restore it
+    const pairedRight=S.matchPairs[val];
+    if(pairedRight){
+      // find mr button with this text
+      const rightOrder=S._matchRightOrder||[];
+      const rIdx=rightOrder.indexOf(pairedRight);
+      if(rIdx>=0){
+        const rEl=document.getElementById('mr-'+rIdx);
+        if(rEl){
+          rEl.classList.remove('matched-ok','matched-no');
+          rEl.onclick=()=>selMR(rIdx,esc(pairedRight));
+          // restore onclick with correct closure
+          rEl.setAttribute('onclick',`selMR(${rIdx},'${esc(pairedRight)}')`);
+        }
+      }
+      delete S.matchPairs[val];
+      S.matchDone--;
+      // remove line
+      const lines=document.getElementById('match-lines');
+      if(lines){
+        [...lines.children].forEach(el=>{
+          if(el.textContent.startsWith(val+' ➜'))el.remove();
+        });
+      }
+    }
+    lEl.classList.remove('matched-ok','matched-no','selected');
+    lEl.setAttribute('onclick',`selML(${idx},'${esc(val)}')`);
+    S.matchSelected=null;
+    return;
+  }
+  // normal select
+  document.querySelectorAll('[id^="ml-"]').forEach(e=>e.classList.remove('selected'));
+  S.matchSelected={idx,val};lEl.classList.add('selected');
+}
+function selMR(idx,val){
+  if(S.answered||!S.matchSelected)return;
+  const leftVal=S.matchSelected.val;
+  const ok=S.questions[S.qi].answer[leftVal]===val;
+  const lEl=document.getElementById('ml-'+S.matchSelected.idx);
+  const rEl=document.getElementById('mr-'+idx);
+  lEl.classList.remove('selected');
+  lEl.classList.add(ok?'matched-ok':'matched-no');
+  rEl.classList.add(ok?'matched-ok':'matched-no');
+  // Bug 1: don't null onclick — keep reference for undo (selML handles undo on left click)
+  rEl.onclick=null; // right side stays locked once chosen (undo via left click)
+  S.matchPairs[leftVal]=val;S.matchDone++;S.matchSelected=null;
+  document.getElementById('match-lines').innerHTML+=
+    `<div class="match-pair-line">${leftVal} ➜ ${val} ${ok?'✓':'✗ 正確：'+S.questions[S.qi].answer[leftVal]}</div>`;
+  if(S.matchDone===S.questions[S.qi].left.length){
+    S.answered=true;
+    const allOk=Object.entries(S.matchPairs).every(([l,rv])=>S.questions[S.qi].answer[l]===rv);
+    if(allOk)S.correct++;else if(S.mode==='challenge')recordWrong(S.questions[S.qi].kp);
+    fbShow(allOk,'',S.questions[S.qi].explanation,'fb');
+    document.getElementById('btn-next').classList.remove('btn-disabled');
+  }
+}
+ 
+// ═══════════════════════════════════════════════════
+// WORD CLASSIFICATION
+// ═══════════════════════════════════════════════════
+function renderClassification(q,r){
+  S.classifPlacements={};
+  q.items.forEach(item=>S.classifPlacements[item]=null);
+  const cats=Object.keys(q.categories);
+  const binsHtml=cats.map(cat=>`
+    <div class="classif-bin" id="bin-${esc(cat)}">
+      <div class="classif-bin-title">${cat}</div>
+      <div class="classif-items" id="items-${esc(cat)}"></div>
+    </div>`).join('');
+  const sourceHtml=q.items.map((item,i)=>
+    `<button class="cls-chip" id="cls-${i}" onclick="placeItem(${i},'${esc(item)}')">${item}</button>`
+  ).join('');
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-hint">點詞語，再點要放入的格子</div>
+    <div class="classif-source" id="cls-source">${sourceHtml}</div>
+    <div class="classif-bins">${binsHtml}</div>
+    <div id="fb"></div>
+  </div>`;
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="submitClassif()">確認答案 ✓</button>
+    <button class="btn btn-sm btn-ghost" style="align-self:center" onclick="clearClassif()">清除重排</button>`);
+  S._clsSelected=null;
+}
+function placeItem(idx,val){
+  if(S.answered)return;
+  // first click: select the word chip
+  if(!S._clsSelected){
+    document.querySelectorAll('.cls-chip').forEach(c=>c.style.background='');
+    const el=document.getElementById('cls-'+idx);
+    if(el.classList.contains('placed'))return;
+    el.style.background='#6ECFF0';el.style.color='#fff';
+    S._clsSelected={idx,val};
+  } else {
+    // second click must be on a bin — handled by placeToBin
+    S._clsSelected=null;
+    document.querySelectorAll('.cls-chip').forEach(c=>{c.style.background='';c.style.color='';});
+  }
+}
+function placeToBin(cat){
+  if(S.answered||!S._clsSelected)return;
+  const {idx,val}=S._clsSelected;
+  // remove from previous bin if any
+  const prev=S.classifPlacements[val];
+  if(prev){
+    const prevArea=document.getElementById('items-'+esc(prev));
+    if(prevArea){
+      [...prevArea.querySelectorAll('.cls-placed')].forEach(el=>{if(el.textContent===val)el.remove();});
+    }
+  }
+  S.classifPlacements[val]=cat;
+  const el=document.getElementById('cls-'+idx);
+  el.classList.add('placed');el.style.background='';el.style.color='';
+  const area=document.getElementById('items-'+esc(cat));
+  if(area){
+    const placed=document.createElement('span');placed.className='cls-placed';placed.textContent=val;
+    placed.onclick=()=>{
+      S.classifPlacements[val]=null;el.classList.remove('placed');placed.remove();
+    };
+    area.appendChild(placed);
+  }
+  S._clsSelected=null;
+  document.querySelectorAll('.cls-chip').forEach(c=>{c.style.background='';c.style.color='';});
+}
+// attach bin click handlers after render
+document.addEventListener('click',function(e){
+  const bin=e.target.closest('.classif-bin');
+  if(bin&&S._clsSelected){
+    const cat=bin.querySelector('.classif-bin-title').textContent;
+    placeToBin(cat);
+  }
+});
+function clearClassif(){
+  const q=S.questions[S.qi];
+  q.items.forEach((item,i)=>{
+    S.classifPlacements[item]=null;
+    const el=document.getElementById('cls-'+i);
+    if(el)el.classList.remove('placed');
+  });
+  Object.keys(q.categories).forEach(cat=>{
+    const area=document.getElementById('items-'+esc(cat));
+    if(area)area.innerHTML='';
+  });
+}
+function submitClassif(){
+  if(S.answered)return;
+  const q=S.questions[S.qi];
+  const allPlaced=q.items.every(item=>S.classifPlacements[item]);
+  if(!allPlaced){alert('請把所有詞語都放進格子喔！');return;}
+  S.answered=true;
+  let allOk=true;
+  q.items.forEach(item=>{
+    const placed=S.classifPlacements[item];
+    const correct=Object.keys(q.answer).find(cat=>q.answer[cat].includes(item));
+    if(placed!==correct)allOk=false;
+  });
+  if(allOk)S.correct++;else if(S.mode==='challenge')recordWrong(q.kp||'');
+  // colour bins
+  Object.keys(q.categories).forEach(cat=>{
+    const bin=document.getElementById('bin-'+esc(cat));
+    if(bin){
+      const correctItems=q.answer[cat]||[];
+      const placedItems=q.items.filter(item=>S.classifPlacements[item]===cat);
+      const binOk=placedItems.every(i=>correctItems.includes(i))&&correctItems.every(i=>placedItems.includes(i));
+      bin.classList.add(binOk?'bin-ok':'bin-no');
+    }
+  });
+  fbShow(allOk,'',q.explanation,'fb');
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="nextQ()">下一題 →</button>`);
+}
+ 
+// ═══════════════════════════════════════════════════
+// WORD INPUT
+// ═══════════════════════════════════════════════════
+function renderWordInput(q,r){
+  const prompt=q.prompt_char?`<div style="text-align:center;margin:12px 0 5px"><span style="font-size:54px;font-weight:900">${q.prompt_char}</span><div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:2px">參考字形</div></div>`:'';
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>${prompt}
+    <div class="input-tip">✏️ 可用手寫鍵盤輸入</div>
+    <input class="ti-single" id="ti-word" type="text" placeholder="在這裡輸入"
+      autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text"
+      onkeydown="if(event.key==='Enter')submitWord()">
+    <div id="fb" style="margin-top:9px;"></div>
+  </div>`;
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="submitWord()">確認答案 ✓</button>`);
+  setTimeout(()=>{const el=document.getElementById('ti-word');if(el)el.focus();},200);
+}
+function submitWord(){
+  if(S.answered)return;
+  const q=S.questions[S.qi];
+  const val=(document.getElementById('ti-word').value||'').trim();
+  if(!val){alert('請先輸入答案喔！');return;}
+  S.answered=true;
+  UP[S.unit]&&(UP[S.unit].hwDone=(UP[S.unit].hwDone||0)+1);
+  saveProgress();
+  const inp=document.getElementById('ti-word');
+  if(q.answer===null){
+    S.correct++;inp.classList.add('correct');inp.disabled=true;
+    document.getElementById('fb').innerHTML=`<div class="feedback ok"><div class="fb-icon">🎉</div><div class="fb-title">寫得很好！</div><div class="fb-text">你寫的是「${val}」。<br>${q.explanation}</div></div>`;
+  } else {
+    const ok=val===q.answer;
+    if(ok)S.correct++;else if(S.mode==='challenge')recordWrong(q.kp);
+    inp.classList.add(ok?'correct':'wrong');inp.disabled=true;
+    // 更新字級掌握度
+    const charTarget=q.answer;
+    const lessonKey=S.unit?S.unit.replace('g2_ch_kanox_s2_',''):'';
+    const trackType=(q.type==='character_to_radical_write'||q.type==='handwrite_radical')?'radical':'write';
+    if(charTarget&&CHAR_POOL[lessonKey]){
+      // 找出答案中的每個字
+      [...charTarget].forEach(ch=>{
+        if(CHAR_POOL[lessonKey].chars.find(c=>c.char===ch)){
+          updateCharMastery(ch,lessonKey,trackType,ok);
+        }
+      });
+    }
+    fbShow(ok,q.answer,q.explanation,'fb');
+  }
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="nextQ()">下一題 →</button>`);
+}
+ 
+// ═══════════════════════════════════════════════════
+// SENTENCE INPUT
+// ═══════════════════════════════════════════════════
+function renderSentenceInput(q,r){
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>
+    <div class="input-tip">✏️ 可用手寫鍵盤輸入整句話</div>
+    <textarea class="ti-sentence" id="ti-sent" rows="3" placeholder="在這裡寫一句話…"
+      autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+    <div id="fb" style="margin-top:9px;"></div>
+  </div>`;
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="submitSent()">確認答案 ✓</button>`);
+  setTimeout(()=>{const el=document.getElementById('ti-sent');if(el)el.focus();},200);
+}
+function submitSent(){
+  if(S.answered)return;
+  const q=S.questions[S.qi];
+  const val=(document.getElementById('ti-sent').value||'').trim();
+  if(!val){alert('請先輸入一句話喔！');return;}
+  S.answered=true;
+  UP[S.unit]&&(UP[S.unit].hwDone=(UP[S.unit].hwDone||0)+1);
+  saveProgress();
+  const ta=document.getElementById('ti-sent');
+  const kw=q.keyword||null;
+  const ok=!kw||val.includes(kw);
+  if(ok)S.correct++;
+  ta.classList.add(ok?'correct':'wrong');ta.disabled=true;
+  if(ok){
+    document.getElementById('fb').innerHTML=`<div class="feedback ok"><div class="fb-icon">🎉</div><div class="fb-title">寫得很棒！</div><div class="fb-text">你的句子：「${val}」<br>${q.explanation}</div></div>`;
+  } else {
+    document.getElementById('fb').innerHTML=`<div class="feedback no"><div class="fb-icon">🤔</div><div class="fb-title">記得要包含「${kw}」喔！</div><div class="fb-text">${q.explanation}</div></div>`;
+  }
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="nextQ()">下一題 →</button>`);
+}
+ 
+// ═══════════════════════════════════════════════════
+// FEEDBACK
+// ═══════════════════════════════════════════════════
+function fbShow(ok,answer,explanation,elId){
+  const el=document.getElementById(elId);if(!el)return;
+  el.innerHTML=ok
+    ?`<div class="feedback ok"><div class="fb-icon">🎉</div><div class="fb-title">答對了！</div><div class="fb-text">${explanation}</div></div>`
+    :`<div class="feedback no"><div class="fb-icon">🤔</div><div class="fb-title">再想想…</div><div class="fb-text">${answer?`正確答案是「${answer}」<br>`:''}${explanation}</div></div>`;
+}
+ 
+// ═══════════════════════════════════════════════════
+// WRONG KP
+// ═══════════════════════════════════════════════════
+function recordWrong(kp){
+  if(!kp||S.wrongKps.includes(kp))return;
+  S.wrongKps.push(kp);
+}
+ 
+// ═══════════════════════════════════════════════════
+// NEXT / END
+// ═══════════════════════════════════════════════════
+function nextQ(){S.qi++;if(S.qi>=S.questions.length)endMode();else renderQ();}
+ 
+function endMode(){
+  if(S.isIntegrated){
+    // 綜合模組結束
+    const earned=calcStars(S.correct,S.questions.length);
+    S.stars+=earned;syncStars();saveProgress();
+    document.getElementById('q-render').innerHTML=`<div class="question-body" style="text-align:center;padding:36px 18px">
+      <div style="font-size:60px;margin-bottom:12px">🌟</div>
+      <div style="font-size:20px;font-weight:900;margin-bottom:8px">模組完成！</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:600;line-height:1.8">答對 ${S.correct}/${S.questions.length} 題<br>獲得 ＋${earned}⭐ 星星！</div>
+    </div>`;
+    setFooter(`<button class="btn btn-lg btn-teal" onclick="goTo('screen-integrated')">🧩 回到模組列表</button>
+      <button class="btn btn-lg btn-ghost" style="margin-top:2px" onclick="goTo('screen-progress')">📊 看我的進度</button>`);
+    return;
+  }
+ 
+  const p=UP[S.unit];p[S.mode]=true;
+  if(S.mode==='challenge'){
+    p.wrongKps=[...S.wrongKps];
+    const e=calcStars(S.correct,S.questions.length);
+    p.starsEarned=e;S.stars+=e;syncStars();saveProgress();showResult();
+  } else if(S.mode==='reinforcement'){
+    S.stars+=3;syncStars();saveProgress();showClear();
+  } else {
+    S.stars+=5;syncStars();saveProgress();showExploreDone();
+  }
+}
+function calcStars(c,t){const r=c/t;return r===1?5:r>=.8?4:r>=.6?3:r>=.4?2:1;}
+ 
+// ═══════════════════════════════════════════════════
+// RESULT
+// ═══════════════════════════════════════════════════
+function showResult(){
+  const t=S.questions.length,c=S.correct,r=c/t,p=UP[S.unit];
+  const[em,ti]=r===1?['🤩','全對！你是小天才！']:r>=.6?['🎉','做得很好！']:['😊','繼續加油！'];
+  document.getElementById('r-emoji').textContent=em;
+  document.getElementById('r-title').textContent=ti;
+  document.getElementById('r-sub').textContent=`完成挑戰關！答對 ${c}/${t} 題`;
+  document.getElementById('r-correct').textContent=c;
+  document.getElementById('r-total').textContent=t;
+  document.getElementById('r-stars').textContent=`+${p.starsEarned}⭐`;
+  let sh='';for(let i=0;i<5;i++)sh+=`<span class="star-e" style="${i>=p.starsEarned?'opacity:.2':''}">⭐</span>`;
+  document.getElementById('r-stars-row').innerHTML=sh;
+  const wk=p.wrongKps||[];
+  const prev=document.getElementById('reinforce-preview');
+  if(wk.length===0){
+    prev.innerHTML=`<div class="reinforce-preview"><div class="rp-title">🏅 全部答對！補強關直接通關！</div></div>`;
+    document.getElementById('btn-go-reinforce').textContent='🏆 直接通關';
+  } else {
+    const chips=wk.map(kp=>`<span class="rp-kp">${KP_LABELS[kp]||kp}</span>`).join('');
+    prev.innerHTML=`<div class="reinforce-preview"><div class="rp-title">💡 補強關將針對這幾個知識點：</div><div class="rp-kp-list">${chips}</div></div>`;
+  }
+  document.getElementById('r-msg').textContent=
+    r===1?'完美！直接通關吧！':r>=.6?'不錯！補強關針對答錯地方再練！':'沒關係，補強關幫你補強！';
+  S.history=[];goTo('screen-result');
+}
+function startReinforce(){startMode('reinforcement')}
+function skipReinforce(){UP[S.unit].reinforcement=true;S.stars+=3;syncStars();saveProgress();showClear();}
+function showClear(){S.history=[];goTo('screen-clear')}
+function startExplore(){startMode('exploration')}
+function showExploreDone(){
+  const unit=DB.units.find(u=>u.unit_id===S.unit);
+  document.getElementById('q-render').innerHTML=`<div class="question-body" style="text-align:center;padding:36px 18px">
+    <div style="font-size:62px;margin-bottom:10px">🌟</div>
+    <div style="font-size:20px;font-weight:900;margin-bottom:7px">探索完成！</div>
+    <div style="font-size:13px;color:var(--muted);font-weight:600;line-height:1.8">你完成了《${unit.unit_title}》全部三關！<br>獲得 ＋5⭐ 星星！<br><br><span style="font-size:22px">🎊 🎉 ✨</span></div></div>`;
+  setFooter(`<button class="btn btn-lg btn-purple" onclick="goTo('screen-units')">🏠 回到單元列表</button>
+    <button class="btn btn-lg btn-ghost" style="margin-top:2px" onclick="goTo('screen-progress')">📊 看我的進度</button>`);
+}
+ 
+// ═══════════════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════════════
+function renderProgress(){
+  const all=Object.values(UP);
+  document.getElementById('a-ch').textContent=all.filter(p=>p.challenge).length;
+  document.getElementById('a-re').textContent=all.filter(p=>p.reinforcement).length;
+  document.getElementById('a-ex').textContent=all.filter(p=>p.exploration).length;
+  document.getElementById('a-hw').textContent=all.reduce((s,p)=>s+(p.hwDone||0),0);
+  const c=document.getElementById('p-units');c.innerHTML='';
+  DB.units.filter(u=>u.subject==='chinese').forEach((unit,idx)=>{
+    const p=UP[unit.unit_id]||{};
+    const color=['#FF6B6B','#6ECFF0','#6BCB77'][idx%3];
+    const modes=[
+      {k:'challenge',l:'挑戰',cl:'ml-ch',col:'var(--coral)'},
+      {k:'reinforcement',l:'補強',cl:'ml-re',col:'var(--peach)'},
+      {k:'exploration',l:'探索',cl:'ml-ex',col:'var(--lavender)'}
+    ];
+    const mh=modes.map(m=>`<div class="mp-row">
+      <span class="mp-label ${m.cl}">${m.l}</span>
+      <div class="progress-wrap" style="flex:1;height:8px;margin:0">
+        <div class="progress-bar" style="width:${p[m.k]?100:0}%;background:${m.col}"></div>
+      </div>
+      <span class="mp-pct">${p[m.k]?100:0}%</span>
+    </div>`).join('');
+    c.innerHTML+=`<div class="upc"><div class="upc-hd">
+      <div class="upc-num" style="background:${color}">${unit.lesson_order}</div>
+      <div style="flex:1"><div class="upc-title">${unit.unit_title}</div><div class="upc-sub">${unit.version} ．${unit.semester}</div></div>
+      <div style="font-weight:900;color:var(--sun);font-size:16px">${p.starsEarned?'⭐'.repeat(p.starsEarned):'—'}</div>
+    </div>${mh}</div>`;
+  });
+}
+ 
+// INIT
+syncStars();
+ 
+// ═══════════════════════════════════════════════════
+// CHAR_POOL — 1～6課生字池（最小可用版：第1課完整，2～6課骨架）
+// ═══════════════════════════════════════════════════
+const CHAR_POOL = {
+  // 第1課：春天的顏色（完整11字）
+  l01: {
+    lesson_title: "春天的顏色",
+    chars: [
+      {char:"顏", radical:"頁", radical_meaning:"與頭臉有關", stroke_hint:"左邊是彥，右邊是頁"},
+      {char:"池", radical:"水", radical_meaning:"與水有關",   stroke_hint:"左邊三點水，右邊是也"},
+      {char:"塘", radical:"土", radical_meaning:"與土地有關", stroke_hint:"左邊土字旁，右邊是唐"},
+      {char:"田", radical:"田", radical_meaning:"農田",       stroke_hint:"方形中間一個十字"},
+      {char:"洞", radical:"水", radical_meaning:"與水有關",   stroke_hint:"左邊三點水，右邊是同"},
+      {char:"窩", radical:"穴", radical_meaning:"與洞穴有關", stroke_hint:"上面穴字頭，下面是渦"},
+      {char:"色", radical:"色", radical_meaning:"顏色",       stroke_hint:"上面是刀，下面是卩"},
+      {char:"草", radical:"艸", radical_meaning:"與植物有關", stroke_hint:"上面草字頭，下面是早"},
+      {char:"蜂", radical:"虫", radical_meaning:"與昆蟲有關", stroke_hint:"左邊虫字旁，右邊是夆"},
+      {char:"粉", radical:"米", radical_meaning:"與米有關",   stroke_hint:"左邊米字旁，右邊是分"},
+      {char:"桃", radical:"木", radical_meaning:"與樹木有關", stroke_hint:"左邊木字旁，右邊是兆"}
+    ],
+    key_radicals: ["頁","水","土","穴","艸","虫","米","木"]
+  },
+  // 第2課：花衣裳（骨架，可擴充）
+  l02: {
+    lesson_title: "花衣裳",
+    chars: [
+      {char:"驚", radical:"馬", radical_meaning:"與馬有關", stroke_hint:"上面是敬，下面是馬"},
+      {char:"喜", radical:"口", radical_meaning:"與口有關", stroke_hint:"上面是壴，下面是口"},
+      {char:"合", radical:"人", radical_meaning:"合在一起", stroke_hint:"上面人字頭，下面是口"},
+      {char:"作", radical:"人", radical_meaning:"與人有關", stroke_hint:"左邊單人旁，右邊是乍"}
+    ],
+    key_radicals: ["馬","口","人"]
+  },
+  // 第3課：彩色王國（骨架）
+  l03: {
+    lesson_title: "彩色王國",
+    chars: [
+      {char:"彩", radical:"彡", radical_meaning:"與色彩有關", stroke_hint:"左邊是采，右邊是彡"},
+      {char:"虹", radical:"虫", radical_meaning:"與昆蟲有關", stroke_hint:"左邊虫字旁，右邊是工"},
+      {char:"融", radical:"鬲", radical_meaning:"熔融", stroke_hint:"左邊鬲，右邊是蟲"}
+    ],
+    key_radicals: ["彡","虫"]
+  },
+  // 第4課：爸爸（骨架）
+  l04: {
+    lesson_title: "爸爸",
+    chars: [
+      {char:"暖", radical:"日", radical_meaning:"與太陽有關", stroke_hint:"左邊日字旁，右邊是爰"},
+      {char:"晶", radical:"日", radical_meaning:"與光亮有關", stroke_hint:"三個日字疊在一起"}
+    ],
+    key_radicals: ["日"]
+  },
+  // 第5課：我的家人（骨架）
+  l05: {
+    lesson_title: "我的家人",
+    chars: [
+      {char:"護", radical:"言", radical_meaning:"與說話有關", stroke_hint:"左邊言字旁，右邊是蒦"},
+      {char:"消", radical:"水", radical_meaning:"與水有關",   stroke_hint:"左邊三點水，右邊是肖"}
+    ],
+    key_radicals: ["言","水"]
+  },
+  // 第6課：愛笑的大樹（骨架）
+  l06: {
+    lesson_title: "愛笑的大樹",
+    chars: [
+      {char:"終", radical:"糸", radical_meaning:"與絲線有關", stroke_hint:"左邊糸字旁，右邊是冬"},
+      {char:"享", radical:"亠", radical_meaning:"亭子頂",     stroke_hint:"上面亠，中間口，下面了"}
+    ],
+    key_radicals: ["糸","亠"]
+  }
+};
+ 
+// 取所有課的字做成綜合池
+const CHAR_POOL_ALL = Object.entries(CHAR_POOL).flatMap(([lesson,data])=>
+  data.chars.map(c=>({...c, lesson}))
+);
+ 
+// ═══════════════════════════════════════════════════
+// CHAR_MASTERY — 字級掌握度追蹤（localStorage 持久化）
+// ═══════════════════════════════════════════════════
+const CM_KEY = 'lpt1_char_mastery_v1';
+ 
+function loadCharMastery(){
+  try{
+    const raw=localStorage.getItem(CM_KEY);
+    return raw?JSON.parse(raw):{};
+  }catch(e){return {};}
+}
+function saveCharMastery(){
+  try{localStorage.setItem(CM_KEY,JSON.stringify(CHAR_MASTERY));}catch(e){}
+}
+ 
+// 初始化：每個字建立追蹤記錄
+const CHAR_MASTERY = loadCharMastery();
+CHAR_POOL_ALL.forEach(c=>{
+  const key=`${c.lesson}_${c.char}`;
+  if(!CHAR_MASTERY[key]){
+    CHAR_MASTERY[key]={
+      char_id: key,
+      char: c.char,
+      lesson: c.lesson,
+      radical: c.radical,
+      seen_count: 0,
+      write_correct_count: 0,
+      write_wrong_count: 0,
+      radical_correct_count: 0,
+      radical_wrong_count: 0,
+      last_seen_at: null,
+      mastery_level: 'new',   // new | learning | review | weak | mastered
+      needs_review: false
+    };
+  }
+});
+ 
+function updateCharMastery(char, lesson, type, isCorrect){
+  const key=`${lesson}_${char}`;
+  if(!CHAR_MASTERY[key])return;
+  const m=CHAR_MASTERY[key];
+  m.seen_count++;
+  m.last_seen_at=Date.now();
+  if(type==='write'){
+    if(isCorrect)m.write_correct_count++;
+    else m.write_wrong_count++;
+  } else if(type==='radical'){
+    if(isCorrect)m.radical_correct_count++;
+    else m.radical_wrong_count++;
+  }
+  // 判斷掌握度
+  const totalCorrect=m.write_correct_count+m.radical_correct_count;
+  const totalWrong=m.write_wrong_count+m.radical_wrong_count;
+  if(m.write_wrong_count>=2||m.radical_wrong_count>=2){
+    m.mastery_level='weak'; m.needs_review=true;
+  } else if(totalCorrect>=4&&totalWrong===0){
+    m.mastery_level='mastered'; m.needs_review=false;
+  } else if(totalCorrect>=2){
+    m.mastery_level='review'; m.needs_review=totalWrong>0;
+  } else if(m.seen_count>0){
+    m.mastery_level='learning'; m.needs_review=false;
+  }
+  saveCharMastery();
+}
+ 
+// ═══════════════════════════════════════════════════
+// CHAR SAMPLING — 抽題優先級邏輯
+// ═══════════════════════════════════════════════════
+// 單元內：本課優先順序
+function sampleCharsForUnit(lessonKey, count=4){
+  const pool=CHAR_POOL[lessonKey]?.chars||[];
+  const scored=pool.map(c=>{
+    const m=CHAR_MASTERY[`${lessonKey}_${c.char}`]||{};
+    let score=0;
+    if(m.mastery_level==='new')score+=40;
+    else if(m.mastery_level==='weak')score+=35;
+    else if(m.mastery_level==='learning')score+=20;
+    else if(m.mastery_level==='review')score+=10;
+    else score+=1; // mastered
+    if(m.write_wrong_count>0)score+=m.write_wrong_count*10;
+    if(!m.last_seen_at)score+=15;
+    return{...c,_score:score};
+  });
+  scored.sort((a,b)=>b._score-a._score);
+  return scored.slice(0,count);
+}
+ 
+// 綜合練習：跨課抽題
+function sampleCharsForIntegrated(count=6){
+  const now=Date.now();
+  const scored=CHAR_POOL_ALL.map(c=>{
+    const m=CHAR_MASTERY[`${c.lesson}_${c.char}`]||{};
+    let score=0;
+    if(m.mastery_level==='weak')score+=50;
+    else if(m.needs_review)score+=40;
+    else if(m.mastery_level==='new')score+=30;
+    else if(m.mastery_level==='learning')score+=20;
+    else if(m.mastery_level==='review')score+=10;
+    else score+=2;
+    // 長時間沒出現加分
+    if(m.last_seen_at){
+      const daysSince=(now-m.last_seen_at)/(1000*60*60*24);
+      if(daysSince>3)score+=15;
+      if(daysSince>7)score+=15;
+    } else {score+=20;}
+    return{...c,_score:score};
+  });
+  // 各課平均輪替：按課次分組後各抽1個高分字，再補齊
+  const byLesson={};
+  scored.forEach(c=>{
+    if(!byLesson[c.lesson])byLesson[c.lesson]=[];
+    byLesson[c.lesson].push(c);
+  });
+  const result=[];
+  Object.keys(byLesson).forEach(l=>{
+    byLesson[l].sort((a,b)=>b._score-a._score);
+    if(byLesson[l][0])result.push(byLesson[l][0]);
+  });
+  // 補齊剩下名額（全域排序）
+  scored.sort((a,b)=>b._score-a._score);
+  scored.forEach(c=>{
+    if(result.length>=count)return;
+    if(!result.find(r=>r.char===c.char&&r.lesson===c.lesson))result.push(c);
+  });
+  return result.slice(0,count);
+}
+ 
+// ═══════════════════════════════════════════════════
+// NEW QUESTION TYPE RENDERERS
+// 7 new types: all reuse existing ti-single / choice UI
+// ═══════════════════════════════════════════════════
+ 
+// 1. zhuyin_to_character — 看注音寫國字（文字輸入）
+function renderZhuyinToChar(q,r){
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>
+    <div style="font-size:28px;font-weight:900;text-align:center;margin:14px 0;letter-spacing:4px;color:var(--lavender)">${q.zhuyin||''}</div>
+    <div class="input-tip">✏️ 可用手寫鍵盤輸入</div>
+    <input class="ti-single" id="ti-word" type="text" placeholder="寫出對應的國字"
+      autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text"
+      maxlength="${(q.answer||'').length||2}"
+      onkeydown="if(event.key==='Enter')submitWord()">
+    <div id="fb" style="margin-top:10px;"></div>
+  </div>`;
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="submitWord()">確認 ✓</button>`);
+  setTimeout(()=>{const el=document.getElementById('ti-word');if(el)el.focus();},200);
+}
+ 
+// 2. character_to_radical_write — 看字寫部首（文字輸入）
+function renderCharToRadical(q,r){
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>
+    <div style="text-align:center;margin:12px 0">
+      <span style="font-size:64px;font-weight:900;color:var(--text)">${q.target_char||''}</span>
+    </div>
+    <div class="input-tip">✏️ 可用手寫鍵盤輸入</div>
+    <input class="ti-single" id="ti-word" type="text" placeholder="寫出部首"
+      autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text" maxlength="2"
+      onkeydown="if(event.key==='Enter')submitWord()">
+    <div id="fb" style="margin-top:10px;"></div>
+  </div>`;
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="submitWord()">確認 ✓</button>`);
+  setTimeout(()=>{const el=document.getElementById('ti-word');if(el)el.focus();},200);
+}
+ 
+// 3. word_missing_character — 詞語缺字（選擇）
+// 4. character_from_context  — 句子缺字（選擇）
+// 5. write_full_word          — 寫完整詞語（文字輸入）
+// 6. radical_classification   — 部首分類（word_classification 擴展）
+// 7. radical_meaning_match    — 部首與字義（matching 擴展）
+// → 以上 5 種：word_missing_character / character_from_context 走 renderChoice
+//               write_full_word 走 renderWordInput
+//               radical_classification 走 renderClassification
+//               radical_meaning_match  走 renderMatching（已有）
+ 
+// ═══════════════════════════════════════════════════
+// PATCH: saveProgress — 加入 char mastery 統計
+// ═══════════════════════════════════════════════════
+const _origSaveProgress = saveProgress;
+// 已在 saveProgress 裡寫入 localStorage，CHAR_MASTERY 另存於 CM_KEY，不影響原邏輯
+ 
+// ═══════════════════════════════════════════════════
+// CONFIRM RESET patch — 同步清除 char mastery
+// ═══════════════════════════════════════════════════
+const _origConfirmReset = confirmReset;
+function confirmReset(){
+  if(confirm('確定要清除所有學習進度嗎？\n這個動作無法復原！')){
+    if(confirm('再次確認：清除後星星和進度都會歸零，確定嗎？')){
+      localStorage.removeItem(LS_KEY);
+      localStorage.removeItem(CM_KEY);
+      const def=defaultProgress();
+      S.stars=0;
+      Object.keys(UP).forEach(uid=>{
+        UP[uid]={challenge:false,reinforcement:false,exploration:false,starsEarned:0,hwDone:0,wrongKps:[]};
+      });
+      // 重置掌握度
+      Object.keys(CHAR_MASTERY).forEach(k=>{
+        CHAR_MASTERY[k].seen_count=0;
+        CHAR_MASTERY[k].write_correct_count=0;
+        CHAR_MASTERY[k].write_wrong_count=0;
+        CHAR_MASTERY[k].radical_correct_count=0;
+        CHAR_MASTERY[k].radical_wrong_count=0;
+        CHAR_MASTERY[k].last_seen_at=null;
+        CHAR_MASTERY[k].mastery_level='new';
+        CHAR_MASTERY[k].needs_review=false;
+      });
+      syncStars();
+      renderProgress();
+      alert('進度已重設！');
+    }
+  }
+}
+</script>
+</body>
+</html>
