@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>學學星球 ✨ 二年級學習平台</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+:root{
+  --sky:#6ECFF0;--sun:#FFD93D;--grass:#6BCB77;--coral:#FF6B6B;
+  --lavender:#C3A6FF;--peach:#FFB347;--bg:#FFF9F0;--text:#2D2D2D;--muted:#8A8A8A;
+  --teal:#2EC4B6;--orange:#FF9F1C;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito','Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+.screen{display:none;height:100dvh;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+#screen-home,#screen-result,#screen-clear,#screen-progress{overflow-y:auto}
+ 
+/* TOPBAR */
+.topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.06);z-index:10}
+.topbar-back{width:44px;height:44px;border-radius:50%;border:none;background:#F0F0F0;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.topbar-back:active{transform:scale(.9)}
+.topbar-title{font-size:17px;font-weight:800}
+.topbar-stars{display:flex;align-items:center;gap:4px;background:var(--sun);padding:6px 14px;border-radius:20px;font-weight:800;font-size:15px}
+ 
+/* SCROLL */
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 18px 100px}
+ 
+/* FIXED FOOTER */
+.q-fixed-footer{position:fixed;bottom:0;left:0;right:0;padding:12px 18px;padding-bottom:calc(12px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:10px;z-index:20}
+ 
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:inherit;font-weight:800;border-radius:20px;transition:transform .12s,box-shadow .12s;user-select:none;width:100%}
+.btn-lg{padding:18px;font-size:19px;border-radius:22px}
+.btn-sm{padding:10px 20px;font-size:14px;border-radius:14px;width:auto}
+.btn-primary{background:var(--coral);color:#fff;box-shadow:0 5px 0 #c94040}
+.btn-primary:active{box-shadow:0 2px 0 #c94040;transform:translateY(3px) scale(.97)}
+.btn-green{background:var(--grass);color:#fff;box-shadow:0 5px 0 #4aaa58}
+.btn-green:active{box-shadow:0 2px 0 #4aaa58;transform:translateY(3px) scale(.97)}
+.btn-purple{background:var(--lavender);color:#fff;box-shadow:0 5px 0 #9c78e0}
+.btn-purple:active{box-shadow:0 2px 0 #9c78e0;transform:translateY(3px) scale(.97)}
+.btn-teal{background:var(--teal);color:#fff;box-shadow:0 5px 0 #1a9e96}
+.btn-teal:active{box-shadow:0 2px 0 #1a9e96;transform:translateY(3px) scale(.97)}
+.btn-ghost{background:#F0F0F0;color:var(--text);box-shadow:0 4px 0 #D0D0D0}
+.btn-ghost:active{box-shadow:0 2px 0 #D0D0D0;transform:translateY(2px) scale(.97)}
+.btn-disabled{background:#E0E0E0!important;color:#AAA!important;box-shadow:none!important;cursor:not-allowed;pointer-events:none}
+.btn-danger{background:#FF4444;color:#fff;box-shadow:0 4px 0 #cc0000}
+.btn-danger:active{box-shadow:0 2px 0 #cc0000;transform:translateY(2px) scale(.97)}
+ 
+/* PROGRESS BARS */
+.progress-wrap{background:#F0F0F0;border-radius:12px;height:12px;overflow:hidden;margin:8px 0}
+.progress-bar{height:100%;border-radius:12px;background:linear-gradient(90deg,var(--grass),var(--sky));transition:width .5s ease}
+.q-dots{display:flex;gap:5px;flex-wrap:wrap}
+.q-dot{width:9px;height:9px;border-radius:50%;background:#E0E0E0;flex-shrink:0}
+.q-dot.done{background:var(--grass)}.q-dot.current{background:var(--coral);transform:scale(1.3)}
+ 
+/* HOME */
+#screen-home{background:linear-gradient(170deg,#E8F7FF 0%,#FFF9F0 60%)}
+.home-hero{padding:28px 20px 8px;text-align:center}
+.home-planet{font-size:72px;animation:float 3s ease-in-out infinite;display:block;margin:0 auto 8px}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.home-title{font-size:30px;font-weight:900}
+.home-sub{font-size:15px;color:var(--muted);margin-top:5px;font-weight:600}
+.home-stars-badge{display:inline-flex;align-items:center;gap:6px;background:var(--sun);padding:7px 18px;border-radius:20px;font-weight:900;font-size:17px;margin:12px auto 0}
+.home-menu{padding:16px 20px 32px;display:flex;flex-direction:column;gap:12px}
+.hbc{border-radius:22px;padding:20px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;border:none;font-family:inherit;font-weight:800;font-size:18px;color:#fff;text-align:left;width:100%}
+.hbc .icon{font-size:36px;flex-shrink:0}
+.hbtext{display:flex;flex-direction:column}
+.hbtext span:last-child{font-size:13px;font-weight:600;opacity:.85;margin-top:2px}
+.hbc-1{background:linear-gradient(135deg,#FF6B6B,#FF8E53);box-shadow:0 7px 0 #c94040}
+.hbc-1:active{box-shadow:0 3px 0 #c94040;transform:translateY(4px) scale(.98)}
+.hbc-2{background:linear-gradient(135deg,#6ECFF0,#43A8D0);box-shadow:0 7px 0 #3088b0}
+.hbc-2:active{box-shadow:0 3px 0 #3088b0;transform:translateY(4px) scale(.98)}
+.hbc-3{background:linear-gradient(135deg,#C3A6FF,#9B6FEF);box-shadow:0 7px 0 #7a4fd0}
+.hbc-3:active{box-shadow:0 3px 0 #7a4fd0;transform:translateY(4px) scale(.98)}
+.hbc-4{background:linear-gradient(135deg,#2EC4B6,#1a9e96);box-shadow:0 7px 0 #127a74}
+.hbc-4:active{box-shadow:0 3px 0 #127a74;transform:translateY(4px) scale(.98)}
+ 
+/* SUBJECT */
+.subject-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.subject-card{border-radius:22px;padding:22px 14px;text-align:center;cursor:pointer;border:none;font-family:inherit;transition:transform .15s;box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.subject-card:active{transform:scale(.95)}
+.subject-card .s-icon{font-size:48px;display:block;margin-bottom:8px}
+.subject-card .s-name{font-size:19px;font-weight:900;color:#fff}
+.subject-card .s-pub{font-size:12px;font-weight:600;color:rgba(255,255,255,.8);margin-top:3px}
+.sc-chinese{background:linear-gradient(135deg,#FF6B6B,#FF9A9A);box-shadow:0 7px 0 #c94040}
+.sc-locked{background:linear-gradient(135deg,#CCC,#AAA);box-shadow:0 7px 0 #888;cursor:not-allowed}
+.lock-chip{display:inline-block;background:rgba(0,0,0,.15);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;margin-top:5px}
+ 
+/* UNITS */
+.unit-card{border-radius:18px;padding:16px 18px;margin-bottom:12px;cursor:pointer;border:none;font-family:inherit;text-align:left;width:100%;display:flex;align-items:center;gap:14px;box-shadow:0 4px 14px rgba(0,0,0,.07);background:#fff;border-left:6px solid transparent}
+.unit-card:active{transform:scale(.98)}
+.uc-active{border-left-color:var(--coral)}.uc-done{border-left-color:var(--grass)}.uc-locked{opacity:.5;cursor:not-allowed}
+.unit-num{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:900;color:#fff;flex-shrink:0}
+.un-active{background:var(--coral)}.un-done{background:var(--grass)}.un-locked{background:#CCC}
+.unit-info{flex:1}
+.unit-title{font-size:16px;font-weight:800}
+.unit-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.unit-badges{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.badge{padding:3px 9px;border-radius:9px;font-size:11px;font-weight:700}
+.badge-done{background:#D4F5DB;color:#2e7d32}
+.badge-todo{background:#FFE8D6;color:#e65100}
+.badge-locked{background:#EEE;color:#888}
+ 
+/* INTEGRATED LEARNING */
+.integ-header{padding:16px 18px 4px}
+.integ-title{font-size:19px;font-weight:900;margin-bottom:4px}
+.integ-sub{font-size:13px;color:var(--muted);font-weight:600}
+.module-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.module-card{border-radius:20px;padding:20px 14px;text-align:center;cursor:pointer;border:none;font-family:inherit;transition:transform .12s;box-shadow:0 6px 20px rgba(0,0,0,.1);color:#fff;position:relative}
+.module-card:active{transform:scale(.96)}
+.module-icon{font-size:36px;display:block;margin-bottom:8px}
+.module-name{font-size:15px;font-weight:900;line-height:1.3}
+.module-count{font-size:11px;opacity:.85;font-weight:600;margin-top:3px}
+.mc-1{background:linear-gradient(135deg,#FF6B6B,#FF8E53);box-shadow:0 6px 0 #c94040}
+.mc-2{background:linear-gradient(135deg,#FFB347,#FF8C00);box-shadow:0 6px 0 #cc6600}
+.mc-3{background:linear-gradient(135deg,#6BCB77,#4aaa58);box-shadow:0 6px 0 #2e7d32}
+.mc-4{background:linear-gradient(135deg,#6ECFF0,#43A8D0);box-shadow:0 6px 0 #1a78a0}
+.mc-5{background:linear-gradient(135deg,#C3A6FF,#9B6FEF);box-shadow:0 6px 0 #7a4fd0}
+.mc-6{background:linear-gradient(135deg,#FF9A9A,#FF6B9A);box-shadow:0 6px 0 #c94070}
+ 
+/* Q ENGINE */
+.qe-header{flex-shrink:0;padding:11px 18px 0;background:var(--bg)}
+.qe-mode-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:11px;font-size:12px;font-weight:700;color:#fff;margin-bottom:7px}
+.qe-mode-challenge{background:var(--coral)}.qe-mode-reinforce{background:var(--peach);color:#333}
+.qe-mode-explore{background:var(--lavender)}.qe-mode-integrated{background:var(--teal)}
+.q-counter{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+ 
+/* QUESTION BODY */
+.question-body{background:#fff;border-radius:20px;padding:22px 18px;margin-bottom:12px;box-shadow:0 4px 14px rgba(0,0,0,.07)}
+.q-stem{font-size:19px;font-weight:800;line-height:1.7;margin-bottom:14px}
+.q-hint{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px}
+ 
+/* OPTIONS */
+.options-grid{display:flex;flex-direction:column;gap:9px}
+.option-btn{border:3px solid #E8E8E8;background:#fff;border-radius:16px;padding:13px 15px;font-family:inherit;font-size:16px;font-weight:700;color:var(--text);cursor:pointer;text-align:left;display:flex;align-items:center;gap:11px;width:100%}
+.option-btn:active{transform:scale(.98)}
+.option-btn.correct{border-color:var(--grass);background:#EDFBF0}
+.option-btn.wrong{border-color:var(--coral);background:#FFF0F0}
+.opt-letter{width:30px;height:30px;border-radius:50%;background:#F0F0F0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0}
+.option-btn.correct .opt-letter{background:var(--grass);color:#fff}
+.option-btn.wrong .opt-letter{background:var(--coral);color:#fff}
+ 
+/* TEXT INPUT */
+.input-tip{display:inline-flex;align-items:center;gap:5px;background:#F0F8FF;border:1.5px solid #B8E4F9;border-radius:9px;padding:4px 10px;font-size:11px;font-weight:700;color:#2a7da0;margin-bottom:9px}
+.ti-single{width:100%;border:3px solid #E0E0E0;border-radius:16px;padding:15px 16px;font-family:inherit;font-size:24px;font-weight:800;color:var(--text);outline:none;text-align:center;letter-spacing:3px;transition:border-color .2s;background:#FAFAFA}
+.ti-single:focus{border-color:var(--sky);background:#fff}
+.ti-single.correct{border-color:var(--grass);background:#EDFBF0}
+.ti-single.wrong{border-color:var(--coral);background:#FFF0F0}
+.ti-sentence{width:100%;border:3px solid #E0E0E0;border-radius:16px;padding:15px 16px;font-family:inherit;font-size:18px;font-weight:700;color:var(--text);outline:none;transition:border-color .2s;background:#FAFAFA;resize:none;line-height:1.7}
+.ti-sentence:focus{border-color:var(--sky);background:#fff}
+.ti-sentence.correct{border-color:var(--grass);background:#EDFBF0}
+.ti-sentence.wrong{border-color:var(--coral);background:#FFF0F0}
+ 
+/* CHIPS */
+.chip-pool{display:flex;flex-wrap:wrap;gap:8px;margin:9px 0}
+.chip{padding:8px 13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
+.chip:active{transform:scale(.93)}
+.chip-src{background:#EEE;color:var(--text)}
+.chip-src.used{opacity:.25;pointer-events:none}
+.chip-sel{background:var(--sky);color:#fff}
+.answer-area{min-height:48px;border:3px dashed #D0D0D0;border-radius:14px;padding:9px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#FAFAFA;margin:9px 0}
+ 
+/* MATCHING */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:7px}
+.match-col-title{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:6px;text-align:center}
+.match-item{border:3px solid #E8E8E8;background:#fff;border-radius:12px;padding:10px 7px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:center;width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;line-height:1.4}
+.match-item.selected{border-color:var(--sky);background:#EDF7FF}
+.match-item.matched-ok{border-color:var(--grass);background:#EDFBF0;cursor:default}
+.match-item.matched-no{border-color:var(--coral);background:#FFF0F0;cursor:default}
+.match-pair-line{font-size:11px;font-weight:700;color:var(--muted);padding:3px 0;text-align:center}
+ 
+/* CLASSIFICATION */
+.classif-bins{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.classif-bin{border:3px solid #E8E8E8;border-radius:14px;padding:10px;background:#FAFAFA}
+.classif-bin-title{font-size:13px;font-weight:800;color:var(--muted);margin-bottom:7px;text-align:center}
+.classif-bin.bin-ok{border-color:var(--grass)}
+.classif-bin.bin-no{border-color:var(--coral)}
+.classif-items{min-height:40px;display:flex;flex-wrap:wrap;gap:5px}
+.classif-source{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+.cls-chip{padding:7px 12px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:#EEE;color:var(--text)}
+.cls-chip.placed{opacity:.25;pointer-events:none}
+.cls-placed{padding:5px 10px;border-radius:8px;font-size:13px;font-weight:700;background:var(--sky);color:#fff;cursor:pointer}
+ 
+/* REINFORCE BANNER */
+.reinforce-banner{background:#FFF4E0;border:2px solid var(--peach);border-radius:13px;padding:11px 14px;margin-bottom:11px;display:flex;align-items:flex-start;gap:9px}
+.rb-icon{font-size:20px;flex-shrink:0}
+.rb-text{font-size:12px;font-weight:700;color:#7a4500;line-height:1.5}
+.rb-kp{display:inline-block;background:var(--peach);color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:7px;margin-top:4px}
+ 
+/* FEEDBACK */
+.feedback{border-radius:14px;padding:14px;margin-top:9px}
+.feedback.ok{background:#EDFBF0;border:2px solid var(--grass)}
+.feedback.no{background:#FFF0F0;border:2px solid var(--coral)}
+.feedback.nt{background:#F0F0FF;border:2px solid var(--lavender)}
+.fb-icon{font-size:26px;margin-bottom:3px}
+.fb-title{font-size:15px;font-weight:900}
+.fb-text{font-size:12px;color:#555;margin-top:3px;font-weight:600;line-height:1.7}
+ 
+/* RESULT */
+.result-hero{text-align:center;padding:28px 18px 12px}
+.result-emoji{font-size:76px;animation:pop .5s ease-out}
+@keyframes pop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+.result-title{font-size:24px;font-weight:900;margin-top:8px}
+.result-sub{font-size:13px;color:var(--muted);font-weight:600;margin-top:4px}
+.score-card{background:#fff;border-radius:22px;padding:18px;margin:0 16px;box-shadow:0 8px 22px rgba(0,0,0,.1);display:flex;justify-content:space-around;align-items:center}
+.score-item{text-align:center}
+.score-num{font-size:36px;font-weight:900}
+.score-label{font-size:11px;color:var(--muted);font-weight:600;margin-top:3px}
+.score-div{width:2px;height:48px;background:#EEE}
+.stars-row{display:flex;justify-content:center;gap:6px;margin:12px 0}
+.star-e{font-size:34px;animation:starPop .4s ease-out both}
+@keyframes starPop{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.2) rotate(10deg)}100%{transform:scale(1) rotate(0)}}
+.star-e:nth-child(2){animation-delay:.15s}.star-e:nth-child(3){animation-delay:.3s}
+.star-e:nth-child(4){animation-delay:.45s}.star-e:nth-child(5){animation-delay:.6s}
+.result-msg{text-align:center;font-size:15px;font-weight:700;margin:0 16px 12px;padding:12px;background:#fff;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,.07)}
+.reinforce-preview{margin:0 16px 12px;background:#FFF4E0;border:2px solid var(--peach);border-radius:13px;padding:12px 14px}
+.rp-title{font-size:12px;font-weight:800;color:#7a4500;margin-bottom:6px}
+.rp-kp-list{display:flex;flex-wrap:wrap;gap:6px}
+.rp-kp{background:var(--peach);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:8px}
+.result-btns{padding:0 16px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+ 
+/* CLEAR */
+#screen-clear{text-align:center;background:linear-gradient(160deg,#E8F7FF,#FFF9F0)}
+.clear-confetti{font-size:88px;margin:32px 0 6px;animation:spin .8s ease-out}
+@keyframes spin{0%{transform:rotate(-20deg) scale(0);opacity:0}60%{transform:rotate(10deg) scale(1.15)}100%{transform:rotate(0) scale(1);opacity:1}}
+.clear-title{font-size:28px;font-weight:900}
+.clear-sub{font-size:13px;color:var(--muted);font-weight:600;margin:6px 18px 0;line-height:1.7}
+.celebrate{display:flex;justify-content:center;gap:7px;font-size:20px;margin:10px 0}
+.unlock-card{margin:14px;background:linear-gradient(135deg,#C3A6FF,#9B6FEF);border-radius:20px;padding:18px;color:#fff;box-shadow:0 7px 0 #7a4fd0}
+.unlock-icon{font-size:40px;margin-bottom:6px}
+.unlock-title{font-size:18px;font-weight:900}
+.unlock-sub{font-size:12px;opacity:.85;font-weight:600;margin-top:4px}
+.clear-btns{padding:0 16px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+ 
+/* PROGRESS */
+.progress-hero{background:linear-gradient(135deg,var(--lavender),#9B6FEF);border-radius:20px;padding:18px;color:#fff;margin-bottom:14px;text-align:center}
+.ph-stars{font-size:40px;font-weight:900}
+.ph-label{font-size:13px;opacity:.85;font-weight:600;margin-top:2px}
+.sec-title{font-size:13px;font-weight:800;color:var(--muted);margin-bottom:10px}
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.ach-card{background:#fff;border-radius:15px;padding:13px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.07)}
+.ach-icon{font-size:28px;margin-bottom:4px}
+.ach-label{font-size:10px;font-weight:700;color:var(--muted)}
+.ach-val{font-size:19px;font-weight:900}
+.upc{background:#fff;border-radius:17px;padding:15px;margin-bottom:10px;box-shadow:0 4px 12px rgba(0,0,0,.07)}
+.upc-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.upc-num{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0}
+.upc-title{font-size:14px;font-weight:800}
+.upc-sub{font-size:10px;color:var(--muted);font-weight:600;margin-top:1px}
+.mp-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.mp-label{width:42px;font-size:10px;font-weight:700;padding:3px 4px;border-radius:6px;text-align:center;flex-shrink:0}
+.ml-ch{background:#FFE8E8;color:#c94040}.ml-re{background:#FFF0D6;color:#e65100}.ml-ex{background:#EEE8FF;color:#7a4fd0}
+.mp-pct{font-size:10px;font-weight:700;color:var(--muted);width:32px;text-align:right}
+.reset-btn-wrap{padding:16px 0 8px;text-align:center}
+.spacer{height:14px}
+</style>
+</head>
+<body>
+ 
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="home-hero">
+    <span class="home-planet">🌏</span>
+    <div class="home-title">學學星球</div>
+    <div class="home-sub">國小二年級 ✨ 下學期</div>
+    <div class="home-stars-badge">⭐ <span id="home-stars">0</span> 顆星</div>
+  </div>
+  <div class="home-menu">
+    <button class="hbc hbc-1" onclick="goTo('screen-subject')">
+      <span class="icon">🚀</span>
+      <span class="hbtext"><span>開始單元挑戰</span><span>依課次學習</span></span>
+    </button>
+    <button class="hbc hbc-2" onclick="goTo('screen-subject')">
+      <span class="icon">🔄</span>
+      <span class="hbtext"><span>再練一次</span><span>複習做過的題目</span></span>
+    </button>
+    <button class="hbc hbc-4" onclick="goTo('screen-integrated')">
+      <span class="icon">🧩</span>
+      <span class="hbtext"><span>國語綜合練習</span><span>跨課能力模組練習</span></span>
+    </button>
+    <button class="hbc hbc-3" onclick="goTo('screen-progress')">
+      <span class="icon">📊</span>
+      <span class="hbtext"><span>我的進度</span><span>看看星星和成就</span></span>
+    </button>
+  </div>
+</div>
+ 
+<!-- SUBJECT -->
+<div id="screen-subject" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <span class="topbar-title">選科目</span>
+    <div class="topbar-stars">⭐ <span class="sd">0</span></div>
+  </div>
+  <div class="scroll-area">
+    <div class="spacer"></div>
+    <div class="subject-grid">
+      <button class="subject-card sc-chinese" onclick="goToUnits('chinese')">
+        <span class="s-icon">📖</span><div class="s-name">國語</div><div class="s-pub">康軒版</div>
+      </button>
+      <button class="subject-card sc-locked" disabled>
+        <span class="s-icon">🔢</span><div class="s-name">數學</div><div class="s-pub">翰林版</div>
+        <div class="lock-chip">🔒 即將開放</div>
+      </button>
+      <button class="subject-card sc-locked" disabled>
+        <span class="s-icon">🌍</span><div class="s-name">生活</div><div class="lock-chip">🔒 即將開放</div>
+      </button>
+      <button class="subject-card sc-locked" disabled>
+        <span class="s-icon">🎨</span><div class="s-name">藝術</div><div class="lock-chip">🔒 即將開放</div>
+      </button>
+    </div>
+  </div>
+</div>
+ 
+<!-- UNITS -->
+<div id="screen-units" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <span class="topbar-title" id="units-title">國語單元</span>
+    <div class="topbar-stars">⭐ <span class="sd">0</span></div>
+  </div>
+  <div class="scroll-area"><div id="units-list"></div></div>
+</div>
+ 
+<!-- INTEGRATED LEARNING -->
+<div id="screen-integrated" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <span class="topbar-title">國語綜合練習</span>
+    <div class="topbar-stars">⭐ <span class="sd">0</span></div>
+  </div>
+  <div class="scroll-area">
+    <div class="integ-header">
+      <div class="integ-title">🧩 跨課能力模組</div>
+      <div class="integ-sub">選一個模組，開始綜合練習！</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="module-grid">
+      <button class="module-card mc-1" onclick="startModule('radical')">
+        <span class="module-icon">🔤</span>
+        <div class="module-name">生字與部首</div>
+        <div class="module-count">辨認・手寫・部首</div>
+      </button>
+      <button class="module-card mc-2" onclick="startModule('vocab')">
+        <span class="module-icon">📝</span>
+        <div class="module-name">詞語與造詞</div>
+        <div class="module-count">組詞・配對・分類</div>
+      </button>
+      <button class="module-card mc-3" onclick="startModule('sentence')">
+        <span class="module-icon">💬</span>
+        <div class="module-name">句型與造句</div>
+        <div class="module-count">排列・補句・造句</div>
+      </button>
+      <button class="module-card mc-4" onclick="startModule('sequence')">
+        <span class="module-icon">🔢</span>
+        <div class="module-name">順序與因果</div>
+        <div class="module-count">時序・因果・排列</div>
+      </button>
+      <button class="module-card mc-5" onclick="startModule('comprehension')">
+        <span class="module-icon">🖼️</span>
+        <div class="module-name">看圖與理解</div>
+        <div class="module-count">看圖・角色・情境</div>
+      </button>
+      <button class="module-card mc-6" onclick="startModule('emotion')">
+        <span class="module-icon">😊</span>
+        <div class="module-name">情緒與生活表達</div>
+        <div class="module-count">情緒詞・生活句</div>
+      </button>
+    </div>
+  </div>
+</div>
+ 
+<!-- QUESTION ENGINE (shared by unit mode + integrated mode) -->
+<div id="screen-question" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="confirmQuit()">✕</button>
+    <span class="topbar-title" id="q-title">挑戰關</span>
+    <div class="topbar-stars">⭐ <span class="sd">0</span></div>
+  </div>
+  <div class="qe-header">
+    <div id="q-chip" class="qe-mode-chip qe-mode-challenge">🎯 挑戰關</div>
+    <div class="q-counter">
+      <span id="q-ctr" style="font-weight:800;font-size:13px;color:var(--muted)">第 1/1 題</span>
+      <div class="q-dots" id="q-dots"></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="q-pbar" style="width:0%"></div></div>
+  </div>
+  <div class="scroll-area" id="q-scroll" style="padding-top:12px"><div id="q-render"></div></div>
+  <div class="q-fixed-footer" id="q-footer"></div>
+</div>
+ 
+<!-- RESULT -->
+<div id="screen-result" class="screen">
+  <div class="topbar" style="background:transparent;box-shadow:none"><div></div><span class="topbar-title">挑戰結果</span><div></div></div>
+  <div class="result-hero">
+    <div class="result-emoji" id="r-emoji">🎉</div>
+    <div class="result-title" id="r-title">超棒！</div>
+    <div class="result-sub" id="r-sub">完成挑戰關！</div>
+  </div>
+  <div class="score-card">
+    <div class="score-item"><div class="score-num" id="r-correct" style="color:var(--grass)">0</div><div class="score-label">答對題數</div></div>
+    <div class="score-div"></div>
+    <div class="score-item"><div class="score-num" id="r-total">0</div><div class="score-label">總題數</div></div>
+    <div class="score-div"></div>
+    <div class="score-item"><div class="score-num" id="r-stars" style="color:var(--sun)">+0⭐</div><div class="score-label">獲得星星</div></div>
+  </div>
+  <div class="stars-row" id="r-stars-row"></div>
+  <div id="reinforce-preview"></div>
+  <div class="result-msg" id="r-msg">繼續加油！</div>
+  <div class="result-btns">
+    <button class="btn btn-lg btn-green" id="btn-go-reinforce" onclick="startReinforce()">💪 進入補強關</button>
+    <button class="btn btn-lg btn-ghost" onclick="goTo('screen-units')">回單元列表</button>
+  </div>
+</div>
+ 
+<!-- CLEAR -->
+<div id="screen-clear" class="screen">
+  <div class="clear-confetti">🏆</div>
+  <div class="clear-title">恭喜通關！</div>
+  <div class="clear-sub">挑戰關 ＋ 補強關都完成了！<br>你真的很棒！</div>
+  <div class="celebrate">🎊 🎉 🌟 ✨ 🎈</div>
+  <div class="unlock-card">
+    <div class="unlock-icon">🔭</div>
+    <div class="unlock-title">🔓 探索關已解鎖！</div>
+    <div class="unlock-sub">去發現更多有趣的知識吧！</div>
+  </div>
+  <div class="clear-btns">
+    <button class="btn btn-lg btn-purple" onclick="startExplore()">🔭 進入探索關</button>
+    <button class="btn btn-lg btn-ghost" onclick="goTo('screen-units')">回單元列表</button>
+  </div>
+</div>
+ 
+<!-- PROGRESS -->
+<div id="screen-progress" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">←</button>
+    <span class="topbar-title">我的進度</span>
+    <div class="topbar-stars">⭐ <span class="sd">0</span></div>
+  </div>
+  <div class="scroll-area">
+    <div class="progress-hero">
+      <div class="ph-stars">⭐ <span id="p-stars">0</span></div>
+      <div class="ph-label">累積星星數</div>
+    </div>
+    <div class="sec-title">🏅 學習成就</div>
+    <div class="ach-grid">
+      <div class="ach-card"><div class="ach-icon">🎯</div><div class="ach-val" id="a-ch">0</div><div class="ach-label">挑戰關完成</div></div>
+      <div class="ach-card"><div class="ach-icon">💪</div><div class="ach-val" id="a-re">0</div><div class="ach-label">補強關完成</div></div>
+      <div class="ach-card"><div class="ach-icon">🔭</div><div class="ach-val" id="a-ex">0</div><div class="ach-label">探索關完成</div></div>
+      <div class="ach-card"><div class="ach-icon">✍️</div><div class="ach-val" id="a-hw">0</div><div class="ach-label">手寫輸入完成</div></div>
+    </div>
+    <div class="sec-title">📚 國語單元進度</div>
+    <div id="p-units"></div>
+    <div class="reset-btn-wrap">
+      <button class="btn btn-sm btn-danger" onclick="confirmReset()">🗑️ 重設所有進度</button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+// ═══════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function esc(s){return(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}
+ 
+// ═══════════════════════════════════════════════════
+// LOCALSTORAGE PERSISTENCE
+// ═══════════════════════════════════════════════════
+const LS_KEY='lpt1_progress_v1';
+ 
+function defaultProgress(){
+  return {
+    totalStars:0,
+    completedChallengeCount:0,
+    completedReinforcementCount:0,
+    completedExplorationCount:0,
+    completedHandwriteCount:0,
+    unitsProgress:{
+      "g2_ch_kanox_s2_l01":{
+        challengeProgress:false,reinforcementProgress:false,explorationProgress:false,
+        earnedStars:0,hwDone:0,wrongKps:[]
+      }
+    }
+  };
+}
+ 
+function loadProgress(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return defaultProgress();
+    const p=JSON.parse(raw);
+    // ensure all units exist
+    const def=defaultProgress();
+    Object.keys(def.unitsProgress).forEach(uid=>{
+      if(!p.unitsProgress[uid])p.unitsProgress[uid]={...def.unitsProgress[uid]};
+    });
+    return p;
+  }catch(e){return defaultProgress();}
+}
+ 
+function saveProgress(){
+  try{
+    const data={
+      totalStars:S.stars,
+      completedChallengeCount:Object.values(UP).filter(p=>p.challenge).length,
+      completedReinforcementCount:Object.values(UP).filter(p=>p.reinforcement).length,
+      completedExplorationCount:Object.values(UP).filter(p=>p.exploration).length,
+      completedHandwriteCount:Object.values(UP).reduce((s,p)=>s+(p.hwDone||0),0),
+      unitsProgress:{}
+    };
+    Object.keys(UP).forEach(uid=>{
+      const p=UP[uid];
+      data.unitsProgress[uid]={
+        challengeProgress:p.challenge,
+        reinforcementProgress:p.reinforcement,
+        explorationProgress:p.exploration,
+        earnedStars:p.starsEarned,
+        hwDone:p.hwDone||0,
+        wrongKps:p.wrongKps||[]
+      };
+    });
+    localStorage.setItem(LS_KEY,JSON.stringify(data));
+  }catch(e){}
+}
+ 
+function confirmReset(){
+  if(confirm('確定要清除所有學習進度嗎？\n這個動作無法復原！')){
+    if(confirm('再次確認：清除後星星和進度都會歸零，確定嗎？')){
+      localStorage.removeItem(LS_KEY);
+      const def=defaultProgress();
+      S.stars=0;
+      Object.keys(UP).forEach(uid=>{
+        UP[uid]={challenge:false,reinforcement:false,exploration:false,starsEarned:0,hwDone:0,wrongKps:[]};
+      });
+      syncStars();
+      renderProgress();
+      alert('進度已重設！');
+    }
+  }
+}
+ 
+// ═══════════════════════════════════════════════════
+// DB
+// ═══════════════════════════════════════════════════
+const DB={
+  units:[{
+    unit_id:"g2_ch_kanox_s2_l01",subject:"chinese",grade:"國小二年級",
+    semester:"下學期",version:"康軒",lesson_order:1,
+    unit_title:"春天的顏色",
+    theme:"觀察春天景物與顏色，學習用句子表達看見的景象。"
+  }],
+ 
+  challenge:[
+    {qid:"ch_01",kp:"kp_l01_002",type:"single_choice",stem:"小蜜蜂飛出蜂窩，一眼就看見什麼？",options:["青綠的草地","粉紅的桃花","淡藍的天空","五顏六色的景色"],answer:"粉紅的桃花",explanation:"課文：小蜜蜂飛出蜂窩，一眼就看見粉紅的桃花。"},
+    {qid:"ch_02",kp:"kp_l01_002",type:"single_choice",stem:"小青蛙跳出池塘，一眼就看見什麼？",options:["粉紅的桃花","五顏六色的景色","淡藍的天空","青綠的草地"],answer:"淡藍的天空",explanation:"課文：小青蛙跳出池塘，一眼就看見淡藍的天空。"},
+    {qid:"ch_03",kp:"kp_l01_010",type:"single_choice",stem:"下面四句話，哪一句和課文完全一致？",options:["小燕子看見五顏六色的景色。","小田鼠看見淡藍的天空。","小青蛙看見粉紅的桃花。","小蜜蜂看見青綠的草地。"],answer:"小燕子看見五顏六色的景色。",explanation:"其他三句的角色和景物都配錯了，只有小燕子這句是正確的。"},
+    {qid:"ch_04",kp:"kp_l01_002",type:"single_choice",stem:"小燕子說春天「五顏六色」，是因為春天…",options:["只有一種顏色","有很多種顏色","全部都是綠色","全部都是粉紅色"],answer:"有很多種顏色",explanation:"「五顏六色」就是形容顏色很多、很豐富的意思。"},
+    {qid:"ch_05",kp:"kp_l01_004",type:"single_choice",stem:"「地」「塘」「堡」「蜂」四個字，哪一個不是土部？",options:["地","塘","堡","蜂"],answer:"蜂",explanation:"「蜂」是虫字旁。地、塘、堡都是土部的字。"},
+    {qid:"ch_06",kp:"kp_l01_006",type:"single_choice",stem:"「高興」的「興」讀哪一個音？",options:["ㄒㄧㄥ","ㄒㄧㄥˋ","ㄏㄧㄥ","ㄏㄨㄥ"],answer:"ㄒㄧㄥˋ",explanation:"高興、興趣的「興」讀 ㄒㄧㄥˋ；興奮、興建則讀 ㄒㄧㄥ。"},
+    {qid:"ch_07",kp:"kp_l01_007",type:"single_choice",stem:"「笑咪咪」「高興」「城堡」「開心」，哪一個不是情緒詞？",options:["笑咪咪","高興","城堡","開心"],answer:"城堡",explanation:"城堡是建築物，不是表示心情的詞語。"},
+    {qid:"ch_08",kp:"kp_l01_008",type:"fill_blank",stem:"小田鼠跑出地洞，一眼就看見（ ）的草地。",options:["粉紅","青綠","淡藍","五顏六色"],answer:"青綠",explanation:"課文中是青綠的草地，青綠形容草地翠綠的顏色。"},
+    {qid:"ch_09",kp:"kp_l01_008",type:"fill_blank",stem:"小蜜蜂飛出（ ），一眼就看見粉紅的桃花。",options:["地洞","池塘","蜂窩","花園"],answer:"蜂窩",explanation:"小蜜蜂是從蜂窩飛出來的，不是從池塘或地洞。"},
+    {qid:"ch_10",kp:"kp_l01_008",type:"sentence_reorder",stem:"把詞語排成正確的課文句子：",options:["小田鼠","跑出","地洞","，","一眼就看見","青綠","的","草地","。"],answer:"小田鼠跑出地洞，一眼就看見青綠的草地。",explanation:"句型：主詞＋動作＋地點，一眼就看見＋顏色＋景物。"},
+    {qid:"ch_11",kp:"kp_l01_009",type:"handwrite_character",stem:"請寫出這個字：",prompt_char:"桃",answer:"桃",explanation:"「桃」是木字旁，右邊是兆，代表春天的桃花。"},
+    {qid:"ch_12",kp:"kp_l01_004",type:"handwrite_radical",stem:"「塘」的部首是什麼？請寫出來：",answer:"土",explanation:"「塘」是土部的字，土字旁代表和土地有關的字。"}
+  ],
+ 
+  reinforcement_bank:{
+    "kp_l01_002":{kp_title:"角色與景物配對",qid:"re_002",type:"matching",stem:"把左邊的小動物和右邊看見的景物配對：",left:["小蜜蜂","小田鼠","小青蛙","小燕子"],right:["淡藍的天空","青綠的草地","粉紅的桃花","五顏六色的景色"],answer:{"小蜜蜂":"粉紅的桃花","小田鼠":"青綠的草地","小青蛙":"淡藍的天空","小燕子":"五顏六色的景色"},explanation:"記憶口訣：蜜蜂→桃花、青蛙→天空、田鼠→草地、燕子→景色。"},
+    "kp_l01_004":{kp_title:"土部識字",qid:"re_004",type:"single_choice",stem:"「土地」「池塘」「城市」「蜂窩」，哪一組詞語的兩個字都跟土部有關？",options:["土地和池塘","池塘和城市","城市和蜂窩","蜂窩和土地"],answer:"土地和池塘",explanation:"地和塘都是土部的字。"},
+    "kp_l01_006":{kp_title:"多音字：興",qid:"re_006",type:"single_choice",stem:"「興建一座橋」的「興」讀哪一個音？",options:["ㄒㄧㄥ","ㄒㄧㄥˋ","ㄏㄧㄥ","ㄏㄨㄥ"],answer:"ㄒㄧㄥ",explanation:"興建、興奮讀 ㄒㄧㄥ；高興、興趣讀 ㄒㄧㄥˋ。"},
+    "kp_l01_007":{kp_title:"情緒詞語",qid:"re_007",type:"single_choice",stem:"看到春天美麗的景色，下面哪一句話最合適？",options:["我好高興，春天真漂亮！","春天有很多桃花。","小蜜蜂飛出蜂窩。","草地是綠色的。"],answer:"我好高興，春天真漂亮！",explanation:"只有這句話包含情緒詞「高興」，表達看到春天後的感受。"},
+    "kp_l01_008":{kp_title:"課文句型",qid:"re_008",type:"sentence_reorder",stem:"把詞語排成正確句子（這次是小青蛙的句子）：",options:["小青蛙","跳出","池塘","，","一眼就看見","淡藍","的","天空","。"],answer:"小青蛙跳出池塘，一眼就看見淡藍的天空。",explanation:"這次是「跳出」不是「跑出」，地點是「池塘」，顏色是「淡藍」。"},
+    "kp_l01_009":{kp_title:"第一課會寫字",qid:"re_009",type:"handwrite_word",stem:"請寫出這個詞語：「粉紅」",answer:"粉紅",explanation:"粉是米字旁，紅是糸字旁。粉紅是本課描寫桃花的重要顏色詞。"},
+    "kp_l01_010":{kp_title:"課文理解",qid:"re_010",type:"single_choice",stem:"課文一共寫了幾個小動物看到春天的景色？",options:["2個","3個","4個","5個"],answer:"4個",explanation:"課文寫了四個小動物：小蜜蜂、小燕子、小青蛙、小田鼠。"}
+  },
+ 
+  exploration:[
+    {qid:"ex_01",kp:"kp_l01_008",type:"single_choice",stem:"下面哪一句話，用了和課文一樣的句型「……一眼就看見……」？",options:["小朋友走出教室，一眼就看見金黃的向日葵。","今天天氣很好，我好開心。","向日葵長得好高。","我的書包是藍色的。"],answer:"小朋友走出教室，一眼就看見金黃的向日葵。",explanation:"這句話把課文的句型搬到生活中。"},
+    {qid:"ex_02",kp:"kp_l01_007",type:"single_choice",stem:"如果你放學回家，一眼就看見媽媽煮了你最愛吃的菜，你會說：",options:["我好高興！","我很地洞！","我看見蜂窩！","天空很淡藍！"],answer:"我好高興！",explanation:"「高興」是表示開心的情緒詞。"},
+    {qid:"ex_03",kp:"kp_l01_008",type:"sentence_reorder",stem:"用課文句型，排出一句關於夏天的句子：",options:["小朋友","走出","家門","，","一眼就看見","藍藍","的","天空","。"],answer:"小朋友走出家門，一眼就看見藍藍的天空。",explanation:"主詞換成小朋友，地點換成家門，景物換成藍天——句型還是一樣！"},
+    {qid:"ex_04",kp:"kp_l01_009",type:"handwrite_word",stem:"請寫出一個你在春天會看到的景物詞語：",answer:null,explanation:"春天的景物還有很多：蝴蝶、嫩葉、小溪……你寫的詞語也很棒！"},
+    {qid:"ex_05",kp:"kp_l01_008",type:"guided_sentence_writing",stem:"仿照課文，用「一眼就看見」寫一句話：",answer:null,keyword:"一眼就看見",explanation:"記得句子裡要有「一眼就看見」，後面加上顏色和景物！"}
+  ],
+ 
+  // ── 綜合模組題庫（骨架＋第一課範例題，可擴充至第2～6課）──────
+  integrated_modules:{
+    radical:[
+      {qid:"int_r01",type:"single_choice",source:"第1課",stem:"「桃」「梅」「松」「柏」四個字，共同的部首是什麼？",options:["木","竹","艸","禾"],answer:"木",explanation:"桃、梅、松、柏都是木字旁，代表和樹木有關的字。"},
+      {qid:"int_r02",type:"single_choice",source:"第1課",stem:"下面哪一個字不是土部的字？",options:["地","塘","城","花"],answer:"花",explanation:"花是艸字頭，不是土部。地、塘、城都是土部的字。"},
+      {qid:"int_r03",type:"handwrite_character",source:"第1課",stem:"請寫出這個字：",prompt_char:"草",answer:"草",explanation:"「草」是艸字頭，下面是早字，代表植物。"},
+      {qid:"int_r04",type:"handwrite_radical",source:"第1課",stem:"「蜂」的部首是什麼？請寫出來：",answer:"虫",explanation:"「蜂」是虫字旁，因為蜜蜂是昆蟲。"},
+      {qid:"int_r05",type:"matching",source:"第1課",stem:"把字和它的部首配對：",left:["塘","蜂","桃","草"],right:["虫","木","艸","土"],answer:{"塘":"土","蜂":"虫","桃":"木","草":"艸"},explanation:"塘→土、蜂→虫、桃→木、草→艸，記住部首就能猜出字的意思！"}
+    ],
+    vocab:[
+      {qid:"int_v01",type:"single_choice",source:"第1課",stem:"「粉紅」是形容顏色的詞語，下面哪一個也是顏色詞？",options:["青綠","草地","蜂窩","桃花"],answer:"青綠",explanation:"青綠是形容顏色的詞，其他三個是景物名稱。"},
+      {qid:"int_v02",type:"word_classification",source:"第1課",stem:"把詞語分類放進正確的格子：",items:["粉紅","高興","青綠","快樂","淡藍","笑咪咪"],categories:{"顏色詞":[],"情緒詞":[]},answer:{"顏色詞":["粉紅","青綠","淡藍"],"情緒詞":["高興","快樂","笑咪咪"]},explanation:"顏色詞描述顏色，情緒詞描述心情。"},
+      {qid:"int_v03",type:"handwrite_word",source:"第1課",stem:"請寫出這個詞語：「五顏六色」",answer:"五顏六色",explanation:"「五顏六色」形容顏色非常多、非常豐富。"},
+      {qid:"int_v04",type:"single_choice",source:"第1課",stem:"「一眼就看見」這個詞的意思是：",options:["找了很久才看見","馬上就看見了","閉著眼睛看見","用一隻眼睛看"],answer:"馬上就看見了",explanation:"「一眼就」表示立刻、馬上的意思。"}
+    ],
+    sentence:[
+      {qid:"int_s01",type:"sentence_reorder",source:"第1課",stem:"把詞語排成課文句型：",options:["小青蛙","跳出","池塘","，","一眼就看見","淡藍","的","天空","。"],answer:"小青蛙跳出池塘，一眼就看見淡藍的天空。",explanation:"句型：主詞＋動作＋地點，一眼就看見＋顏色＋景物。"},
+      {qid:"int_s02",type:"fill_blank",source:"第1課",stem:"小燕子從很遠的地方飛來，一眼就看見（ ）的景色。",options:["粉紅","五顏六色","淡藍","青綠"],answer:"五顏六色",explanation:"課文中小燕子看見五顏六色的景色。"},
+      {qid:"int_s03",type:"guided_sentence_writing",source:"第1課",stem:"仿照課文，用「一眼就看見」寫一句新的句子：",answer:null,keyword:"一眼就看見",explanation:"好棒！只要句子有「一眼就看見」，後面接上顏色和景物就很完整！"},
+      {qid:"int_s04",type:"single_choice",source:"第1課",stem:"哪一句話的句型和課文最像？",options:["小貓走出門，一眼就看見紅色的玫瑰。","今天天氣很好。","我喜歡春天。","花朵很漂亮。"],answer:"小貓走出門，一眼就看見紅色的玫瑰。",explanation:"這句用了一樣的句型：小動物＋動作＋地點，一眼就看見＋顏色＋景物。"}
+    ],
+    sequence:[
+      {qid:"int_q01",type:"sentence_reorder",source:"第1課",stem:"把下面的詞語排成完整的句子：",options:["春天","來了","，","到處","都是","五顏六色","的","花朵","。"],answer:"春天來了，到處都是五顏六色的花朵。",explanation:"春天到了，各種顏色的花都開了，所以到處都是五顏六色的花朵。"},
+      {qid:"int_q02",type:"single_choice",source:"第1課",stem:"「先飛出蜂窩，才看見桃花」，這句話說明了：",options:["先有結果，再有原因","先有動作，再有發現","先有顏色，再有景物","先有景物，再有動作"],answer:"先有動作，再有發現",explanation:"先做了「飛出蜂窩」的動作，之後才「發現桃花」，這就是動作和發現的先後順序。"},
+      {qid:"int_q03",type:"fill_blank",source:"第1課",stem:"因為春天有很多美麗的景色，所以小動物們都感到很（ ）。",options:["高興","地洞","蜂窩","淡藍"],answer:"高興",explanation:"看到美麗的景色，當然會感到高興！這是因果關係：因為有美景，所以感到高興。"}
+    ],
+    comprehension:[
+      {qid:"int_c01",type:"single_choice",source:"第1課",stem:"課文中，從「蜂窩」裡飛出來的是哪個小動物？",options:["小青蛙","小田鼠","小蜜蜂","小燕子"],answer:"小蜜蜂",explanation:"「蜂窩」是蜜蜂住的地方，所以從蜂窩飛出來的是小蜜蜂。"},
+      {qid:"int_c02",type:"matching",source:"第1課",stem:"把小動物和牠們住的地方配對：",left:["小蜜蜂","小青蛙","小田鼠"],right:["地洞","池塘","蜂窩"],answer:{"小蜜蜂":"蜂窩","小青蛙":"池塘","小田鼠":"地洞"},explanation:"蜜蜂住蜂窩、青蛙住池塘、田鼠住地洞。"},
+      {qid:"int_c03",type:"single_choice",source:"第1課",stem:"課文說小燕子看到春天的景色，覺得「像彩虹一樣」，這代表春天的顏色是：",options:["只有一種顏色","很多種顏色","全是綠色","全是粉紅色"],answer:"很多種顏色",explanation:"彩虹有七種顏色，所以說「像彩虹」是在形容春天顏色非常豐富多彩。"}
+    ],
+    emotion:[
+      {qid:"int_e01",type:"single_choice",source:"第1課",stem:"看到美麗的春天，你最可能有什麼心情？",options:["高興","生氣","害怕","難過"],answer:"高興",explanation:"看到美麗的春天景色，當然會感到高興和開心！"},
+      {qid:"int_e02",type:"word_classification",source:"第1課",stem:"把詞語分類：哪些是「開心」的詞語，哪些是「景物」的詞語？",items:["高興","桃花","快樂","草地","笑咪咪","天空"],categories:{"開心的詞語":[],"景物詞語":[]},answer:{"開心的詞語":["高興","快樂","笑咪咪"],"景物詞語":["桃花","草地","天空"]},explanation:"情緒詞描述心情，景物詞描述我們看見的東西。"},
+      {qid:"int_e03",type:"guided_sentence_writing",source:"第1課",stem:"用「高興」寫一句話，說說是什麼讓你感到高興：",answer:null,keyword:"高興",explanation:"把「高興」這個詞用到生活中，讓別人知道什麼讓你開心！"}
+    ]
+  }
+};
+ 
+// ═══════════════════════════════════════════════════
+// KP_POOL — 1～6課跨課 knowledge points 整併資料池
+// 供單課出題、綜合練習、補強錯題、模組分類使用
+// ═══════════════════════════════════════════════════
+const KP_POOL=[
+ 
+  // ── A. 生字 ─────────────────────────────────────────
+  {
+    kp_id:"kp_x_char_001",
+    module:"radical",
+    subcategory:"生字",
+    title:"木部高頻字",
+    source_lessons:["l01","l02","l03"],
+    difficulty_band:1,
+    recommended_question_types:["handwrite_character","radical_choice","matching"],
+    core_examples:["桃","梅","松","柏","樹","根","枝","葉"],
+    tags:["木部","生字","植物"]
+  },
+  {
+    kp_id:"kp_x_char_002",
+    module:"radical",
+    subcategory:"生字",
+    title:"土部高頻字",
+    source_lessons:["l01"],
+    difficulty_band:1,
+    recommended_question_types:["radical_choice","handwrite_radical","single_choice"],
+    core_examples:["地","塘","城","堡","坐","坡","場"],
+    tags:["土部","生字","地理"]
+  },
+  {
+    kp_id:"kp_x_char_003",
+    module:"radical",
+    subcategory:"生字",
+    title:"虫部高頻字",
+    source_lessons:["l01","l04"],
+    difficulty_band:1,
+    recommended_question_types:["radical_choice","handwrite_character"],
+    core_examples:["蜂","蝴","蝶","蛙","蟲","螢"],
+    tags:["虫部","生字","動物"]
+  },
+  {
+    kp_id:"kp_x_char_004",
+    module:"radical",
+    subcategory:"生字",
+    title:"水部高頻字",
+    source_lessons:["l01","l03"],
+    difficulty_band:1,
+    recommended_question_types:["radical_choice","handwrite_character","matching"],
+    core_examples:["池","河","海","泳","波","流","清"],
+    tags:["水部","生字","自然"]
+  },
+  {
+    kp_id:"kp_x_char_005",
+    module:"radical",
+    subcategory:"生字",
+    title:"艸部高頻字",
+    source_lessons:["l01","l02"],
+    difficulty_band:1,
+    recommended_question_types:["radical_choice","handwrite_character"],
+    core_examples:["草","花","菜","葉","苗","茶","芽"],
+    tags:["艸部","生字","植物"]
+  },
+  {
+    kp_id:"kp_x_char_006",
+    module:"radical",
+    subcategory:"生字",
+    title:"心部高頻字",
+    source_lessons:["l02","l05"],
+    difficulty_band:2,
+    recommended_question_types:["radical_choice","handwrite_character","single_choice"],
+    core_examples:["想","感","愛","忙","忘","怕","快"],
+    tags:["心部","生字","情緒"]
+  },
+ 
+  // ── B. 部首 ─────────────────────────────────────────
+  {
+    kp_id:"kp_x_radical_001",
+    module:"radical",
+    subcategory:"部首",
+    title:"部首與字義對應",
+    source_lessons:["l01","l02","l03","l04","l05","l06"],
+    difficulty_band:2,
+    recommended_question_types:["radical_choice","matching","word_classification"],
+    core_examples:[
+      {"部首":"木","字義":"與樹木植物有關","例字":["桃","梅","樹"]},
+      {"部首":"土","字義":"與土地地方有關","例字":["地","塘","城"]},
+      {"部首":"虫","字義":"與昆蟲動物有關","例字":["蜂","蝴","蛙"]},
+      {"部首":"水","字義":"與水流有關","例字":["池","河","清"]},
+      {"部首":"艸","字義":"與植物花草有關","例字":["草","花","葉"]},
+      {"部首":"心","字義":"與心情感受有關","例字":["想","感","愛"]}
+    ],
+    tags:["部首","字義","識字"]
+  },
+ 
+  // ── C. 詞語 ─────────────────────────────────────────
+  {
+    kp_id:"kp_x_vocab_color",
+    module:"vocab",
+    subcategory:"顏色詞",
+    title:"顏色描寫詞",
+    source_lessons:["l01","l02","l03"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","word_classification","context_word_choice","handwrite_word"],
+    core_examples:["粉紅","青綠","淡藍","五顏六色","金黃","雪白","深紅","橙色"],
+    tags:["顏色","描寫詞","形容詞"]
+  },
+  {
+    kp_id:"kp_x_vocab_scene",
+    module:"vocab",
+    subcategory:"景物詞",
+    title:"自然景物詞",
+    source_lessons:["l01","l03","l04"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","matching","word_classification","handwrite_word"],
+    core_examples:["桃花","草地","天空","池塘","彩虹","蜂窩","地洞","樹林","河流","向日葵"],
+    tags:["景物","自然","名詞"]
+  },
+  {
+    kp_id:"kp_x_vocab_family",
+    module:"vocab",
+    subcategory:"家人與角色詞",
+    title:"家人與角色詞",
+    source_lessons:["l02","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","matching","role_action_choice"],
+    core_examples:["爸爸","媽媽","爺爺","奶奶","哥哥","姐姐","弟弟","妹妹","老師","同學","朋友"],
+    tags:["家人","角色","人物"]
+  },
+  {
+    kp_id:"kp_x_vocab_action",
+    module:"vocab",
+    subcategory:"動作詞",
+    title:"高頻動作詞",
+    source_lessons:["l01","l02","l03","l04","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","role_action_choice","sentence_reorder"],
+    core_examples:["飛出","跳出","跑出","看見","走到","拿起","放下","打開","分享","幫忙","製作","完成","等待"],
+    tags:["動作","動詞","句型"]
+  },
+  {
+    kp_id:"kp_x_vocab_emotion",
+    module:"emotion",
+    subcategory:"情緒詞",
+    title:"情緒與感受詞",
+    source_lessons:["l01","l02","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","emotion_word_choice","word_classification","guided_sentence_writing"],
+    core_examples:["高興","開心","快樂","興奮","微笑","感動","幸福","得意","熱情","冷靜","安靜","神奇","美麗","驚喜","期待","難過","生氣","害怕"],
+    tags:["情緒","感受","形容詞"]
+  },
+  {
+    kp_id:"kp_x_vocab_describe",
+    module:"vocab",
+    subcategory:"描寫詞",
+    title:"樣態描寫詞",
+    source_lessons:["l01","l02","l03","l04"],
+    difficulty_band:2,
+    recommended_question_types:["single_choice","context_word_choice","sentence_pattern_fill"],
+    core_examples:["五顏六色","一眼就","慢慢地","輕輕地","快快地","靜靜地","大大的","小小的","高高的","長長的"],
+    tags:["描寫","副詞","形容詞"]
+  },
+  {
+    kp_id:"kp_x_vocab_life",
+    module:"vocab",
+    subcategory:"生活詞",
+    title:"常用生活詞",
+    source_lessons:["l02","l03","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["single_choice","word_building","context_word_choice"],
+    core_examples:["教室","學校","生日","作品","禮物","驚喜","故事","圖書館","操場","辦公室","便當","書包"],
+    tags:["生活","場所","物品"]
+  },
+ 
+  // ── D. 句型 ─────────────────────────────────────────
+  {
+    kp_id:"kp_x_sent_pattern_001",
+    module:"sentence",
+    subcategory:"句型",
+    title:"一眼就看見句型",
+    source_lessons:["l01"],
+    difficulty_band:2,
+    recommended_question_types:["sentence_reorder","sentence_pattern_fill","guided_sentence_writing","sentence_rewrite"],
+    core_examples:[
+      "小蜜蜂飛出蜂窩，一眼就看見粉紅的桃花。",
+      "小青蛙跳出池塘，一眼就看見淡藍的天空。",
+      "小田鼠跑出地洞，一眼就看見青綠的草地。",
+      "小朋友走出教室，一眼就看見金黃的向日葵。"
+    ],
+    tags:["句型","觀察","描寫"]
+  },
+  {
+    kp_id:"kp_x_sent_pattern_002",
+    module:"sentence",
+    subcategory:"句型",
+    title:"因為……所以……",
+    source_lessons:["l02","l03","l05"],
+    difficulty_band:2,
+    recommended_question_types:["because_so_fill","cause_effect_match","sentence_reorder"],
+    core_examples:[
+      "因為天氣很好，所以我們去公園玩。",
+      "因為媽媽生病了，所以我幫她倒水。",
+      "因為大家一起努力，所以作品很漂亮。"
+    ],
+    tags:["因果","關聯詞","句型"]
+  },
+  {
+    kp_id:"kp_x_sent_pattern_003",
+    module:"sentence",
+    subcategory:"句型",
+    title:"當……的時候……",
+    source_lessons:["l03","l04","l06"],
+    difficulty_band:2,
+    recommended_question_types:["sentence_pattern_fill","sentence_reorder","guided_sentence_writing"],
+    core_examples:[
+      "當春天來的時候，花朵都開了。",
+      "當我難過的時候，媽媽會抱著我。",
+      "當大家一起唱歌的時候，教室裡充滿笑聲。"
+    ],
+    tags:["時間","關聯詞","句型"]
+  },
+  {
+    kp_id:"kp_x_sent_pattern_004",
+    module:"sentence",
+    subcategory:"句型",
+    title:"不管……都……",
+    source_lessons:["l04","l05"],
+    difficulty_band:3,
+    recommended_question_types:["sentence_pattern_fill","sentence_pattern_fill_dual","guided_sentence_writing"],
+    core_examples:[
+      "不管天氣怎樣，我都會去上學。",
+      "不管多忙，媽媽都會陪我讀書。",
+      "不管遇到什麼困難，我都不放棄。"
+    ],
+    tags:["轉折","關聯詞","句型"]
+  },
+  {
+    kp_id:"kp_x_sent_pattern_005",
+    module:"sentence",
+    subcategory:"句型",
+    title:"終於……",
+    source_lessons:["l03","l05","l06"],
+    difficulty_band:2,
+    recommended_question_types:["sentence_pattern_fill","guided_sentence_writing","time_sequence_fill"],
+    core_examples:[
+      "經過很多天的努力，他終於學會了游泳。",
+      "我們等了很久，火車終於來了。",
+      "大家一起合作，終於把作品完成了。"
+    ],
+    tags:["結果","關聯詞","句型"]
+  },
+  {
+    kp_id:"kp_x_sent_pattern_006",
+    module:"sentence",
+    subcategory:"句型",
+    title:"像……一樣",
+    source_lessons:["l01","l02","l04"],
+    difficulty_band:2,
+    recommended_question_types:["sentence_pattern_fill","guided_sentence_writing","single_choice"],
+    core_examples:[
+      "春天的顏色像彩虹一樣。",
+      "媽媽的笑容像太陽一樣溫暖。",
+      "他跑得像風一樣快。"
+    ],
+    tags:["比喻","修辭","句型"]
+  },
+ 
+  // ── E. 關聯詞 ────────────────────────────────────────
+  {
+    kp_id:"kp_x_connector_001",
+    module:"sequence",
+    subcategory:"關聯詞",
+    title:"因果關聯詞：因為／所以",
+    source_lessons:["l02","l03","l05"],
+    difficulty_band:2,
+    recommended_question_types:["because_so_fill","cause_effect_match","single_choice"],
+    core_examples:["因為","所以"],
+    tags:["因果","關聯詞","邏輯"]
+  },
+  {
+    kp_id:"kp_x_connector_002",
+    module:"sequence",
+    subcategory:"關聯詞",
+    title:"時間順序詞：先／再／最後",
+    source_lessons:["l02","l03","l04","l06"],
+    difficulty_band:1,
+    recommended_question_types:["time_sequence_fill","story_sequence","sentence_reorder"],
+    core_examples:["先","再","然後","最後","接著","之後"],
+    tags:["時序","關聯詞","順序"]
+  },
+  {
+    kp_id:"kp_x_connector_003",
+    module:"sequence",
+    subcategory:"關聯詞",
+    title:"轉折強調詞：不管／都、終於、立刻",
+    source_lessons:["l04","l05","l06"],
+    difficulty_band:3,
+    recommended_question_types:["sentence_pattern_fill","single_choice","context_word_choice"],
+    core_examples:["不管","都","終於","立刻","馬上","竟然"],
+    tags:["轉折","強調","關聯詞"]
+  },
+  {
+    kp_id:"kp_x_connector_004",
+    module:"sequence",
+    subcategory:"關聯詞",
+    title:"並列關聯詞：並且／而且",
+    source_lessons:["l03","l05"],
+    difficulty_band:2,
+    recommended_question_types:["sentence_pattern_fill","single_choice","context_word_choice"],
+    core_examples:["並且","而且","也","還有","同時"],
+    tags:["並列","關聯詞","句型"]
+  },
+ 
+  // ── F. 情緒／感受詞（供 emotion 模組專用） ─────────────
+  {
+    kp_id:"kp_x_emotion_positive",
+    module:"emotion",
+    subcategory:"正向情緒",
+    title:"正向情緒詞",
+    source_lessons:["l01","l02","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["emotion_word_choice","word_classification","guided_sentence_writing","picture_sentence_writing"],
+    core_examples:["高興","開心","快樂","興奮","微笑","感動","幸福","得意","熱情","期待","驚喜"],
+    tags:["正向情緒","感受","表達"]
+  },
+  {
+    kp_id:"kp_x_emotion_calm",
+    module:"emotion",
+    subcategory:"平靜情緒",
+    title:"平靜狀態詞",
+    source_lessons:["l03","l04"],
+    difficulty_band:2,
+    recommended_question_types:["emotion_word_choice","single_choice","context_word_choice"],
+    core_examples:["冷靜","安靜","平靜","認真","專心","仔細"],
+    tags:["平靜","狀態","描寫"]
+  },
+  {
+    kp_id:"kp_x_emotion_negative",
+    module:"emotion",
+    subcategory:"負向情緒",
+    title:"負向情緒詞（辨認用）",
+    source_lessons:["l05","l06"],
+    difficulty_band:2,
+    recommended_question_types:["emotion_word_choice","word_classification","single_choice"],
+    core_examples:["難過","生氣","害怕","擔心","失望","傷心"],
+    tags:["負向情緒","對比","辨認"]
+  },
+ 
+  // ── G. 看圖理解／角色動作 ────────────────────────────
+  {
+    kp_id:"kp_x_comp_role_action",
+    module:"comprehension",
+    subcategory:"角色動作",
+    title:"誰在做什麼",
+    source_lessons:["l01","l02","l03","l04","l05","l06"],
+    difficulty_band:1,
+    recommended_question_types:["role_action_choice","single_choice","matching","picture_comprehension"],
+    core_examples:[
+      {"角色":"小蜜蜂","動作":"飛出蜂窩","看見":"粉紅的桃花"},
+      {"角色":"小青蛙","動作":"跳出池塘","看見":"淡藍的天空"},
+      {"角色":"小田鼠","動作":"跑出地洞","看見":"青綠的草地"},
+      {"角色":"小燕子","動作":"從遠處飛來","看見":"五顏六色的景色"}
+    ],
+    tags:["角色","動作","課文理解"]
+  },
+  {
+    kp_id:"kp_x_comp_sequence",
+    module:"comprehension",
+    subcategory:"事件順序",
+    title:"先後發生了什麼",
+    source_lessons:["l02","l03","l04","l06"],
+    difficulty_band:2,
+    recommended_question_types:["story_sequence","time_sequence_fill","sentence_reorder"],
+    core_examples:[
+      "先出發，再到達，最後完成任務。",
+      "先準備材料，再動手製作，最後展示作品。",
+      "先等待，然後出現，終於看見了。"
+    ],
+    tags:["順序","時序","故事"]
+  },
+  {
+    kp_id:"kp_x_comp_together",
+    module:"comprehension",
+    subcategory:"合作與互動",
+    title:"誰和誰一起做事",
+    source_lessons:["l02","l05","l06"],
+    difficulty_band:2,
+    recommended_question_types:["role_action_choice","single_choice","picture_comprehension"],
+    core_examples:[
+      "爸爸和我一起去公園。",
+      "同學們一起完成作品。",
+      "老師和學生一起討論。"
+    ],
+    tags:["合作","互動","角色"]
+  },
+ 
+  // ── H. 生活應用主題 ──────────────────────────────────
+  {
+    kp_id:"kp_x_theme_spring",
+    module:"comprehension",
+    subcategory:"生活應用",
+    title:"春天與自然主題",
+    source_lessons:["l01"],
+    difficulty_band:1,
+    recommended_question_types:["picture_comprehension","single_choice","picture_sentence_writing","guided_sentence_writing"],
+    core_examples:["春天","桃花","草地","天空","彩虹","蜜蜂","燕子","青蛙","五顏六色"],
+    tags:["春天","自然","季節"]
+  },
+  {
+    kp_id:"kp_x_theme_family",
+    module:"emotion",
+    subcategory:"生活應用",
+    title:"家人與陪伴主題",
+    source_lessons:["l02","l05"],
+    difficulty_band:1,
+    recommended_question_types:["picture_comprehension","single_choice","picture_sentence_writing","emotion_word_choice"],
+    core_examples:["爸爸","媽媽","爺爺","奶奶","陪伴","關心","一起","幫忙","愛"],
+    tags:["家人","陪伴","情感"]
+  },
+  {
+    kp_id:"kp_x_theme_school",
+    module:"comprehension",
+    subcategory:"生活應用",
+    title:"教室與學校主題",
+    source_lessons:["l03","l06"],
+    difficulty_band:1,
+    recommended_question_types:["picture_comprehension","single_choice","role_action_choice"],
+    core_examples:["教室","老師","同學","書包","黑板","作業","上課","下課","操場"],
+    tags:["學校","教室","生活"]
+  },
+  {
+    kp_id:"kp_x_theme_birthday",
+    module:"emotion",
+    subcategory:"生活應用",
+    title:"生日／驚喜／作品主題",
+    source_lessons:["l04","l06"],
+    difficulty_band:2,
+    recommended_question_types:["picture_comprehension","emotion_word_choice","guided_sentence_writing","picture_sentence_writing"],
+    core_examples:["生日","驚喜","禮物","蛋糕","作品","慶祝","開心","興奮","期待"],
+    tags:["生日","驚喜","情緒"]
+  },
+  {
+    kp_id:"kp_x_theme_growth",
+    module:"comprehension",
+    subcategory:"生活應用",
+    title:"觀察與成長主題",
+    source_lessons:["l03","l04","l05"],
+    difficulty_band:2,
+    recommended_question_types:["story_sequence","picture_comprehension","guided_sentence_writing"],
+    core_examples:["種子","發芽","長大","觀察","記錄","努力","進步","完成","成功"],
+    tags:["成長","觀察","學習"]
+  },
+  {
+    kp_id:"kp_x_theme_sharing",
+    module:"emotion",
+    subcategory:"生活應用",
+    title:"分享與表達主題",
+    source_lessons:["l02","l05","l06"],
+    difficulty_band:2,
+    recommended_question_types:["guided_sentence_writing","picture_sentence_writing","emotion_word_choice"],
+    core_examples:["分享","表達","說出來","告訴","讓大家知道","一起","謝謝","幫忙"],
+    tags:["分享","表達","溝通"]
+  }
+];
+ 
+// KP_POOL 查詢工具函式
+function kpByModule(moduleId){return KP_POOL.filter(k=>k.module===moduleId);}
+function kpByLesson(lesson){return KP_POOL.filter(k=>k.source_lessons.includes(lesson));}
+function kpByTag(tag){return KP_POOL.filter(k=>k.tags.includes(tag));}
+function kpById(id){return KP_POOL.find(k=>k.kp_id===id)||null;}
+ 
+// ═══════════════════════════════════════════════════
+// STATE  ─  初始化時從 localStorage 讀取
+// ═══════════════════════════════════════════════════
+const saved=loadProgress();
+ 
+const S={
+  screen:'screen-home',history:[],
+  stars:saved.totalStars||0,
+  unit:null,mode:null,
+  questions:[],qi:0,correct:0,answered:false,
+  built:[],
+  matchSelected:null,matchPairs:{},matchDone:0,
+  wrongKps:[],
+  isIntegrated:false,
+  currentModule:null
+};
+ 
+// UP — 從 localStorage 恢復
+const UP={};
+DB.units.forEach(u=>{
+  const sp=saved.unitsProgress&&saved.unitsProgress[u.unit_id];
+  UP[u.unit_id]={
+    challenge:sp?sp.challengeProgress:false,
+    reinforcement:sp?sp.reinforcementProgress:false,
+    exploration:sp?sp.explorationProgress:false,
+    starsEarned:sp?sp.earnedStars:0,
+    hwDone:sp?sp.hwDone:0,
+    wrongKps:sp?sp.wrongKps:[]
+  };
+});
+ 
+const KP_LABELS={
+  "kp_l01_002":"角色與景物配對","kp_l01_004":"土部識字",
+  "kp_l01_006":"多音字：興","kp_l01_007":"情緒詞語",
+  "kp_l01_008":"課文句型","kp_l01_009":"第一課會寫字",
+  "kp_l01_010":"課文理解"
+};
+ 
+const MODULE_LABELS={
+  radical:"🔤 生字與部首",vocab:"📝 詞語與造詞",
+  sentence:"💬 句型與造句",sequence:"🔢 順序與因果",
+  comprehension:"🖼️ 看圖與理解",emotion:"😊 情緒與生活表達"
+};
+ 
+// ═══════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════
+function goTo(id){S.history.push(S.screen);show(id)}
+function goBack(){show(S.history.pop()||'screen-home')}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  S.screen=id;syncStars();
+  if(id==='screen-progress')renderProgress();
+}
+function syncStars(){
+  document.getElementById('home-stars').textContent=S.stars;
+  document.getElementById('p-stars').textContent=S.stars;
+  document.querySelectorAll('.sd').forEach(e=>e.textContent=S.stars);
+}
+function confirmQuit(){
+  if(confirm('要離開這一關嗎？進度不會儲存喔！')){
+    if(S.isIntegrated)goTo('screen-integrated');
+    else goTo('screen-units');
+  }
+}
+ 
+// ═══════════════════════════════════════════════════
+// UNITS
+// ═══════════════════════════════════════════════════
+function goToUnits(subj){
+  document.getElementById('units-title').textContent=subj==='chinese'?'國語單元':'數學單元';
+  const c=document.getElementById('units-list');c.innerHTML='';
+  DB.units.filter(u=>u.subject===subj).forEach((unit,idx,arr)=>{
+    const p=UP[unit.unit_id]||{};
+    const unlocked=idx===0||(UP[arr[idx-1].unit_id]?.challenge);
+    const done=p.challenge&&p.reinforcement;
+    const nc=!unlocked?'un-locked':done?'un-done':'un-active';
+    const cc=!unlocked?'uc-locked':done?'uc-done':'uc-active';
+    const ni=!unlocked?'🔒':done?'✓':unit.lesson_order;
+    const bgs=[{k:'challenge',l:'挑戰關'},{k:'reinforcement',l:'補強關'},{k:'exploration',l:'探索關'}]
+      .map(m=>{
+        if(!unlocked)return`<span class="badge badge-locked">${m.l} 🔒</span>`;
+        if(p[m.k])return`<span class="badge badge-done">${m.l} ✓</span>`;
+        return`<span class="badge badge-todo">${m.l}</span>`;
+      }).join('');
+    const oc=unlocked?`openUnit('${unit.unit_id}')`:`alert('請先完成前一課！')`;
+    c.innerHTML+=`<button class="unit-card ${cc}" onclick="${oc}">
+      <div class="unit-num ${nc}">${ni}</div>
+      <div class="unit-info">
+        <div class="unit-title">第${unit.lesson_order}課　${unit.unit_title}</div>
+        <div class="unit-sub">${unit.theme}</div>
+        <div class="unit-badges">${bgs}</div>
+      </div></button>`;
+  });
+  goTo('screen-units');
+}
+function openUnit(uid){
+  S.unit=uid;S.isIntegrated=false;const p=UP[uid];
+  if(!p.challenge)startMode('challenge');
+  else if(!p.reinforcement)startMode('reinforcement');
+  else if(!p.exploration)startMode('exploration');
+  else if(confirm('你已完成這一課！要重新挑戰嗎？'))startMode('challenge');
+}
+ 
+// ═══════════════════════════════════════════════════
+// INTEGRATED MODULE
+// ═══════════════════════════════════════════════════
+function startModule(moduleId){
+  S.isIntegrated=true;
+  S.currentModule=moduleId;
+  S.mode='integrated';S.qi=0;S.correct=0;S.wrongKps=[];
+  S.answered=false;S.built=[];S.matchSelected=null;S.matchPairs={};S.matchDone=0;
+  S.questions=shuffle([...DB.integrated_modules[moduleId]]);
+  document.getElementById('q-chip').textContent=MODULE_LABELS[moduleId]||'🧩 綜合練習';
+  document.getElementById('q-chip').className='qe-mode-chip qe-mode-integrated';
+  document.getElementById('q-title').textContent='綜合練習';
+  goTo('screen-question');renderQ();
+}
+ 
+// ═══════════════════════════════════════════════════
+// MODE (unit)
+// ═══════════════════════════════════════════════════
+function startMode(mode){
+  S.mode=mode;S.isIntegrated=false;S.qi=0;S.correct=0;S.wrongKps=[];
+  S.answered=false;S.built=[];S.matchSelected=null;S.matchPairs={};S.matchDone=0;
+ 
+  if(mode==='challenge'){
+    S.questions=DB.challenge.map(q=>({...q}));
+  } else if(mode==='reinforcement'){
+    const wk=UP[S.unit].wrongKps||[];
+    if(wk.length===0){
+      S.questions=[{qid:'re_perfect',kp:'',type:'all_correct',stem:'',answer:null,explanation:''}];
+    } else {
+      S.questions=wk.filter(kp=>DB.reinforcement_bank[kp]).map(kp=>({...DB.reinforcement_bank[kp]}));
+    }
+  } else {
+    S.questions=DB.exploration.map(q=>({...q}));
+  }
+ 
+  const labels={challenge:'🎯 挑戰關',reinforcement:'💪 補強關',exploration:'🔭 探索關'};
+  const cls={challenge:'qe-mode-challenge',reinforcement:'qe-mode-reinforce',exploration:'qe-mode-explore'};
+  document.getElementById('q-chip').textContent=labels[mode];
+  document.getElementById('q-chip').className='qe-mode-chip '+cls[mode];
+  document.getElementById('q-title').textContent={challenge:'挑戰關',reinforcement:'補強關',exploration:'探索關'}[mode];
+  goTo('screen-question');renderQ();
+}
+ 
+// ═══════════════════════════════════════════════════
+// RENDER Q
+// ═══════════════════════════════════════════════════
+function renderQ(){
+  const q=S.questions[S.qi],total=S.questions.length,idx=S.qi;
+  S.answered=false;S.built=[];
+  S.matchSelected=null;S.matchPairs={};S.matchDone=0;
+  S.classifPlacements={};
+ 
+  document.getElementById('q-ctr').textContent=`第 ${idx+1} / ${total} 題`;
+  document.getElementById('q-pbar').style.width=(idx/total*100)+'%';
+  const dots=document.getElementById('q-dots');dots.innerHTML='';
+  for(let i=0;i<total;i++){
+    const d=document.createElement('div');
+    d.className='q-dot '+(i<idx?'done':i===idx?'current':'');
+    dots.appendChild(d);
+  }
+  const r=document.getElementById('q-render');
+  const scroll=document.getElementById('q-scroll');
+  r.innerHTML='';setFooter('');
+  if(scroll)scroll.scrollTop=0;
+ 
+  // reinforce banner
+  let banner='';
+  if(S.mode==='reinforcement'&&q.kp&&KP_LABELS[q.kp]){
+    banner=`<div class="reinforce-banner"><div class="rb-icon">💡</div><div class="rb-text">針對你答錯的地方，換個問法再練一次！<br><span class="rb-kp">📌 ${KP_LABELS[q.kp]}</span></div></div>`;
+  }
+  // integrated source tag
+  if(S.isIntegrated&&q.source){
+    banner+=`<div style="display:inline-block;background:#E8F4FF;border-radius:8px;padding:3px 10px;font-size:11px;font-weight:700;color:#1a78a0;margin-bottom:10px">📚 ${q.source}</div>`;
+  }
+ 
+  if(q.type==='all_correct'){
+    r.innerHTML=`<div class="question-body" style="text-align:center;padding:36px 18px">
+      <div style="font-size:52px;margin-bottom:10px">🏅</div>
+      <div style="font-size:19px;font-weight:900;margin-bottom:8px">挑戰關全部答對！</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:600;line-height:1.8">你完全掌握了這一課，<br>不需要補強，直接通關！</div>
+    </div>`;
+    setFooter(`<button class="btn btn-lg btn-green" onclick="skipReinforce()">直接通關 🏆</button>`);
+    return;
+  }
+ 
+  r.innerHTML=banner;
+ 
+  if(q.type==='matching') renderMatching(q,r);
+  else if(q.type==='sentence_reorder') renderReorder(q,r);
+  else if(q.type==='word_classification') renderClassification(q,r);
+  else if(q.type==='handwrite_character'||q.type==='handwrite_radical'||q.type==='handwrite_word') renderWordInput(q,r);
+  else if(q.type==='guided_sentence_writing') renderSentenceInput(q,r);
+  else renderChoice(q,r);
+}
+ 
+function setFooter(html){document.getElementById('q-footer').innerHTML=html;}
+ 
+// ═══════════════════════════════════════════════════
+// CHOICE
+// ═══════════════════════════════════════════════════
+function renderChoice(q,r){
+  const letters=['Ａ','Ｂ','Ｃ','Ｄ'];
+  const hint=q.type==='fill_blank'?'<div class="q-hint">選出正確的詞語填入空格</div>':'';
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>${hint}
+    <div class="options-grid">
+      ${q.options.map((o,i)=>`<button class="option-btn" id="opt-${i}" onclick="selOpt(${i})"><span class="opt-letter">${letters[i]}</span>${o}</button>`).join('')}
+    </div><div id="fb"></div></div>`;
+  setFooter(`<button class="btn btn-lg btn-primary btn-disabled" id="btn-next" onclick="nextQ()">下一題 →</button>`);
+}
+function selOpt(idx){
+  if(S.answered)return;S.answered=true;
+  const q=S.questions[S.qi],ok=q.options[idx]===q.answer;
+  if(ok)S.correct++;else if(S.mode==='challenge')recordWrong(q.kp);
+  document.querySelectorAll('.option-btn').forEach((btn,i)=>{
+    if(q.options[i]===q.answer)btn.classList.add('correct');
+    else if(i===idx&&!ok)btn.classList.add('wrong');
+  });
+  fbShow(ok,q.answer,q.explanation,'fb');
+  document.getElementById('btn-next').classList.remove('btn-disabled');
+}
+ 
+// ═══════════════════════════════════════════════════
+// SENTENCE REORDER
+// ═══════════════════════════════════════════════════
+function renderReorder(q,r){
+  const shuffled=shuffle(q.options);
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-hint">點詞語來排列句子 👇</div>
+    <div class="answer-area" id="aa"><span style="color:#CCC;font-size:12px;font-weight:600">點詞語來組句子</span></div>
+    <div class="chip-pool" id="cp">
+      ${shuffled.map((o,i)=>`<button class="chip chip-src" id="chip-${i}" data-val="${esc(o)}" onclick="addChip(${i})">${o}</button>`).join('')}
+    </div><div id="fb"></div></div>`;
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="submitReorder()">確認答案 ✓</button>
+    <button class="btn btn-sm btn-ghost" style="align-self:center" onclick="clearReorder()">清除重排</button>`);
+}
+function addChip(idx){
+  const el=document.getElementById('chip-'+idx);
+  if(!el||el.classList.contains('used'))return;
+  el.classList.add('used');S.built.push({idx,val:el.dataset.val});refreshAA();
+}
+function refreshAA(){
+  const aa=document.getElementById('aa');if(!aa)return;
+  if(!S.built.length){aa.innerHTML='<span style="color:#CCC;font-size:12px;font-weight:600">點詞語來組句子</span>';return;}
+  aa.innerHTML='';
+  S.built.forEach((item,i)=>{
+    const btn=document.createElement('button');btn.className='chip chip-sel';btn.textContent=item.val;
+    btn.onclick=()=>{const s=document.getElementById('chip-'+item.idx);if(s)s.classList.remove('used');S.built.splice(i,1);refreshAA();};
+    aa.appendChild(btn);
+  });
+}
+function clearReorder(){S.built.forEach(item=>{const e=document.getElementById('chip-'+item.idx);if(e)e.classList.remove('used')});S.built=[];refreshAA();}
+function submitReorder(){
+  if(S.answered)return;
+  const q=S.questions[S.qi],built=S.built.map(i=>i.val).join('');
+  if(!built){alert('請先排列詞語喔！');return;}
+  S.answered=true;
+  const ok=built===q.answer;
+  if(ok)S.correct++;else if(S.mode==='challenge')recordWrong(q.kp);
+  fbShow(ok,q.answer,q.explanation,'fb');
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="nextQ()">下一題 →</button>`);
+}
+ 
+// ═══════════════════════════════════════════════════
+// MATCHING
+// ═══════════════════════════════════════════════════
+function renderMatching(q,r){
+  const rightShuffled=shuffle(q.right);
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-hint">先點左邊，再點右邊配對</div>
+    <div class="match-grid">
+      <div><div class="match-col-title">左邊</div>${q.left.map((item,i)=>`<button class="match-item" id="ml-${i}" onclick="selML(${i},'${esc(item)}')">${item}</button>`).join('')}</div>
+      <div><div class="match-col-title">右邊</div>${rightShuffled.map((item,i)=>`<button class="match-item" id="mr-${i}" onclick="selMR(${i},'${esc(item)}')">${item}</button>`).join('')}</div>
+    </div>
+    <div id="match-lines" style="margin-top:7px;"></div>
+    <div id="fb"></div>
+  </div>`;
+  setFooter(`<button class="btn btn-lg btn-primary btn-disabled" id="btn-next" onclick="nextQ()">下一題 →</button>`);
+}
+function selML(idx,val){
+  if(S.answered)return;
+  document.querySelectorAll('[id^="ml-"]').forEach(e=>e.classList.remove('selected'));
+  S.matchSelected={idx,val};document.getElementById('ml-'+idx).classList.add('selected');
+}
+function selMR(idx,val){
+  if(S.answered||!S.matchSelected)return;
+  const leftVal=S.matchSelected.val;
+  const ok=S.questions[S.qi].answer[leftVal]===val;
+  const lEl=document.getElementById('ml-'+S.matchSelected.idx);
+  const rEl=document.getElementById('mr-'+idx);
+  lEl.classList.remove('selected');
+  lEl.classList.add(ok?'matched-ok':'matched-no');
+  rEl.classList.add(ok?'matched-ok':'matched-no');
+  lEl.onclick=null;rEl.onclick=null;
+  S.matchPairs[leftVal]=val;S.matchDone++;S.matchSelected=null;
+  document.getElementById('match-lines').innerHTML+=
+    `<div class="match-pair-line">${leftVal} ➜ ${val} ${ok?'✓':'✗ 正確：'+S.questions[S.qi].answer[leftVal]}</div>`;
+  if(S.matchDone===S.questions[S.qi].left.length){
+    S.answered=true;
+    const allOk=Object.entries(S.matchPairs).every(([l,rv])=>S.questions[S.qi].answer[l]===rv);
+    if(allOk)S.correct++;else if(S.mode==='challenge')recordWrong(S.questions[S.qi].kp);
+    fbShow(allOk,'',S.questions[S.qi].explanation,'fb');
+    document.getElementById('btn-next').classList.remove('btn-disabled');
+  }
+}
+ 
+// ═══════════════════════════════════════════════════
+// WORD CLASSIFICATION
+// ═══════════════════════════════════════════════════
+function renderClassification(q,r){
+  S.classifPlacements={};
+  q.items.forEach(item=>S.classifPlacements[item]=null);
+  const cats=Object.keys(q.categories);
+  const binsHtml=cats.map(cat=>`
+    <div class="classif-bin" id="bin-${esc(cat)}">
+      <div class="classif-bin-title">${cat}</div>
+      <div class="classif-items" id="items-${esc(cat)}"></div>
+    </div>`).join('');
+  const sourceHtml=q.items.map((item,i)=>
+    `<button class="cls-chip" id="cls-${i}" onclick="placeItem(${i},'${esc(item)}')">${item}</button>`
+  ).join('');
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-hint">點詞語，再點要放入的格子</div>
+    <div class="classif-source" id="cls-source">${sourceHtml}</div>
+    <div class="classif-bins">${binsHtml}</div>
+    <div id="fb"></div>
+  </div>`;
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="submitClassif()">確認答案 ✓</button>
+    <button class="btn btn-sm btn-ghost" style="align-self:center" onclick="clearClassif()">清除重排</button>`);
+  S._clsSelected=null;
+}
+function placeItem(idx,val){
+  if(S.answered)return;
+  // first click: select the word chip
+  if(!S._clsSelected){
+    document.querySelectorAll('.cls-chip').forEach(c=>c.style.background='');
+    const el=document.getElementById('cls-'+idx);
+    if(el.classList.contains('placed'))return;
+    el.style.background='#6ECFF0';el.style.color='#fff';
+    S._clsSelected={idx,val};
+  } else {
+    // second click must be on a bin — handled by placeToBin
+    S._clsSelected=null;
+    document.querySelectorAll('.cls-chip').forEach(c=>{c.style.background='';c.style.color='';});
+  }
+}
+function placeToBin(cat){
+  if(S.answered||!S._clsSelected)return;
+  const {idx,val}=S._clsSelected;
+  // remove from previous bin if any
+  const prev=S.classifPlacements[val];
+  if(prev){
+    const prevArea=document.getElementById('items-'+esc(prev));
+    if(prevArea){
+      [...prevArea.querySelectorAll('.cls-placed')].forEach(el=>{if(el.textContent===val)el.remove();});
+    }
+  }
+  S.classifPlacements[val]=cat;
+  const el=document.getElementById('cls-'+idx);
+  el.classList.add('placed');el.style.background='';el.style.color='';
+  const area=document.getElementById('items-'+esc(cat));
+  if(area){
+    const placed=document.createElement('span');placed.className='cls-placed';placed.textContent=val;
+    placed.onclick=()=>{
+      S.classifPlacements[val]=null;el.classList.remove('placed');placed.remove();
+    };
+    area.appendChild(placed);
+  }
+  S._clsSelected=null;
+  document.querySelectorAll('.cls-chip').forEach(c=>{c.style.background='';c.style.color='';});
+}
+// attach bin click handlers after render
+document.addEventListener('click',function(e){
+  const bin=e.target.closest('.classif-bin');
+  if(bin&&S._clsSelected){
+    const cat=bin.querySelector('.classif-bin-title').textContent;
+    placeToBin(cat);
+  }
+});
+function clearClassif(){
+  const q=S.questions[S.qi];
+  q.items.forEach((item,i)=>{
+    S.classifPlacements[item]=null;
+    const el=document.getElementById('cls-'+i);
+    if(el)el.classList.remove('placed');
+  });
+  Object.keys(q.categories).forEach(cat=>{
+    const area=document.getElementById('items-'+esc(cat));
+    if(area)area.innerHTML='';
+  });
+}
+function submitClassif(){
+  if(S.answered)return;
+  const q=S.questions[S.qi];
+  const allPlaced=q.items.every(item=>S.classifPlacements[item]);
+  if(!allPlaced){alert('請把所有詞語都放進格子喔！');return;}
+  S.answered=true;
+  let allOk=true;
+  q.items.forEach(item=>{
+    const placed=S.classifPlacements[item];
+    const correct=Object.keys(q.answer).find(cat=>q.answer[cat].includes(item));
+    if(placed!==correct)allOk=false;
+  });
+  if(allOk)S.correct++;else if(S.mode==='challenge')recordWrong(q.kp||'');
+  // colour bins
+  Object.keys(q.categories).forEach(cat=>{
+    const bin=document.getElementById('bin-'+esc(cat));
+    if(bin){
+      const correctItems=q.answer[cat]||[];
+      const placedItems=q.items.filter(item=>S.classifPlacements[item]===cat);
+      const binOk=placedItems.every(i=>correctItems.includes(i))&&correctItems.every(i=>placedItems.includes(i));
+      bin.classList.add(binOk?'bin-ok':'bin-no');
+    }
+  });
+  fbShow(allOk,'',q.explanation,'fb');
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="nextQ()">下一題 →</button>`);
+}
+ 
+// ═══════════════════════════════════════════════════
+// WORD INPUT
+// ═══════════════════════════════════════════════════
+function renderWordInput(q,r){
+  const prompt=q.prompt_char?`<div style="text-align:center;margin:12px 0 5px"><span style="font-size:54px;font-weight:900">${q.prompt_char}</span><div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:2px">參考字形</div></div>`:'';
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>${prompt}
+    <div class="input-tip">✏️ 可用手寫鍵盤輸入</div>
+    <input class="ti-single" id="ti-word" type="text" placeholder="在這裡輸入"
+      autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text"
+      onkeydown="if(event.key==='Enter')submitWord()">
+    <div id="fb" style="margin-top:9px;"></div>
+  </div>`;
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="submitWord()">確認答案 ✓</button>`);
+  setTimeout(()=>{const el=document.getElementById('ti-word');if(el)el.focus();},200);
+}
+function submitWord(){
+  if(S.answered)return;
+  const q=S.questions[S.qi];
+  const val=(document.getElementById('ti-word').value||'').trim();
+  if(!val){alert('請先輸入答案喔！');return;}
+  S.answered=true;
+  UP[S.unit]&&(UP[S.unit].hwDone=(UP[S.unit].hwDone||0)+1);
+  saveProgress();
+  const inp=document.getElementById('ti-word');
+  if(q.answer===null){
+    S.correct++;inp.classList.add('correct');inp.disabled=true;
+    document.getElementById('fb').innerHTML=`<div class="feedback ok"><div class="fb-icon">🎉</div><div class="fb-title">寫得很好！</div><div class="fb-text">你寫的是「${val}」。<br>${q.explanation}</div></div>`;
+  } else {
+    const ok=val===q.answer;
+    if(ok)S.correct++;else if(S.mode==='challenge')recordWrong(q.kp);
+    inp.classList.add(ok?'correct':'wrong');inp.disabled=true;
+    fbShow(ok,q.answer,q.explanation,'fb');
+  }
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="nextQ()">下一題 →</button>`);
+}
+ 
+// ═══════════════════════════════════════════════════
+// SENTENCE INPUT
+// ═══════════════════════════════════════════════════
+function renderSentenceInput(q,r){
+  r.innerHTML+=`<div class="question-body">
+    <div class="q-stem">${q.stem}</div>
+    <div class="input-tip">✏️ 可用手寫鍵盤輸入整句話</div>
+    <textarea class="ti-sentence" id="ti-sent" rows="3" placeholder="在這裡寫一句話…"
+      autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+    <div id="fb" style="margin-top:9px;"></div>
+  </div>`;
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="submitSent()">確認答案 ✓</button>`);
+  setTimeout(()=>{const el=document.getElementById('ti-sent');if(el)el.focus();},200);
+}
+function submitSent(){
+  if(S.answered)return;
+  const q=S.questions[S.qi];
+  const val=(document.getElementById('ti-sent').value||'').trim();
+  if(!val){alert('請先輸入一句話喔！');return;}
+  S.answered=true;
+  UP[S.unit]&&(UP[S.unit].hwDone=(UP[S.unit].hwDone||0)+1);
+  saveProgress();
+  const ta=document.getElementById('ti-sent');
+  const kw=q.keyword||null;
+  const ok=!kw||val.includes(kw);
+  if(ok)S.correct++;
+  ta.classList.add(ok?'correct':'wrong');ta.disabled=true;
+  if(ok){
+    document.getElementById('fb').innerHTML=`<div class="feedback ok"><div class="fb-icon">🎉</div><div class="fb-title">寫得很棒！</div><div class="fb-text">你的句子：「${val}」<br>${q.explanation}</div></div>`;
+  } else {
+    document.getElementById('fb').innerHTML=`<div class="feedback no"><div class="fb-icon">🤔</div><div class="fb-title">記得要包含「${kw}」喔！</div><div class="fb-text">${q.explanation}</div></div>`;
+  }
+  setFooter(`<button class="btn btn-lg btn-primary" onclick="nextQ()">下一題 →</button>`);
+}
+ 
+// ═══════════════════════════════════════════════════
+// FEEDBACK
+// ═══════════════════════════════════════════════════
+function fbShow(ok,answer,explanation,elId){
+  const el=document.getElementById(elId);if(!el)return;
+  el.innerHTML=ok
+    ?`<div class="feedback ok"><div class="fb-icon">🎉</div><div class="fb-title">答對了！</div><div class="fb-text">${explanation}</div></div>`
+    :`<div class="feedback no"><div class="fb-icon">🤔</div><div class="fb-title">再想想…</div><div class="fb-text">${answer?`正確答案是「${answer}」<br>`:''}${explanation}</div></div>`;
+}
+ 
+// ═══════════════════════════════════════════════════
+// WRONG KP
+// ═══════════════════════════════════════════════════
+function recordWrong(kp){
+  if(!kp||S.wrongKps.includes(kp))return;
+  S.wrongKps.push(kp);
+}
+ 
+// ═══════════════════════════════════════════════════
+// NEXT / END
+// ═══════════════════════════════════════════════════
+function nextQ(){S.qi++;if(S.qi>=S.questions.length)endMode();else renderQ();}
+ 
+function endMode(){
+  if(S.isIntegrated){
+    // 綜合模組結束
+    const earned=calcStars(S.correct,S.questions.length);
+    S.stars+=earned;syncStars();saveProgress();
+    document.getElementById('q-render').innerHTML=`<div class="question-body" style="text-align:center;padding:36px 18px">
+      <div style="font-size:60px;margin-bottom:12px">🌟</div>
+      <div style="font-size:20px;font-weight:900;margin-bottom:8px">模組完成！</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:600;line-height:1.8">答對 ${S.correct}/${S.questions.length} 題<br>獲得 ＋${earned}⭐ 星星！</div>
+    </div>`;
+    setFooter(`<button class="btn btn-lg btn-teal" onclick="goTo('screen-integrated')">🧩 回到模組列表</button>
+      <button class="btn btn-lg btn-ghost" style="margin-top:2px" onclick="goTo('screen-progress')">📊 看我的進度</button>`);
+    return;
+  }
+ 
+  const p=UP[S.unit];p[S.mode]=true;
+  if(S.mode==='challenge'){
+    p.wrongKps=[...S.wrongKps];
+    const e=calcStars(S.correct,S.questions.length);
+    p.starsEarned=e;S.stars+=e;syncStars();saveProgress();showResult();
+  } else if(S.mode==='reinforcement'){
+    S.stars+=3;syncStars();saveProgress();showClear();
+  } else {
+    S.stars+=5;syncStars();saveProgress();showExploreDone();
+  }
+}
+function calcStars(c,t){const r=c/t;return r===1?5:r>=.8?4:r>=.6?3:r>=.4?2:1;}
+ 
+// ═══════════════════════════════════════════════════
+// RESULT
+// ═══════════════════════════════════════════════════
+function showResult(){
+  const t=S.questions.length,c=S.correct,r=c/t,p=UP[S.unit];
+  const[em,ti]=r===1?['🤩','全對！你是小天才！']:r>=.6?['🎉','做得很好！']:['😊','繼續加油！'];
+  document.getElementById('r-emoji').textContent=em;
+  document.getElementById('r-title').textContent=ti;
+  document.getElementById('r-sub').textContent=`完成挑戰關！答對 ${c}/${t} 題`;
+  document.getElementById('r-correct').textContent=c;
+  document.getElementById('r-total').textContent=t;
+  document.getElementById('r-stars').textContent=`+${p.starsEarned}⭐`;
+  let sh='';for(let i=0;i<5;i++)sh+=`<span class="star-e" style="${i>=p.starsEarned?'opacity:.2':''}">⭐</span>`;
+  document.getElementById('r-stars-row').innerHTML=sh;
+  const wk=p.wrongKps||[];
+  const prev=document.getElementById('reinforce-preview');
+  if(wk.length===0){
+    prev.innerHTML=`<div class="reinforce-preview"><div class="rp-title">🏅 全部答對！補強關直接通關！</div></div>`;
+    document.getElementById('btn-go-reinforce').textContent='🏆 直接通關';
+  } else {
+    const chips=wk.map(kp=>`<span class="rp-kp">${KP_LABELS[kp]||kp}</span>`).join('');
+    prev.innerHTML=`<div class="reinforce-preview"><div class="rp-title">💡 補強關將針對這幾個知識點：</div><div class="rp-kp-list">${chips}</div></div>`;
+  }
+  document.getElementById('r-msg').textContent=
+    r===1?'完美！直接通關吧！':r>=.6?'不錯！補強關針對答錯地方再練！':'沒關係，補強關幫你補強！';
+  S.history=[];goTo('screen-result');
+}
+function startReinforce(){startMode('reinforcement')}
+function skipReinforce(){UP[S.unit].reinforcement=true;S.stars+=3;syncStars();saveProgress();showClear();}
+function showClear(){S.history=[];goTo('screen-clear')}
+function startExplore(){startMode('exploration')}
+function showExploreDone(){
+  const unit=DB.units.find(u=>u.unit_id===S.unit);
+  document.getElementById('q-render').innerHTML=`<div class="question-body" style="text-align:center;padding:36px 18px">
+    <div style="font-size:62px;margin-bottom:10px">🌟</div>
+    <div style="font-size:20px;font-weight:900;margin-bottom:7px">探索完成！</div>
+    <div style="font-size:13px;color:var(--muted);font-weight:600;line-height:1.8">你完成了《${unit.unit_title}》全部三關！<br>獲得 ＋5⭐ 星星！<br><br><span style="font-size:22px">🎊 🎉 ✨</span></div></div>`;
+  setFooter(`<button class="btn btn-lg btn-purple" onclick="goTo('screen-units')">🏠 回到單元列表</button>
+    <button class="btn btn-lg btn-ghost" style="margin-top:2px" onclick="goTo('screen-progress')">📊 看我的進度</button>`);
+}
+ 
+// ═══════════════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════════════
+function renderProgress(){
+  const all=Object.values(UP);
+  document.getElementById('a-ch').textContent=all.filter(p=>p.challenge).length;
+  document.getElementById('a-re').textContent=all.filter(p=>p.reinforcement).length;
+  document.getElementById('a-ex').textContent=all.filter(p=>p.exploration).length;
+  document.getElementById('a-hw').textContent=all.reduce((s,p)=>s+(p.hwDone||0),0);
+  const c=document.getElementById('p-units');c.innerHTML='';
+  DB.units.filter(u=>u.subject==='chinese').forEach((unit,idx)=>{
+    const p=UP[unit.unit_id]||{};
+    const color=['#FF6B6B','#6ECFF0','#6BCB77'][idx%3];
+    const modes=[
+      {k:'challenge',l:'挑戰',cl:'ml-ch',col:'var(--coral)'},
+      {k:'reinforcement',l:'補強',cl:'ml-re',col:'var(--peach)'},
+      {k:'exploration',l:'探索',cl:'ml-ex',col:'var(--lavender)'}
+    ];
+    const mh=modes.map(m=>`<div class="mp-row">
+      <span class="mp-label ${m.cl}">${m.l}</span>
+      <div class="progress-wrap" style="flex:1;height:8px;margin:0">
+        <div class="progress-bar" style="width:${p[m.k]?100:0}%;background:${m.col}"></div>
+      </div>
+      <span class="mp-pct">${p[m.k]?100:0}%</span>
+    </div>`).join('');
+    c.innerHTML+=`<div class="upc"><div class="upc-hd">
+      <div class="upc-num" style="background:${color}">${unit.lesson_order}</div>
+      <div style="flex:1"><div class="upc-title">${unit.unit_title}</div><div class="upc-sub">${unit.version} ．${unit.semester}</div></div>
+      <div style="font-weight:900;color:var(--sun);font-size:16px">${p.starsEarned?'⭐'.repeat(p.starsEarned):'—'}</div>
+    </div>${mh}</div>`;
+  });
+}
+ 
+// INIT
+syncStars();
+</script>
+</body>
+</html>
